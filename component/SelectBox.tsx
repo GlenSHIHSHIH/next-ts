@@ -9,7 +9,7 @@ import { useState } from 'react';
 interface SelectOption {
     SelectName: string,
     OptionValue: number[],
-    DefaultValue: number,
+    // DefaultValue: number,
 }
 
 const SelectBox: React.FC<SelectOption> = (props) => {

@@ -51,10 +51,20 @@ const Home: NextPage = () => {
         <SearchBar />
 
         <SelectBox
+          SelectName={'分類'}
+          OptionValue={process.env.PAGE_SIZE?.split(',').map(
+            function (item) {
+              return parseInt(item, 10);
+            }) as number[]}
+
+        />
+
+        <SelectBox
           SelectName={'筆數'}
-          OptionValue={process.env.PAGE_SIZE?.split(',').map(function (item) {
-            return parseInt(item, 10);
-          }) as number[]}
+          OptionValue={process.env.PAGE_SIZE?.split(',').map(
+            function (item) {
+              return parseInt(item, 10);
+            }) as number[]}
 
         />
 
