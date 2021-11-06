@@ -1,24 +1,29 @@
-import * as React from 'react';
 import Box from '@mui/material/Box';
+import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
+import * as React from 'react';
 import { useState } from 'react';
 
 interface SelectOption {
     SelectName: string,
-    OptionValue: number[],
-    // DefaultValue: number,
+    OptionValue: string[],
+    DefaultValue?: string,
+    SelectSet: (value: string) => void,
 }
 
 const SelectBox: React.FC<SelectOption> = (props) => {
 
-    const { OptionValue, SelectName } = props;
+    const { OptionValue, SelectName, DefaultValue,SelectSet } = props;
     const [selectValue, setSelectValue] = useState('');
 
-    const handleChange = (event: SelectChangeEvent) => {
+    const selectHandleChange = (event: SelectChangeEvent) => {
         setSelectValue(event.target.value as string);
+        if (SelectSet) {
+            SelectSet(event.target.value);
+        }
+
 
     };
 
@@ -28,15 +33,15 @@ const SelectBox: React.FC<SelectOption> = (props) => {
                 <InputLabel id="demo-simple-select-label">{SelectName}</InputLabel>
                 <Select
                     labelId="demo-simple-select-label"
-                    id="demo-simple-select"
                     value={selectValue}
                     label={SelectName}
-                    onChange={handleChange}
+                    onChange={selectHandleChange}
+                    defaultValue={DefaultValue ?? ""}
                 >
                     {
                         OptionValue.map((oValue) => {
                             return (
-                                <MenuItem value={oValue}>{oValue}</MenuItem>
+                                <MenuItem key={SelectName + oValue} value={oValue}>{oValue}</MenuItem>
                             )
                         })
                     }

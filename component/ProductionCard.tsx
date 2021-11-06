@@ -1,5 +1,5 @@
-import React from "react";
 import { Button, Card, CardActions, CardContent, CardHeader, CardMedia, IconButton, Typography } from "@mui/material";
+import React from "react";
 
 
 interface CardProps {
@@ -43,7 +43,7 @@ const ProductionCard: React.FC<CardProps> = (props) => {
             />
             <CardContent>
                 <Typography variant="body2" color="text.secondary">
-                    <div> ${productionPrice} </div>
+                    ${productionPrice} <br />
                     {productionDescript} {/*/敘述*/}
                 </Typography>
             </CardContent>
