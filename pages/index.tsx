@@ -40,17 +40,21 @@ const Home: NextPage = () => {
         }
     ]
 
+    const [page, setPage] = useState(1);
     const [searchMsg, setSearchMsg] = useState<string>("");
     const [selectCategory, setSelectCategory] = useState<string>("");
     const [selectCount, setSelectCount] = useState<number>(Number(process.env.PAGE_SIZE_DEFAULT ?? 20));
 
     useEffect(() => {
-        if (searchMsg != "") {
-            console.log("searchMsg:" + searchMsg);
-            console.log("selectCategory:" + selectCategory);
-            console.log("selectCount:" + selectCount);
-        }
-    }, [searchMsg, selectCategory, selectCount])
+        console.log("page:" + page);
+        console.log("searchMsg:" + searchMsg);
+        console.log("selectCategory:" + selectCategory);
+        console.log("selectCount:" + selectCount);
+    }, [page, searchMsg, selectCategory, selectCount])
+
+    const pageChange = (event: React.ChangeEvent<unknown>, value: number) => {
+        setPage(value);
+    };
 
     const searchChange = (value: string) => {
         setSearchMsg(value);
@@ -110,8 +114,8 @@ const Home: NextPage = () => {
                 </div>
                 <div className={styles.title}>
 
-                    <Pagination count={10} showFirstButton showLastButton />
-                    <Pagination count={10} showFirstButton showLastButton siblingCount={0} boundaryCount={1} />
+                    <Pagination count={10} page={page} onChange={pageChange} showFirstButton showLastButton />
+                    <Pagination count={10} page={page} onChange={pageChange} showFirstButton showLastButton siblingCount={0} boundaryCount={1} />
                 </div>
 
             </main>
