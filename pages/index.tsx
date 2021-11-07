@@ -52,6 +52,13 @@ const Home: NextPage = () => {
         console.log("selectCount:" + selectCount);
     }, [page, searchMsg, selectCategory, selectCount])
 
+    useEffect(() => { //需要換參數
+        console.log("page:" + page);
+        console.log("searchMsg:" + searchMsg);
+        console.log("selectCategory:" + selectCategory);
+        console.log("selectCount:" + selectCount);
+    }, [page, selectCount])
+
     const pageChange = (event: React.ChangeEvent<unknown>, value: number) => {
         setPage(value);
     };
