@@ -63,6 +63,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 function ProductionPage({ category, pList }: InferGetServerSidePropsType<typeof getServerSideProps>) {
 
     const pageCount: number = Math.ceil(pList.count / pList.pageLimit);
+
+    const [searchCheck, setSearchCheck] = useState(false);
     const [page, setPage] = useState(1);
     const [searchMsg, setSearchMsg] = useState<string>("");
     const [selectCategory, setSelectCategory] = useState<string>("");
@@ -80,7 +82,7 @@ function ProductionPage({ category, pList }: InferGetServerSidePropsType<typeof 
         console.log("searchMsg:" + searchMsg);
         console.log("selectCategory:" + selectCategory);
         console.log("selectCount:" + selectCount);
-    }, [page, selectCount])
+    }, [searchCheck, page, selectCount])
 
     const pageChange = (event: React.ChangeEvent<unknown>, value: number) => {
         setPage(value);
@@ -88,6 +90,10 @@ function ProductionPage({ category, pList }: InferGetServerSidePropsType<typeof 
 
     const searchChange = (value: string) => {
         setSearchMsg(value);
+    };
+
+    const searchCheckChange = (value: boolean) => {
+        setSearchCheck(value);
     };
 
     const selectCategoryChange = (value: string) => {
@@ -108,7 +114,7 @@ function ProductionPage({ category, pList }: InferGetServerSidePropsType<typeof 
 
             <main className={styles.main}>
 
-                <SearchBar searchSet={searchChange} />
+                <SearchBar searchSet={searchChange} searchCheckSet={searchCheckChange} />
 
                 <SelectBox
                     SelectName={'分類'}
@@ -124,7 +130,7 @@ function ProductionPage({ category, pList }: InferGetServerSidePropsType<typeof 
                     SelectSet={selectCountChange}
                 />
 
-                <div className={cardScss.card}>
+                {/* <div className={cardScss.card}>
                     {
                         pList?.productionList?.map((p: ProductionCardData) => {
                             return (
@@ -141,7 +147,7 @@ function ProductionPage({ category, pList }: InferGetServerSidePropsType<typeof 
                                 </div>)
                         })
                     }
-                </div>
+                </div> */}
                 <div className={styles.title}>
 
                     <Pagination count={pageCount} page={page} onChange={pageChange} showFirstButton showLastButton />
