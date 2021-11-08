@@ -6,7 +6,8 @@ import * as React from 'react';
 
 interface SearchData {
     searchSet: (text: string) => void;
-    searchCheckSet: (value: boolean) => void;
+    searchCheckSet: () => void;
+    DefaultValue:string;
 }
 
 const SearchBar: React.FC<SearchData> = (props) => {
@@ -14,6 +15,7 @@ const SearchBar: React.FC<SearchData> = (props) => {
     var {
         searchSet,
         searchCheckSet,
+        DefaultValue,
     } = props;
 
     return (
@@ -25,8 +27,9 @@ const SearchBar: React.FC<SearchData> = (props) => {
                 sx={{ ml: 1, flex: 1 }}
                 placeholder="Search Production"
                 onChange={e => searchSet(e.target.value)}
+                defaultValue={DefaultValue}
             />
-            <IconButton type="submit" sx={{ p: '10px' }} aria-label="search" onClick={(e => searchCheckSet(true))} >
+            <IconButton type="button" sx={{ p: '10px' }} aria-label="search" onClick={(e => searchCheckSet)} >
                 <SearchIcon />
             </IconButton>
         </Paper>

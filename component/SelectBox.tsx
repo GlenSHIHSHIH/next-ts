@@ -15,11 +15,11 @@ interface SelectOption {
 
 const SelectBox: React.FC<SelectOption> = (props) => {
 
-    const { OptionValue, SelectName, DefaultValue,SelectSet } = props;
-    const [selectValue, setSelectValue] = useState('');
+    const { OptionValue, SelectName, DefaultValue, SelectSet } = props;
+    const [selectValue, setSelectValue] = useState<string>();
 
     const selectHandleChange = (event: SelectChangeEvent) => {
-        setSelectValue(event.target.value as string);
+        setSelectValue(event.target.value);
         if (SelectSet) {
             SelectSet(event.target.value);
         }
@@ -33,7 +33,7 @@ const SelectBox: React.FC<SelectOption> = (props) => {
                 <InputLabel id="demo-simple-select-label">{SelectName}</InputLabel>
                 <Select
                     labelId="demo-simple-select-label"
-                    value={selectValue}
+                    value={selectValue ?? DefaultValue}
                     label={SelectName}
                     onChange={selectHandleChange}
                     defaultValue={DefaultValue ?? ""}
@@ -41,7 +41,7 @@ const SelectBox: React.FC<SelectOption> = (props) => {
                     {
                         OptionValue.map((oValue) => {
                             return (
-                                <MenuItem key={SelectName + oValue} value={oValue}>{oValue}</MenuItem>
+                                <MenuItem key={SelectName + oValue} value={oValue}>{oValue} </MenuItem>
                             )
                         })
                     }

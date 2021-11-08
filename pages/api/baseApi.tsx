@@ -3,7 +3,7 @@ import axios, { AxiosRequestConfig } from 'axios';
 const TIMEOUT = 5000;
 const devBaseURL = "http://localhost";
 const proBaseURL = "http://localhost";
-console.log(process.env.NODE_ENV);
+console.log("env: "+process.env.NODE_ENV);
 const baseURL = process.env.NODE_ENV === 'development' ? devBaseURL : proBaseURL;
 
 
