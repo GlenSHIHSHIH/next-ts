@@ -10,6 +10,8 @@ interface CardProps {
     productionPrice?: Number;
     shopeeUrl?: string;
     urlName?: string;
+    alt:string;
+
 }
 
 const ProductionCard: React.FC<CardProps> = (props) => {
@@ -22,10 +24,11 @@ const ProductionCard: React.FC<CardProps> = (props) => {
         productionPrice,
         shopeeUrl,
         urlName,
+        alt,
     } = props;
 
     return (
-        <Card sx={{ maxWidth: 345 }}>
+        <Card sx={{ maxWidth: 320 }}>
             <CardHeader
                 action={
                     <IconButton aria-label="settings">
@@ -37,13 +40,16 @@ const ProductionCard: React.FC<CardProps> = (props) => {
             />
             <CardMedia
                 component="img"
-                height="194"
+                height="320"
+                width="320"
                 image={productionIMG} //"圖片路徑"
-                alt="Paella dish"
+                alt={alt}
             />
             <CardContent>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="subtitle1" >
                     ${productionPrice} <br />
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
                     {productionDescript} {/*/敘述*/}
                 </Typography>
             </CardContent>

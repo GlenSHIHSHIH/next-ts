@@ -29,7 +29,7 @@ const SearchBar: React.FC<SearchData> = (props) => {
                 onChange={e => searchSet(e.target.value)}
                 defaultValue={DefaultValue}
             />
-            <IconButton type="button" sx={{ p: '10px' }} aria-label="search" onClick={(e => searchCheckSet)} >
+            <IconButton type="button" sx={{ p: '10px' }} aria-label="search" onClick={searchCheckSet} >
                 <SearchIcon />
             </IconButton>
         </Paper>

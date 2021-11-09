@@ -1,15 +1,16 @@
 // import { GetServerSideProps } from 'next'
 
-import styles from 'styles/Home.module.css';
-import cardScss from 'styles/ProductionCard.module.scss';
 import { Pagination } from "@mui/material";
-import { GetServerSideProps, InferGetServerSidePropsType, NextPage } from "next";
-import Head from "next/head";
-import React, { useEffect, useState } from "react";
 import ProductionCard from "component/ProductionCard";
 import SearchBar from "component/SearchBar";
 import SelectBox from "component/SelectBox";
+import { GetServerSideProps, InferGetServerSidePropsType } from "next";
+import Head from "next/head";
+import { useRouter } from 'next/router';
 import { getCategoriesListList, getProductionList } from "pages/api/productionApi";
+import React, { useEffect, useRef, useState } from "react";
+import styles from 'styles/Home.module.css';
+import cardStyle from 'styles/ProductionCard.module.css';
 
 interface ProductionList {
     count?: Number,
@@ -51,49 +52,69 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
     return {
         props: {
-            // "category": category, "pList": pList 
-            category, pList
+            // "category": category, "pList": pList
+            category, pList, "queryString": context.query
         },
     }
 
 }
 
-
-
-function ProductionPage({ category, pList }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-
+function ProductionPage({ category, pList, queryString }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+    // console.log(queryString);
+    // console.log(pList);
     const pageCount: number = Math.ceil(pList.count / pList.pageLimit);
+    const firstUpdate = useRef(true);
+    const router = useRouter();
+    const [searchCheck, setSearchCheck] = useState<number>(0);
+    const [page, setPage] = useState<number>(pList.page ?? 1);
+    const [searchMsg, setSearchMsg] = useState<string>(queryString.search ?? "");
+    const [selectCategory, setSelectCategory] = useState<string>(queryString.searchCategory ?? "");
+    const [selectCount, setSelectCount] = useState<number>(Number(pList.pageLimit ?? process.env.PAGE_SIZE_DEFAULT));
 
-    const [searchCheck, setSearchCheck] = useState(false);
-    const [page, setPage] = useState(1);
-    const [searchMsg, setSearchMsg] = useState<string>("");
-    const [selectCategory, setSelectCategory] = useState<string>("");
-    const [selectCount, setSelectCount] = useState<number>(Number(process.env.PAGE_SIZE_DEFAULT ?? 20));
-
-    useEffect(() => {
-        console.log("page:" + page);
-        console.log("searchMsg:" + searchMsg);
-        console.log("selectCategory:" + selectCategory);
-        console.log("selectCount:" + selectCount);
-    }, [page, searchMsg, selectCategory, selectCount])
+    const url = (page: number
+        , pageLimit: number
+        , sort: string
+        , sortColumn: string
+        , search: string
+        , searchCategory: string) => {
+        let parameter: string = "?";
+        parameter = parameter + `page=${page}&pageLimit=${pageLimit}&sort=${sort}&sortColumn=${sortColumn}&search=${search}&searchCategory=${searchCategory}`
+        return router.pathname + parameter;
+    };
 
     useEffect(() => { //需要換參數
-        console.log("page:" + page);
-        console.log("searchMsg:" + searchMsg);
-        console.log("selectCategory:" + selectCategory);
-        console.log("selectCount:" + selectCount);
-    }, [searchCheck, page, selectCount])
+        // console.log(firstUpdate.current);
+        if (firstUpdate.current) {
+            firstUpdate.current = false;
+            return;
+        }
+        else {
+            // console.log(url(1, selectCount, 'asc',
+            //     'PId', searchMsg, selectCategory));
+            router.push(url(1, selectCount, 'asc',
+                'PId', searchMsg, selectCategory));
+            // console.log("page:" + page);
+            // console.log("searchMsg:" + searchMsg);
+            // console.log("selectCategory:" + selectCategory);
+            // console.log("selectCount:" + selectCount);
+        }
+    }, [searchCheck, selectCount])
 
     const pageChange = (event: React.ChangeEvent<unknown>, value: number) => {
         setPage(value);
+        // console.log(url(1, selectCount, 'asc',
+        //     'PId', searchMsg, selectCategory));
+        router.push(url(value, selectCount, 'asc',
+            'PId', searchMsg, selectCategory));
     };
 
     const searchChange = (value: string) => {
         setSearchMsg(value);
     };
 
-    const searchCheckChange = (value: boolean) => {
-        setSearchCheck(value);
+    const searchCheckChange = () => {
+        console.log(searchCheck + 1)
+        setSearchCheck(searchCheck + 1);
     };
 
     const selectCategoryChange = (value: string) => {
@@ -103,6 +124,16 @@ function ProductionPage({ category, pList }: InferGetServerSidePropsType<typeof 
     const selectCountChange = (value: string) => {
         setSelectCount(Number(value));
     };
+
+    const substring = (value: string | undefined, count: number) => {
+        let str = "";
+        if (value != undefined && value.length <= count) {
+            str = value;
+        } else {
+            str = value?.substring(0, count - 1) + "...";
+        }
+        return str;
+    }
 
     return (
         <div className={styles.container}>
@@ -114,44 +145,47 @@ function ProductionPage({ category, pList }: InferGetServerSidePropsType<typeof 
 
             <main className={styles.main}>
 
-                <SearchBar searchSet={searchChange} searchCheckSet={searchCheckChange} />
+                <div>
+                    <SearchBar searchSet={searchChange} searchCheckSet={searchCheckChange} DefaultValue={searchMsg} />
+                    <SelectBox
+                        selectName={'分類'}
+                        optionValue={category}
+                        defaultValue={selectCategory}
+                        selectSet={selectCategoryChange}
+                        optionAll={true}
+                    />
+                    <SelectBox
+                        selectName={'筆數'}
+                        optionValue={process.env.PAGE_SIZE?.split(',') as string[]}
+                        defaultValue={selectCount.toString()}
+                        selectSet={selectCountChange}
+                        optionAll={false}
+                    />
+                    <Pagination count={pageCount} page={page} onChange={pageChange} showFirstButton showLastButton siblingCount={0} boundaryCount={0} />
+                </div>
 
-                <SelectBox
-                    SelectName={'分類'}
-                    OptionValue={category}
-                    DefaultValue={""}
-                    SelectSet={selectCategoryChange}
-                />
-
-                <SelectBox
-                    SelectName={'筆數'}
-                    OptionValue={process.env.PAGE_SIZE?.split(',') as string[]}
-                    DefaultValue={(process.env.PAGE_SIZE_DEFAULT ?? "20")}
-                    SelectSet={selectCountChange}
-                />
-
-                {/* <div className={cardScss.card}>
+                <div className={cardStyle.card}>
                     {
                         pList?.productionList?.map((p: ProductionCardData) => {
                             return (
                                 <div key={p.name + (p.url)}>
                                     <ProductionCard
-                                        productionName={(p.name?.length < 15) ? p.name : p.name?.substring(0, 15) + "..."}
-                                        productionCategory={p.categories}
+                                        productionName={substring(p.name,26)}
+                                        productionCategory={substring(p.categories,18)}
                                         productionIMG={p.image}
-                                        productionDescript={((p.description) != undefined && (p.description.length < 20)) ? p.description : p.description?.substring(0, 20) + "..."}
+                                        productionDescript={substring(p.description,50)}
                                         productionPrice={p.price}
                                         shopeeUrl={p.url}
                                         urlName={"Shopee 直接購買"}
+                                        alt={substring(p.name,26)}
                                     />
                                 </div>)
                         })
                     }
-                </div> */}
-                <div className={styles.title}>
+                </div>
 
+                <div className={styles.title}>
                     <Pagination count={pageCount} page={page} onChange={pageChange} showFirstButton showLastButton />
-                    <Pagination count={pageCount} page={page} onChange={pageChange} showFirstButton showLastButton siblingCount={0} boundaryCount={1} />
                 </div>
 
             </main>

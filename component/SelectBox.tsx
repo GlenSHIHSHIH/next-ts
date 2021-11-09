@@ -7,21 +7,22 @@ import * as React from 'react';
 import { useState } from 'react';
 
 interface SelectOption {
-    SelectName: string,
-    OptionValue: string[],
-    DefaultValue?: string,
-    SelectSet: (value: string) => void,
+    selectName: string,
+    optionValue: string[],
+    optionAll: boolean,
+    defaultValue?: string,
+    selectSet: (value: string) => void,
 }
 
 const SelectBox: React.FC<SelectOption> = (props) => {
 
-    const { OptionValue, SelectName, DefaultValue, SelectSet } = props;
+    const { optionValue, optionAll, selectName, defaultValue, selectSet } = props;
     const [selectValue, setSelectValue] = useState<string>();
 
     const selectHandleChange = (event: SelectChangeEvent) => {
         setSelectValue(event.target.value);
-        if (SelectSet) {
-            SelectSet(event.target.value);
+        if (selectSet) {
+            selectSet(event.target.value);
         }
 
 
@@ -30,19 +31,18 @@ const SelectBox: React.FC<SelectOption> = (props) => {
     return (
         <Box sx={{ minWidth: 120 }}>
             <FormControl fullWidth>
-                <InputLabel id="demo-simple-select-label">{SelectName}</InputLabel>
+                <InputLabel id="demo-simple-select-label">{selectName}</InputLabel>
                 <Select
                     labelId="demo-simple-select-label"
-                    value={selectValue ?? DefaultValue}
-                    label={SelectName}
+                    value={selectValue ?? defaultValue}
+                    label={selectName}
                     onChange={selectHandleChange}
-                    defaultValue={DefaultValue ?? ""}
+                    defaultValue={defaultValue ?? ""}
                 >
+                    {optionAll && <MenuItem key={"All"} value={""}>{"All"} </MenuItem>}
                     {
-                        OptionValue.map((oValue) => {
-                            return (
-                                <MenuItem key={SelectName + oValue} value={oValue}>{oValue} </MenuItem>
-                            )
+                        optionValue.map((oValue) => {
+                            return (<MenuItem key={selectName + oValue} value={oValue}>{oValue} </MenuItem>)
                         })
                     }
                 </Select>
