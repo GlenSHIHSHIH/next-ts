@@ -9,7 +9,7 @@ import Head from "next/head";
 import { useRouter } from 'next/router';
 import { getCategoriesListList, getProductionList } from "pages/api/productionApi";
 import React, { useEffect, useRef, useState } from "react";
-import listStyle from 'styles/list.module.css';
+import productionListStyle from 'styles/productionList.module.css';
 
 interface ProductionList {
     count?: Number,
@@ -131,16 +131,16 @@ function ProductionPage({ category, pList, queryString }: InferGetServerSideProp
     }
 
     return (
-        <div className={listStyle.container}>
+        <div className={productionListStyle.container}>
             <Head>
                 <title>welecome to kumkum shop</title>
                 <meta name="description" content="kumkumshop" />
                 <link rel="icon" href="/favicon.ico" />
             </Head>
 
-            <main className={listStyle.main}>
+            <main className={productionListStyle.main}>
 
-                <div className={listStyle.searchBar}>
+                <div className={productionListStyle.searchBar}>
                     <SearchBar searchSet={searchChange} searchCheckSet={searchCheckChange} DefaultValue={searchMsg} />
                     <SelectBox
                         selectName={'分類'}
@@ -159,12 +159,12 @@ function ProductionPage({ category, pList, queryString }: InferGetServerSideProp
                     <Pagination count={pageCount} page={page} onChange={pageChange} showFirstButton showLastButton siblingCount={0} boundaryCount={0} />
                 </div>
 
-                <div className={listStyle.cardContainer}>
-                    <div className={listStyle.card}>
+                <div className={productionListStyle.cardContainer}>
+                    <div className={productionListStyle.card}>
                         {
                             pList?.productionList?.map((p: ProductionCardData) => {
                                 return (
-                                    <div className={listStyle.carditem} key={p.name + (p.url)}>
+                                    <div className={productionListStyle.carditem} key={p.name + (p.url)}>
                                         <ProductionCard
                                             productionName={substring(p.name, 26)}
                                             productionCategory={substring(p.categories, 18)}
@@ -182,7 +182,7 @@ function ProductionPage({ category, pList, queryString }: InferGetServerSideProp
                 </div>
 
 
-                <div className={listStyle.title}>
+                <div className={productionListStyle.title}>
                     <Pagination count={pageCount} page={page} onChange={pageChange} showFirstButton showLastButton />
                 </div>
 
