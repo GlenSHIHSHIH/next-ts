@@ -1,5 +1,6 @@
 import { Button, Card, CardActions, CardContent, CardHeader, CardMedia, IconButton, Typography } from "@mui/material";
 import React from "react";
+import cardStyle from "styles/component/ProductionCard.module.css";
 
 
 interface CardProps {
@@ -45,7 +46,7 @@ const ProductionCard: React.FC<CardProps> = (props) => {
                 image={productionIMG} //"圖片路徑"
                 alt={alt}
             />
-            <CardContent>
+            <CardContent className={cardStyle.cardContent}>
                 <Typography variant="subtitle1" >
                     ${productionPrice} <br />
                 </Typography>

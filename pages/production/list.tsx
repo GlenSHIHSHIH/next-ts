@@ -9,8 +9,7 @@ import Head from "next/head";
 import { useRouter } from 'next/router';
 import { getCategoriesListList, getProductionList } from "pages/api/productionApi";
 import React, { useEffect, useRef, useState } from "react";
-import styles from 'styles/Home.module.css';
-import cardStyle from 'styles/ProductionCard.module.css';
+import listStyle from 'styles/list.module.css';
 
 interface ProductionList {
     count?: Number,
@@ -89,8 +88,6 @@ function ProductionPage({ category, pList, queryString }: InferGetServerSideProp
             return;
         }
         else {
-            // console.log(url(1, selectCount, 'asc',
-            //     'PId', searchMsg, selectCategory));
             router.push(url(1, selectCount, 'asc',
                 'PId', searchMsg, selectCategory));
             // console.log("page:" + page);
@@ -102,8 +99,6 @@ function ProductionPage({ category, pList, queryString }: InferGetServerSideProp
 
     const pageChange = (event: React.ChangeEvent<unknown>, value: number) => {
         setPage(value);
-        // console.log(url(1, selectCount, 'asc',
-        //     'PId', searchMsg, selectCategory));
         router.push(url(value, selectCount, 'asc',
             'PId', searchMsg, selectCategory));
     };
@@ -136,16 +131,16 @@ function ProductionPage({ category, pList, queryString }: InferGetServerSideProp
     }
 
     return (
-        <div className={styles.container}>
+        <div className={listStyle.container}>
             <Head>
-                <title>Create Next App</title>
+                <title>welecome to kumkum shop</title>
                 <meta name="description" content="kumkumshop" />
                 <link rel="icon" href="/favicon.ico" />
             </Head>
 
-            <main className={styles.main}>
+            <main className={listStyle.main}>
 
-                <div>
+                <div className={listStyle.searchBar}>
                     <SearchBar searchSet={searchChange} searchCheckSet={searchCheckChange} DefaultValue={searchMsg} />
                     <SelectBox
                         selectName={'分類'}
@@ -164,27 +159,30 @@ function ProductionPage({ category, pList, queryString }: InferGetServerSideProp
                     <Pagination count={pageCount} page={page} onChange={pageChange} showFirstButton showLastButton siblingCount={0} boundaryCount={0} />
                 </div>
 
-                <div className={cardStyle.card}>
-                    {
-                        pList?.productionList?.map((p: ProductionCardData) => {
-                            return (
-                                <div key={p.name + (p.url)}>
-                                    <ProductionCard
-                                        productionName={substring(p.name,26)}
-                                        productionCategory={substring(p.categories,18)}
-                                        productionIMG={p.image}
-                                        productionDescript={substring(p.description,50)}
-                                        productionPrice={p.price}
-                                        shopeeUrl={p.url}
-                                        urlName={"Shopee 直接購買"}
-                                        alt={substring(p.name,26)}
-                                    />
-                                </div>)
-                        })
-                    }
+                <div className={listStyle.cardContainer}>
+                    <div className={listStyle.card}>
+                        {
+                            pList?.productionList?.map((p: ProductionCardData) => {
+                                return (
+                                    <div className={listStyle.carditem} key={p.name + (p.url)}>
+                                        <ProductionCard
+                                            productionName={substring(p.name, 26)}
+                                            productionCategory={substring(p.categories, 18)}
+                                            productionIMG={p.image}
+                                            productionDescript={substring(p.description, 75)}
+                                            productionPrice={p.price}
+                                            shopeeUrl={p.url}
+                                            urlName={"Shopee 購買"}
+                                            alt={substring(p.name, 26)}
+                                        />
+                                    </div>)
+                            })
+                        }
+                    </div>
                 </div>
 
-                <div className={styles.title}>
+
+                <div className={listStyle.title}>
                     <Pagination count={pageCount} page={page} onChange={pageChange} showFirstButton showLastButton />
                 </div>
 
