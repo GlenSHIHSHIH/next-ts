@@ -1,6 +1,6 @@
 // import { GetServerSideProps } from 'next'
 
-import { Pagination } from "@mui/material";
+import { Grid, Pagination } from "@mui/material";
 import ProductionCard from "component/ProductionCard";
 import SearchBar from "component/SearchBar";
 import SelectBox from "component/SelectBox";
@@ -138,9 +138,9 @@ function ProductionPage({ category, pList, queryString }: InferGetServerSideProp
                 <link rel="icon" href="/favicon.ico" />
             </Head>
 
-            <main className={productionListStyle.main}>
-
-                <div className={productionListStyle.searchBar}>
+            {/* <main className={productionListStyle.main}> */}
+            <Grid container direction="column" justifyContent="flex-start" alignItems="baseline">
+                <Grid container item spacing={1} direction="row" justifyContent="center" alignItems="flex-end">
                     <SearchBar searchSet={searchChange} searchCheckSet={searchCheckChange} DefaultValue={searchMsg} />
                     <SelectBox
                         selectName={'分類'}
@@ -157,37 +157,37 @@ function ProductionPage({ category, pList, queryString }: InferGetServerSideProp
                         optionAll={false}
                     />
                     <Pagination count={pageCount} page={page} onChange={pageChange} showFirstButton showLastButton siblingCount={0} boundaryCount={0} />
-                </div>
+                </Grid>
 
-                <div className={productionListStyle.cardContainer}>
-                    <div className={productionListStyle.card}>
-                        {
-                            pList?.productionList?.map((p: ProductionCardData) => {
-                                return (
-                                    <div className={productionListStyle.carditem} key={p.name + (p.url)}>
-                                        <ProductionCard
-                                            productionName={substring(p.name, 26)}
-                                            productionCategory={substring(p.categories, 18)}
-                                            productionIMG={p.image}
-                                            productionDescript={substring(p.description, 75)}
-                                            productionPrice={p.price}
-                                            shopeeUrl={p.url}
-                                            urlName={"Shopee 購買"}
-                                            alt={substring(p.name, 26)}
-                                        />
-                                    </div>)
-                            })
-                        }
-                    </div>
-                </div>
+                <Grid container item direction="row" justifyContent="center" alignItems="baseline" width="80%" >
+                    {
+                        pList?.productionList?.map((p: ProductionCardData) => {
+                            return (
+                                <Grid item direction="row" justifyContent="flex-start" alignItems="baseline" margin="10px" key={p.name + (p.url)}>
 
+                                    <ProductionCard
+                                        productionName={substring(p.name, 26)}
+                                        productionCategory={substring(p.categories, 18)}
+                                        productionIMG={p.image}
+                                        productionDescript={substring(p.description, 75)}
+                                        productionPrice={p.price}
+                                        shopeeUrl={p.url}
+                                        urlName={"Shopee 購買"}
+                                        alt={substring(p.name, 26)}
+                                    />
+                                </Grid>
+                            )
+                        })
+                    }
+                </Grid>
 
                 <div className={productionListStyle.title}>
                     <Pagination count={pageCount} page={page} onChange={pageChange} showFirstButton showLastButton />
                 </div>
 
-            </main>
-        </div>
+                {/* </main> */}
+            </Grid>
+        </div >
     )
 }
 
