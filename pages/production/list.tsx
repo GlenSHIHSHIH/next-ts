@@ -1,6 +1,6 @@
 // import { GetServerSideProps } from 'next'
 
-import { Grid, Pagination } from "@mui/material";
+import { Container, Grid, Pagination } from "@mui/material";
 import ProductionCard from "component/ProductionCard";
 import SearchBar from "component/SearchBar";
 import SelectBox from "component/SelectBox";
@@ -9,7 +9,6 @@ import Head from "next/head";
 import { useRouter } from 'next/router';
 import { getCategoriesListList, getProductionList } from "pages/api/productionApi";
 import React, { useEffect, useRef, useState } from "react";
-import productionListStyle from 'styles/productionList.module.css';
 
 interface ProductionList {
     count?: Number,
@@ -131,15 +130,14 @@ function ProductionPage({ category, pList, queryString }: InferGetServerSideProp
     }
 
     return (
-        <div className={productionListStyle.container}>
+        <Container maxWidth="xl">
             <Head>
                 <title>welecome to kumkum shop</title>
                 <meta name="description" content="kumkumshop" />
                 <link rel="icon" href="/favicon.ico" />
             </Head>
 
-            {/* <main className={productionListStyle.main}> */}
-            <Grid container direction="column" justifyContent="flex-start" alignItems="baseline">
+
                 <Grid container item spacing={1} direction="row" justifyContent="center" alignItems="flex-end">
                     <SearchBar searchSet={searchChange} searchCheckSet={searchCheckChange} DefaultValue={searchMsg} />
                     <SelectBox
@@ -159,11 +157,11 @@ function ProductionPage({ category, pList, queryString }: InferGetServerSideProp
                     <Pagination count={pageCount} page={page} onChange={pageChange} showFirstButton showLastButton siblingCount={0} boundaryCount={0} />
                 </Grid>
 
-                <Grid container item direction="row" justifyContent="center" alignItems="baseline" width="80%" >
+                <Grid container item direction="row" justifyContent="center" alignItems="baseline" width="100%" >
                     {
                         pList?.productionList?.map((p: ProductionCardData) => {
                             return (
-                                <Grid item direction="row" justifyContent="flex-start" alignItems="baseline" margin="10px" key={p.name + (p.url)}>
+                                <Grid item  margin="10px" key={p.name + (p.url)}>
 
                                     <ProductionCard
                                         productionName={substring(p.name, 26)}
@@ -181,13 +179,11 @@ function ProductionPage({ category, pList, queryString }: InferGetServerSideProp
                     }
                 </Grid>
 
-                <div className={productionListStyle.title}>
+                <Grid container item direction="row" justifyContent="center" alignItems="baseline" width="100%" >
                     <Pagination count={pageCount} page={page} onChange={pageChange} showFirstButton showLastButton />
-                </div>
+                </Grid>
 
-                {/* </main> */}
-            </Grid>
-        </div >
+            </Container>
     )
 }
 
