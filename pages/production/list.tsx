@@ -1,5 +1,3 @@
-// import { GetServerSideProps } from 'next'
-
 import { Container, Grid, Pagination } from "@mui/material";
 import ProductionCard from "component/ProductionCard";
 import SearchBar from "component/SearchBar";
@@ -9,6 +7,8 @@ import Head from "next/head";
 import { useRouter } from 'next/router';
 import { getCategoriesListList, getProductionList } from "pages/api/productionApi";
 import React, { useEffect, useRef, useState } from "react";
+import { Carousel } from 'react-responsive-carousel';
+import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
 
 interface ProductionList {
     count?: Number,
@@ -129,6 +129,10 @@ function ProductionPage({ category, pList, queryString }: InferGetServerSideProp
         return str;
     }
 
+    const image: string[] = [
+        "https://cf.shopee.tw/file/f7883d9860f030c83b2f41d862bc25b0",
+        "https://cf.shopee.tw/file/890b5a720f54ee5c531fe38c5373c868"];
+
     return (
         <Container maxWidth="xl">
             <Head>
@@ -138,52 +142,66 @@ function ProductionPage({ category, pList, queryString }: InferGetServerSideProp
             </Head>
 
 
-                <Grid container item spacing={1} direction="row" justifyContent="center" alignItems="flex-end">
-                    <SearchBar searchSet={searchChange} searchCheckSet={searchCheckChange} DefaultValue={searchMsg} />
-                    <SelectBox
-                        selectName={'分類'}
-                        optionValue={category}
-                        defaultValue={selectCategory}
-                        selectSet={selectCategoryChange}
-                        optionAll={true}
-                    />
-                    <SelectBox
-                        selectName={'筆數'}
-                        optionValue={process.env.PAGE_SIZE?.split(',') as string[]}
-                        defaultValue={selectCount.toString()}
-                        selectSet={selectCountChange}
-                        optionAll={false}
-                    />
-                    <Pagination count={pageCount} page={page} onChange={pageChange} showFirstButton showLastButton siblingCount={0} boundaryCount={0} />
+            <Grid container item spacing={2} direction="row" justifyContent="center" alignItems="flex-end">
+                <Grid container item spacing={1} margin={1} justifyContent="center">
+                    <Carousel showThumbs={false} infiniteLoop={true} showStatus={false}>
+                        {
+                            image.map((imageUrl) => {
+                                return (
+                                    <div>
+                                        <img src={imageUrl} />
+                                        {/* <p className="legend">Legend 1</p> */}
+                                    </div>
+                                )
+                            })
+                        }
+                    </Carousel>
                 </Grid>
+                <SearchBar searchSet={searchChange} searchCheckSet={searchCheckChange} DefaultValue={searchMsg} />
+                <SelectBox
+                    selectName={'分類'}
+                    optionValue={category}
+                    defaultValue={selectCategory}
+                    selectSet={selectCategoryChange}
+                    optionAll={true}
+                />
+                <SelectBox
+                    selectName={'筆數'}
+                    optionValue={process.env.PAGE_SIZE?.split(',') as string[]}
+                    defaultValue={selectCount.toString()}
+                    selectSet={selectCountChange}
+                    optionAll={false}
+                />
+                <Pagination count={pageCount} page={page} onChange={pageChange} showFirstButton showLastButton siblingCount={0} boundaryCount={0} />
+            </Grid>
 
-                <Grid container item direction="row" justifyContent="center" alignItems="baseline" width="100%" >
-                    {
-                        pList?.productionList?.map((p: ProductionCardData) => {
-                            return (
-                                <Grid item  margin="10px" key={p.name + (p.url)}>
+            <Grid container item direction="row" justifyContent="center" alignItems="baseline" width="100%" >
+                {
+                    pList?.productionList?.map((p: ProductionCardData) => {
+                        return (
+                            <Grid item margin="10px" key={p.name + (p.url)}>
 
-                                    <ProductionCard
-                                        productionName={substring(p.name, 26)}
-                                        productionCategory={substring(p.categories, 18)}
-                                        productionIMG={p.image}
-                                        productionDescript={substring(p.description, 75)}
-                                        productionPrice={p.price}
-                                        shopeeUrl={p.url}
-                                        urlName={"Shopee 購買"}
-                                        alt={substring(p.name, 26)}
-                                    />
-                                </Grid>
-                            )
-                        })
-                    }
-                </Grid>
+                                <ProductionCard
+                                    productionName={substring(p.name, 26)}
+                                    productionCategory={substring(p.categories, 18)}
+                                    productionIMG={p.image}
+                                    productionDescript={substring(p.description, 75)}
+                                    productionPrice={p.price}
+                                    shopeeUrl={p.url}
+                                    urlName={"Shopee 購買"}
+                                    alt={substring(p.name, 26)}
+                                />
+                            </Grid>
+                        )
+                    })
+                }
+            </Grid>
 
-                <Grid container item direction="row" justifyContent="center" alignItems="baseline" width="100%" >
-                    <Pagination count={pageCount} page={page} onChange={pageChange} showFirstButton showLastButton />
-                </Grid>
+            <Grid container item direction="row" justifyContent="center" alignItems="baseline" width="100%" >
+                <Pagination count={pageCount} page={page} onChange={pageChange} showFirstButton showLastButton />
+            </Grid>
 
-            </Container>
+        </Container>
     )
 }
 
