@@ -144,7 +144,7 @@ function ProductionPage({ category, pList, queryString }: InferGetServerSideProp
 
             <Grid container item spacing={2} direction="row" justifyContent="center" alignItems="flex-end">
                 <Grid container item spacing={1} margin={1} justifyContent="center">
-                    <Carousel showThumbs={false} infiniteLoop={true} showStatus={false}>
+                    <Carousel showThumbs={false} infiniteLoop={true} showStatus={false} autoPlay={true} interval={4000}>
                         {
                             image.map((imageUrl) => {
                                 return (
