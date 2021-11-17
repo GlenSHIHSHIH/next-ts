@@ -10,10 +10,18 @@ import React, { useEffect, useRef, useState } from "react";
 import { Carousel } from 'react-responsive-carousel';
 import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
 
+interface PageData {
+    count: Number,
+    page: Number,
+    pageLimit: Number,
+    sort: string,
+    sortColumn: string,
+    search: string,
+    searchCategory: string
+}
+
+
 interface ProductionList {
-    count?: Number,
-    page?: Number,
-    pageLimit?: Number,
     productionList?: ProductionCardData[],
 }
 
@@ -32,6 +40,15 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
     var category: string[] = [];
     var pList: ProductionList = {};
+    var pageData: PageData = {
+        count: 0,
+        page: 1,
+        pageLimit: 15,
+        sort: "",
+        sortColumn: "",
+        search: "",
+        searchCategory: ""
+    };
     await getCategoriesListList(null)?.then(res => {
         // console.log("get categories list");
         // console.log(res);
@@ -43,7 +60,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     await getProductionList(context.query)?.then(res => {
         // console.log("get production list");
         // console.log(res);
-        pList = res.data;
+        pList.productionList = res.data.productionList;
+        pageData = res.data.pageData;
     }).catch(error => {
         console.log("錯誤");
     })
@@ -51,25 +69,26 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     return {
         props: {
             // "category": category, "pList": pList
-            category, pList, "queryString": context.query
+            category, pList, pageData
         },
     }
 
 }
 
-function ProductionPage({ category, pList, queryString }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-    // console.log(queryString);
+function ProductionPage({ category, pList, pageData }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+    console.log(pageData);
     // console.log(pList);
-    const pageCount: number = Math.ceil(pList.count / pList.pageLimit);
+    const pageCount: number = Math.ceil(pageData.count / pageData.pageLimit);
     const firstUpdate = useRef(true);
     const router = useRouter();
     const [searchCheck, setSearchCheck] = useState<number>(0);
-    const [page, setPage] = useState<number>(pList.page ?? 1);
-    const [searchMsg, setSearchMsg] = useState<string>(queryString.search ?? "");
-    const [selectCategory, setSelectCategory] = useState<string>(queryString.searchCategory ?? "");
-    const [selectCount, setSelectCount] = useState<number>(Number(pList.pageLimit ?? process.env.PAGE_SIZE_DEFAULT));
+    const [page, setPage] = useState<number>(pageData.page);
+    const [searchMsg, setSearchMsg] = useState<string>(pageData.search);
+    const [selectCategory, setSelectCategory] = useState<string>(pageData.searchCategory);
+    const [selectCount, setSelectCount] = useState<number>(Number(pageData.pageLimit ?? process.env.PAGE_SIZE_DEFAULT));
 
-    const url = (page: number
+    const url = (
+        page: number
         , pageLimit: number
         , sort: string
         , sortColumn: string
