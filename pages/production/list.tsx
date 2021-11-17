@@ -1,4 +1,4 @@
-import { Container, Grid, Pagination } from "@mui/material";
+import { Container, Grid, Pagination, Typography } from "@mui/material";
 import ProductionCard from "component/ProductionCard";
 import SearchBar from "component/SearchBar";
 import SelectBox from "component/SelectBox";
@@ -195,6 +195,7 @@ function ProductionPage({ category, pList, pageData }: InferGetServerSidePropsTy
             </Grid>
 
             <Grid container item direction="row" justifyContent="center" alignItems="baseline" width="100%" >
+                {pList.productionList == null && <Typography variant="h2" color="text.secondary">此條件搜尋不到商品</Typography>}
                 {
                     pList?.productionList?.map((p: ProductionCardData) => {
                         return (
