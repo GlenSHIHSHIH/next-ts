@@ -5,7 +5,7 @@ import SelectBox from "component/SelectBox";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import Head from "next/head";
 import { useRouter } from 'next/router';
-import { getCategoriesListList, getProductionList } from "pages/api/productionApi";
+import { getCategoriesList, getProductionList } from "pages/api/productionApi";
 import React, { useEffect, useRef, useState } from "react";
 import { Carousel } from 'react-responsive-carousel';
 import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
@@ -49,7 +49,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         search: "",
         searchCategory: ""
     };
-    await getCategoriesListList(null)?.then(res => {
+    await getCategoriesList(null)?.then(res => {
         // console.log("get categories list");
         // console.log(res);
         category = res.data.category;

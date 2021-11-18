@@ -13,8 +13,8 @@ export const getProductionList = (data: null | any) => {
     return api("get", "/production/list", data, null)
 }
 
-export const getCategoriesListList = (data: null | any) => {
-    return api("get", "/categoriesList/list", data, null)
+export const getCategoriesList = (data: null | any) => {
+    return api("get", "/categories/list", data, null)
 }
 
 // export const userDelete = (userNo: null | any) => {
