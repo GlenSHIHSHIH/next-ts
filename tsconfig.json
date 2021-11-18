@@ -7,7 +7,7 @@
       "@pages/*": ["pages/*"],
       "@layouts/*": ["layouts/*"],
       "@styles/*": ["styles/*"],
-      "@utils/*": ["utils/*"]
+      "@utils/*": ["utils/*"],
     },
 
     "target": "es5",

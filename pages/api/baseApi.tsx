@@ -1,18 +1,18 @@
 import axios, { AxiosRequestConfig } from 'axios';
 
 const TIMEOUT = 5000;
-const devBaseURL = "http://localhost";
-const proBaseURL = "http://localhost";
+const devBaseURL = process.env.PRODUCTION_BASE_URL;
+const proBaseURL = process.env.DEVELOP_BASEURL;
 console.log("env: "+process.env.NODE_ENV);
-const baseURL = process.env.NODE_ENV === 'development' ? devBaseURL : proBaseURL;
 
+export const baseURL = process.env.NODE_ENV === 'development' ? devBaseURL : proBaseURL;
+console.log(baseURL);
 
 const instance = axios.create({
     timeout: TIMEOUT,
     baseURL: baseURL,
     headers: { 'Content-Type': 'application/json' },
     responseType: 'json',
-
 })
 
 instance.interceptors.request.use(config => {
