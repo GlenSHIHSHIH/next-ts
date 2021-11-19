@@ -170,46 +170,50 @@ export default function ProductionPage({ carousel, category, pList, pageData, cu
 				json={JSON.stringify(pList)}
 			/>
 
-			<Grid container item spacing={2} margin={2} direction="row" justifyContent="center" alignItems="flex-end">
+			<Grid container spacing={2} margin={2} direction="column" justifyContent="center" >
 				{carousel &&
 					<Grid item margin={1} justifyContent="center">
 						<Carousel showThumbs={false} infiniteLoop={true} showStatus={false} autoPlay={true} interval={4000}>
 							{
 								carousel?.map((c: CarouselData) => {
 									return (
-										<div key={"Carousel" + c.id.toString()}>
-											<img src={c.image} alt={c.name} />
-											{/* <p className="legend">Legend 1</p> */}
-										</div>
+										<a href={c.url} target="_blank">
+											<div key={"Carousel" + c.id.toString()}>
+												<img src={c.image} alt={c.name} />
+												{/* <p className="legend">Legend 1</p> */}
+											</div>
+										</a>
 									)
 								})
 							}
 						</Carousel>
 					</Grid>
 				}
-				<Grid item>
-					<SearchBar searchSet={searchChange} searchCheckSet={searchCheckChange} DefaultValue={searchMsg} />
-				</Grid>
-				<Grid item>
-					<SelectBox
-						selectName={'分類'}
-						optionValue={category}
-						defaultValue={selectCategory}
-						selectSet={selectCategoryChange}
-						optionAll={true}
-					/>
-				</Grid>
-				<Grid item>
-					<SelectBox
-						selectName={'筆數'}
-						optionValue={process.env.PAGE_SIZE?.split(',') as string[]}
-						defaultValue={selectCount.toString()}
-						selectSet={selectCountChange}
-						optionAll={false}
-					/>
-				</Grid>
-				<Grid item>
-					<Pagination count={pageCount} page={page} onChange={pageChange} showFirstButton showLastButton siblingCount={0} boundaryCount={0} />
+				<Grid container spacing={2} marginTop={2} direction="row" justifyContent="center">
+					<Grid item md={4} xs={10}>
+						<SearchBar searchSet={searchChange} searchCheckSet={searchCheckChange} DefaultValue={searchMsg} />
+					</Grid>
+					<Grid item >
+						<SelectBox
+							selectName={'分類'}
+							optionValue={category}
+							defaultValue={selectCategory}
+							selectSet={selectCategoryChange}
+							optionAll={true}
+						/>
+					</Grid>
+					<Grid item >
+						<SelectBox
+							selectName={'筆數'}
+							optionValue={process.env.PAGE_SIZE?.split(',') as string[]}
+							defaultValue={selectCount.toString()}
+							selectSet={selectCountChange}
+							optionAll={false}
+						/>
+					</Grid>
+					<Grid container item md={4} xs={10} justifyContent="center" alignItems="center">
+						<Pagination count={pageCount} page={page} onChange={pageChange} showFirstButton showLastButton siblingCount={0} boundaryCount={0} />
+					</Grid>
 				</Grid>
 			</Grid>
 
