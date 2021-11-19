@@ -40,7 +40,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
 }
 
-function ProductionIntroduce({ prodcution }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function ProductionIntroduce({ prodcution }: InferGetServerSidePropsType<typeof getServerSideProps>) {
     // let data: ProductionCardData;
     let data: ProductionCardData;
     data = prodcution;
@@ -66,5 +66,3 @@ function ProductionIntroduce({ prodcution }: InferGetServerSidePropsType<typeof 
         </Container>
     );
 }
-
-export default ProductionIntroduce;

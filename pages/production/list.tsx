@@ -1,11 +1,11 @@
 import { Container, Grid, Pagination, Typography } from "@mui/material";
+import getCurrentUrl from "@utils/base_fucntion";
 import HeaderTitle from "component/HeaderTitle";
 import ProductionCard from "component/ProductionCard";
 import SearchBar from "component/SearchBar";
 import SelectBox from "component/SelectBox";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { useRouter } from 'next/router';
-import { baseURL } from "pages/api/baseApi";
 import { getCarouselList, getCategoryList, getProductionList } from "pages/api/productionApi";
 import React, { useEffect, useRef, useState } from "react";
 import { Carousel } from 'react-responsive-carousel';
@@ -42,6 +42,8 @@ interface ProductionCardData {
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
+
+	var currentUrl = getCurrentUrl(context);
 
 	var category: string[] = [];
 	var pList: ProductionCardData[] = [];
@@ -83,12 +85,12 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 	return {
 		props: {
 			// "category": category, "pList": pList
-			carousel, category, pList, pageData
+			carousel, category, pList, pageData, currentUrl
 		},
 	}
 }
 
-function ProductionPage({ carousel, category, pList, pageData }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function ProductionPage({ carousel, category, pList, pageData, currentUrl }: InferGetServerSidePropsType<typeof getServerSideProps>) {
 
 	const pageCount: number = Math.ceil(pageData.count / pageData.pageLimit);
 	const firstUpdate = useRef(true);
@@ -138,7 +140,7 @@ function ProductionPage({ carousel, category, pList, pageData }: InferGetServerS
 	};
 
 	const searchCheckChange = () => {
-		console.log(searchCheck + 1)
+		// console.log(searchCheck + 1)
 		setSearchCheck(searchCheck + 1);
 	};
 
@@ -163,43 +165,52 @@ function ProductionPage({ carousel, category, pList, pageData }: InferGetServerS
 	return (
 		<Container maxWidth="xl">
 			<HeaderTitle
-				image={carousel[0]?.image}
-				url={baseURL+url(page, selectCount, 'asc',
-                'PId', searchMsg, selectCategory)}
+				image={(carousel != null) ? carousel[0].image : ''}
+				url={currentUrl}
 				json={JSON.stringify(pList)}
 			/>
 
-			<Grid container item spacing={2} direction="row" justifyContent="center" alignItems="flex-end">
-				<Grid item spacing={1} margin={1} justifyContent="center">
-					<Carousel showThumbs={false} infiniteLoop={true} showStatus={false} autoPlay={true} interval={4000}>
-						{
-							carousel.map((c: CarouselData) => {
-								return (
-									<div key={"Carousel" + c.id.toString()}>
-										<img src={c.image} alt={c.name} />
-										{/* <p className="legend">Legend 1</p> */}
-									</div>
-								)
-							})
-						}
-					</Carousel>
+			<Grid container item spacing={2} margin={2} direction="row" justifyContent="center" alignItems="flex-end">
+				{carousel &&
+					<Grid item margin={1} justifyContent="center">
+						<Carousel showThumbs={false} infiniteLoop={true} showStatus={false} autoPlay={true} interval={4000}>
+							{
+								carousel?.map((c: CarouselData) => {
+									return (
+										<div key={"Carousel" + c.id.toString()}>
+											<img src={c.image} alt={c.name} />
+											{/* <p className="legend">Legend 1</p> */}
+										</div>
+									)
+								})
+							}
+						</Carousel>
+					</Grid>
+				}
+				<Grid item>
+					<SearchBar searchSet={searchChange} searchCheckSet={searchCheckChange} DefaultValue={searchMsg} />
 				</Grid>
-				<SearchBar searchSet={searchChange} searchCheckSet={searchCheckChange} DefaultValue={searchMsg} />
-				<SelectBox
-					selectName={'分類'}
-					optionValue={category}
-					defaultValue={selectCategory}
-					selectSet={selectCategoryChange}
-					optionAll={true}
-				/>
-				<SelectBox
-					selectName={'筆數'}
-					optionValue={process.env.PAGE_SIZE?.split(',') as string[]}
-					defaultValue={selectCount.toString()}
-					selectSet={selectCountChange}
-					optionAll={false}
-				/>
-				<Pagination count={pageCount} page={page} onChange={pageChange} showFirstButton showLastButton siblingCount={0} boundaryCount={0} />
+				<Grid item>
+					<SelectBox
+						selectName={'分類'}
+						optionValue={category}
+						defaultValue={selectCategory}
+						selectSet={selectCategoryChange}
+						optionAll={true}
+					/>
+				</Grid>
+				<Grid item>
+					<SelectBox
+						selectName={'筆數'}
+						optionValue={process.env.PAGE_SIZE?.split(',') as string[]}
+						defaultValue={selectCount.toString()}
+						selectSet={selectCountChange}
+						optionAll={false}
+					/>
+				</Grid>
+				<Grid item>
+					<Pagination count={pageCount} page={page} onChange={pageChange} showFirstButton showLastButton siblingCount={0} boundaryCount={0} />
+				</Grid>
 			</Grid>
 
 			<Grid container item direction="row" justifyContent="center" alignItems="baseline" width="100%" >
@@ -233,4 +244,4 @@ function ProductionPage({ carousel, category, pList, pageData }: InferGetServerS
 	)
 }
 
-export default ProductionPage;
+// export default ProductionPage;
