@@ -10,8 +10,7 @@ export default function getCurrentUrl(context: GetServerSidePropsContext) {
     } else if (host.indexOf('localhost') > -1) {
         protocol = 'http://';
     }
-    currentUrl = protocol + host + (req.url ?? "")
+    currentUrl = protocol + host + (req.url ?? "");
 
-    console.log(currentUrl);
     return currentUrl;
 }
