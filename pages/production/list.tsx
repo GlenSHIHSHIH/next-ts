@@ -170,9 +170,9 @@ export default function ProductionPage({ carousel, category, pList, pageData, cu
 				json={JSON.stringify(pList)}
 			/>
 
-			<Grid container spacing={2} margin={2} direction="column" justifyContent="center" >
+			<Grid container spacing={2} marginTop={2} direction="column" justifyContent="center" >
 				{carousel &&
-					<Grid item margin={1} justifyContent="center">
+					<Grid item marginTop={1} justifyContent="center">
 						<Carousel showThumbs={false} infiniteLoop={true} showStatus={false} autoPlay={true} interval={4000}>
 							{
 								carousel?.map((c: CarouselData) => {
@@ -231,7 +231,7 @@ export default function ProductionPage({ carousel, category, pList, pageData, cu
 									productionDescript={substring(p.description, 75)}
 									productionPrice={p.price}
 									shopeeUrl={p.url}
-									urlName={"Shopee 購買"}
+									urlName={process.env.DEFAULT_BUY_SHOPEE_NAME}
 									alt={substring(p.name, 26)}
 								/>
 							</Grid>
