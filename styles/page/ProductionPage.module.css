@@ -1,0 +1,14 @@
+.poductionOption {
+  min-height: 300px;
+}
+
+@media (max-width: 880px) {
+  .poductionOption {
+    min-height: 100%;
+  }
+}
+@media (min-width: 880.5px) and (max-width: 1000px) {
+  .poductionOption {
+    min-height: 150px;
+  }
+}

@@ -1,7 +1,12 @@
 import { GetServerSidePropsContext } from "next";
 
-export default function getCurrentUrl(context: GetServerSidePropsContext) {
-    var currentUrl = "";
+export function getCurrentUrl(context: GetServerSidePropsContext) {
+    var currentUrl = getDomain(context) + (context.req.url ?? "");
+    return currentUrl;
+}
+
+export function getDomain(context: GetServerSidePropsContext) {
+    var currentDomain = "";
     let req = context.req;
     let protocol = 'https://'
     let host = req.headers.host ? req.headers.host : ""
@@ -10,7 +15,7 @@ export default function getCurrentUrl(context: GetServerSidePropsContext) {
     } else if (host.indexOf('localhost') > -1) {
         protocol = 'http://';
     }
-    currentUrl = protocol + host + (req.url ?? "");
+    currentDomain = protocol + host;
 
-    return currentUrl;
+    return currentDomain;
 }
