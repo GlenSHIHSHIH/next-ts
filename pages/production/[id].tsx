@@ -112,34 +112,55 @@ export default function ProductionIntroduce({ prodcution, currentUrl }: InferGet
                     <Grid item xs={12} md={6}  >
                         <Grid item marginLeft={4} marginRight={4}>
                             <ThemeProvider theme={theme}>
-                                <Typography variant="h4" color="text.secondary">
+                                <Typography variant="h3" color="text.primary">
                                     {data.name} {/*/商品名稱*/}
                                 </Typography>
 
-                                <Typography variant="h4" color="text.secondary" marginTop={3} marginBottom={3}>
+                                <Typography variant="h4" color="warning.main" marginTop={4} marginBottom={4}>
                                     ${data.price} {/*/價格*/}
                                 </Typography>
-
-                                {
-                                    option?.map((o: OptionData) => {
-                                        return (
-                                            <Grid container item key={"option" + o.Name + o.Option} direction="row" justifyContent="flex-start" alignItems="flex-start">
-                                                <Typography variant="h6" color="text.secondary" marginTop={2} >
-                                                    {o.Name}： {/*/項目名稱*/}
-                                                </Typography>
-                                                {o.Option &&
-                                                    <Typography variant="h6" color="text.secondary" marginLeft={2} marginTop={2} >
-                                                        {itemJoin(o.Option)} {/*/項目內容*/}
+                                <Grid item minHeight={300}>
+                                    {
+                                        option?.map((o: OptionData) => {
+                                            return (
+                                                <Grid container item key={"option" + o.Name + o.Option} direction="row" justifyContent="flex-start" alignItems="flex-start">
+                                                    <Typography variant="h5" color="text.secondary" marginTop={2} >
+                                                        {o.Name}： {/*/項目名稱*/}
                                                     </Typography>
-                                                }
-                                            </Grid>
-                                        )
-                                    })
-                                }
+                                                    {o.Option &&
+                                                        <Typography variant="h5" color="text.secondary" marginLeft={2} marginTop={2} >
+                                                            {itemJoin(o.Option)} {/*/項目內容*/}
+                                                        </Typography>
+                                                    }
+                                                </Grid>
+                                            )
+                                        })
+                                    }
+                                </Grid >
                             </ThemeProvider>
-                            <Button color="warning" size="large" variant="contained" href={data.url}>{process.env.DEFAULT_BUY_SHOPEE_NAME}</Button>
+                            <Grid container item justifyContent="flex-end" alignItems="flex-end" margin={3}>
+                                <Button color="warning" size="large" variant="contained" href={data.url}>{process.env.DEFAULT_BUY_SHOPEE_NAME}</Button>
+                            </Grid>
                         </Grid>
                     </Grid>
+
+                    {/* 商品詳情 */}
+                    <Grid container direction="row" justifyContent="flex-start" alignItems="flex-start">
+                        <Grid item xs={10} md={8}>
+                            <ThemeProvider theme={theme}>
+                                <Typography variant="h4" color="text.primary" marginTop={4} marginBottom={4}>
+                                    商品詳情{/*商品詳情*/}
+                                </Typography>
+                                {/* <Typography variant="h5" color="text.primary" marginTop={4} marginBottom={4}> */}
+                                {data.description}{/*描述descript*/}
+                                {/* </Typography> */}
+                            </ThemeProvider>
+                        </Grid>
+                        <Grid item xs={2} md={4}>
+
+                        </Grid>
+                    </Grid>
+
                 </Grid>
             </Grid>
         </Container>
