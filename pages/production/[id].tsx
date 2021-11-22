@@ -164,7 +164,7 @@ export default function ProductionIntroduce({ prodcution, currentUrl }: InferGet
                                     商品詳情{/*商品詳情*/}
                                 </Typography>
                                 {/*描述descript*/}
-                                <Typography variant="subtitle1" color="text.primary" component="div" marginTop={4} marginBottom={4} style={{whiteSpace:'pre-wrap'}}>
+                                <Typography variant="h5" color="text.primary" component="div" marginTop={4} marginBottom={4} style={{whiteSpace:'pre-wrap'}}>
                                     {data.description?.replace(/(<br>)/g, '\n')}
                                 </Typography>
                                 {
