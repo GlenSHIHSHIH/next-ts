@@ -171,9 +171,9 @@ export default function ProductionPage({ carousel, category, pList, pageData, cu
                 json={JSON.stringify(pList)}
             />
 
-            <Grid container spacing={2} marginTop={2} direction="column" justifyContent="center" >
+            <Grid container spacing={2} marginTop={1} direction="column" justifyContent="center" >
                 {carousel &&
-                    <Grid item marginTop={1} justifyContent="center">
+                    <Grid item justifyContent="center">
                         <Carousel showThumbs={false} infiniteLoop={true} showStatus={false} autoPlay={true} interval={4000}>
                             {
                                 carousel?.map((c: CarouselData) => {
