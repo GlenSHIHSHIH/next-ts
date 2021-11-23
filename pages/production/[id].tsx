@@ -14,7 +14,12 @@ interface OptionData {
     Option?: string[],
 }
 
-interface ProductionCardData {
+interface Attribute {
+    name?: string,
+    value?: string,
+}
+
+interface ProductionDetail {
     id?: Number,
     name?: string,
     categories?: string,
@@ -25,6 +30,10 @@ interface ProductionCardData {
     price?: Number,
     priceMin?: Number,
     url?: string,
+    attribute?: string,
+    likedCount?: Number,
+    historicalSold?: Number,
+    stock?: Number,
 }
 
 
@@ -33,7 +42,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
     var currentUrl = getCurrentUrl(context);
     var paramObj = context.params;
-    var prodcution: ProductionCardData = {};
+    var prodcution: ProductionDetail = {};
 
     await getProductionById(paramObj)?.then(res => {
         // console.log("get categories list");
@@ -53,20 +62,22 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 }
 
 export default function ProductionIntroduce({ prodcution, currentUrl }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-    // let data: ProductionCardData;
-    var data: ProductionCardData;
+    // let data: ProductionDetail;
+    var data: ProductionDetail;
     data = prodcution;
 
     var images: string[] | null = (data.images) ? data.images.split(",") : null;
     var option: OptionData[] | null = (data.options) ? JSON.parse(data.options) : null;
+    var attribute: Attribute[] | null = (data.attribute) ? JSON.parse(data.attribute) : null;
 
-    const itemJoin = (items: string[]) => {
-        var item: string = "";
-        items.map((os) => {
-            item = item + "、" + os.replace(/(")+/gm, '');
-        })
-        return item.replace(/^、/g, '');
-    };
+    // const itemJoin = (items: string[]) => {
+    //     var item: string = "";
+    //     items.map((os) => {
+    //         item = item + "、" + os.replace(/(")+/gm, '');
+    //     })
+    //     return item.replace(/^、/g, '');
+    // };
+
 
     let theme = createTheme();
     theme = responsiveFontSizes(theme);
@@ -115,6 +126,23 @@ export default function ProductionIntroduce({ prodcution, currentUrl }: InferGet
                                 <Typography variant="h4" color="text.primary">
                                     {data.name} {/*/商品名稱*/}
                                 </Typography>
+                                <Grid container item direction="row" justifyContent="space-between" alignItems="center" marginTop={2}>
+                                    {(data.historicalSold != undefined && data.historicalSold > 0) &&
+                                        <Typography variant="h5" color="text.secondary">
+                                            已售出：{data.historicalSold}
+                                        </Typography>
+                                    }
+                                    {(data.stock != undefined && data.stock > 0) &&
+                                        <Typography variant="h5" color="text.secondary">
+                                            數量：{data.stock}
+                                        </Typography>
+                                    }
+                                    {(data.likedCount != undefined && data.likedCount > 0) &&
+                                        <Typography variant="h5" color="text.secondary">
+                                            讚：{data.likedCount}
+                                        </Typography>
+                                    }
+                                </Grid >
                                 <Grid container item justifyContent="flex-start" alignItems="center">
                                     {
                                         ((data.priceMin ?? 0) < (data.price ?? 0)) ?
@@ -127,22 +155,60 @@ export default function ProductionIntroduce({ prodcution, currentUrl }: InferGet
                                         <b>${data.priceMin}</b> {/*/價格*/}
                                     </Typography>
                                 </Grid>
-                                <Grid item className={styleProductionPage.poductionOption}>
+                                <Grid item className={styleProductionPage.poductionOption} marginBottom={2} >
                                     {
-                                        option?.map((o: OptionData) => {
+                                        option?.map((oItem: OptionData) => {
                                             return (
-                                                <Grid container item key={"option" + o.Name + o.Option} direction="row" justifyContent="flex-start" alignItems="flex-start">
-                                                    <Typography variant="h5" color="text.secondary" marginTop={2} >
-                                                        {o.Name}： {/*/項目名稱*/}
-                                                    </Typography>
-                                                    {o.Option &&
-                                                        <Typography variant="h5" color="text.secondary" marginLeft={2} marginTop={2} >
-                                                            {itemJoin(o.Option)} {/*/項目內容*/}
+                                                <Grid container key={"option" + oItem.Name + oItem.Option} direction="row"
+                                                    justifyContent="flex-start" alignItems="flex-start" marginBottom={2} marginTop={2}>
+                                                    <Grid item md={4} xs={4}>
+                                                        <Typography variant="h5" color="text.secondary" >
+                                                            {oItem.Name}{/*/項目名稱*/}
                                                         </Typography>
-                                                    }
+                                                    </Grid>
+
+                                                    <Grid container md={8} xs={8} direction="row" spacing={1}
+                                                        justifyContent="flex-start" alignItems="flex-start">
+                                                        {
+                                                            oItem.Option?.map((item: string) => {
+                                                                return (
+                                                                    <Grid item >
+                                                                        <Typography component={"div"} variant="h6" color="text.secondary" padding={1}
+                                                                            style={{ border: '1px gray solid', borderRadius: '6px' }} >
+                                                                            {item.replace(/(")+/gm, '')} {/*/項目內容*/}
+                                                                        </Typography>
+                                                                    </Grid>
+                                                                )
+                                                            })
+                                                        }
+                                                    </Grid>
                                                 </Grid>
                                             )
                                         })
+                                    }
+                                    {
+                                        attribute?.map((aItem) => {
+                                            return (
+                                                <Grid container key={"attribute" + aItem.name} direction="row"
+                                                    justifyContent="flex-start" alignItems="flex-start" marginBottom={2} marginTop={2}>
+                                                    <Grid item md={4} xs={4}>
+                                                        <Typography variant="h5" color="text.secondary" >
+                                                            {aItem.name}{/*/產品其他資訊*/}
+                                                        </Typography>
+                                                    </Grid>
+
+                                                    <Grid container md={8} xs={8} direction="row"
+                                                        justifyContent="flex-start" alignItems="flex-start">
+                                                        <Grid item >
+                                                            <Typography component={"div"} variant="h6" color="text.secondary">
+                                                                {aItem.value} {/*/產品其他資訊內容*/}
+                                                            </Typography>
+                                                        </Grid>
+                                                    </Grid>
+                                                </Grid>
+                                            )
+                                        })
+
                                     }
                                 </Grid >
                             </ThemeProvider>
@@ -164,7 +230,7 @@ export default function ProductionIntroduce({ prodcution, currentUrl }: InferGet
                                     商品詳情{/*商品詳情*/}
                                 </Typography>
                                 {/*描述descript*/}
-                                <Typography variant="h5" color="text.primary" component="div" marginTop={4} marginBottom={4} style={{whiteSpace:'pre-wrap'}}>
+                                <Typography variant="h5" color="text.primary" component="div" marginTop={4} marginBottom={4} style={{ whiteSpace: 'pre-wrap' }}>
                                     {data.description?.replace(/(<br>)/g, '\n')}
                                 </Typography>
                                 {
