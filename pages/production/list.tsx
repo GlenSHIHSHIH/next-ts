@@ -166,7 +166,7 @@ export default function ProductionPage({ carousel, category, pList, pageData, cu
     return (
         <Container maxWidth="xl">
             <HeaderTitle
-                image={(carousel != null) ? carousel[0].image : ''}
+                image={(carousel != null) ? carousel[0]?.image : ''}
                 url={currentUrl}
                 json={JSON.stringify(pList)}
             />

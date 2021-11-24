@@ -42,7 +42,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
     var currentUrl = getCurrentUrl(context);
     var paramObj = context.params;
-    var prodcution: ProductionDetail = {};
+    var prodcution: ProductionDetail | null = null;
 
     await getProductionById(paramObj)?.then(res => {
         // console.log("get categories list");
@@ -52,13 +52,21 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         console.log("getCategoryList 錯誤");
     })
 
+    if (prodcution == null ) {
+        return {
+            redirect: {
+                permanent: false,
+                destination: process.env.DEFAULT_HOME_URL
+            },
+            props: {}
+        }
+    }
     return {
         props: {
             // "category": category, "pList": pList
             prodcution, currentUrl
         },
     }
-
 }
 
 export default function ProductionIntroduce({ prodcution, currentUrl }: InferGetServerSidePropsType<typeof getServerSideProps>) {
@@ -77,7 +85,6 @@ export default function ProductionIntroduce({ prodcution, currentUrl }: InferGet
     //     })
     //     return item.replace(/^、/g, '');
     // };
-
 
     let theme = createTheme();
     theme = responsiveFontSizes(theme);
@@ -167,12 +174,12 @@ export default function ProductionIntroduce({ prodcution, currentUrl }: InferGet
                                                         </Typography>
                                                     </Grid>
 
-                                                    <Grid container md={8} xs={8} direction="row" spacing={1}
+                                                    <Grid container item md={8} xs={8} direction="row" spacing={1}
                                                         justifyContent="flex-start" alignItems="flex-start">
                                                         {
                                                             oItem.Option?.map((item: string) => {
                                                                 return (
-                                                                    <Grid item >
+                                                                    <Grid item key={item}>
                                                                         <Typography component={"div"} variant="h6" color="text.secondary" padding={1}
                                                                             style={{ border: '1px gray solid', borderRadius: '6px' }} >
                                                                             {item.replace(/(")+/gm, '')} {/*/項目內容*/}
@@ -197,13 +204,10 @@ export default function ProductionIntroduce({ prodcution, currentUrl }: InferGet
                                                         </Typography>
                                                     </Grid>
 
-                                                    <Grid container md={8} xs={8} direction="row"
-                                                        justifyContent="flex-start" alignItems="flex-start">
-                                                        <Grid item >
-                                                            <Typography component={"div"} variant="h6" color="text.secondary">
-                                                                {aItem.value} {/*/產品其他資訊內容*/}
-                                                            </Typography>
-                                                        </Grid>
+                                                    <Grid item md={8} xs={8} >
+                                                        <Typography component={"div"} variant="h6" color="text.secondary">
+                                                            {aItem.value} {/*/產品其他資訊內容*/}
+                                                        </Typography>
                                                     </Grid>
                                                 </Grid>
                                             )
