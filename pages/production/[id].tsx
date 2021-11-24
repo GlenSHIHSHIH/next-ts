@@ -1,9 +1,10 @@
 import { Button, Container, Divider, Grid, Typography } from "@mui/material";
 import { createTheme, responsiveFontSizes, ThemeProvider } from '@mui/material/styles';
-import { getProductionById } from "@pages/api/productionIntroduceApi";
+import { getProductionById, getProductionRank } from "@pages/api/productionDetailApi";
 import styleProductionPage from "@styles/page/ProductionPage.module.css"; // requires a loader
-import { getCurrentUrl } from "@utils/base_fucntion";
+import { getCurrentUrl, getDomain, substring } from "@utils/base_fucntion";
 import HeaderTitle from "component/HeaderTitle";
+import ProductionCard from "component/ProductionCard";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import React from "react";
 import { Carousel } from "react-responsive-carousel";
@@ -36,23 +37,50 @@ interface ProductionDetail {
     stock?: number,
 }
 
-
+interface ProductionRankList {
+    id: number,
+    name: string,
+    categories?: string,
+    options?: string,
+    description?: string,
+    image?: string,
+    price?: number,
+    priceMin?: number,
+    url?: string,
+    weight?: number,
+    amount?: number,
+    likedCount?: number,
+    historicalSold?: number,
+    stock?: number,
+}
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
 
     var currentUrl = getCurrentUrl(context);
+    var domain = getDomain(context);
+
     var paramObj = context.params;
     var prodcution: ProductionDetail | null = null;
+    var productionRankList: ProductionRankList[] | null = null;
 
     await getProductionById(paramObj)?.then(res => {
         // console.log("get categories list");
         // console.log(res);
         prodcution = res.data.production;
     }).catch(error => {
-        console.log("getCategoryList 錯誤");
+        console.log("getProductionById 錯誤");
     })
 
-    if (prodcution == null ) {
+    await getProductionRank({ count: process.env.DEFAULT_RANK_COUNT })?.then(res => {
+        // console.log("get categories list");
+        productionRankList = res.data.productionList;
+        // console.log(productionRankList);
+    }).catch(error => {
+        // console.log(error);
+        console.log("getProductionRank 錯誤");
+    })
+
+    if (prodcution == null) {
         return {
             redirect: {
                 permanent: false,
@@ -64,27 +92,19 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     return {
         props: {
             // "category": category, "pList": pList
-            prodcution, currentUrl
+            productionRankList, prodcution, currentUrl, domain
         },
     }
 }
 
-export default function ProductionIntroduce({ prodcution, currentUrl }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function ProductionIntroduce({ productionRankList, prodcution, currentUrl, domain }: InferGetServerSidePropsType<typeof getServerSideProps>) {
     // let data: ProductionDetail;
-    var data: ProductionDetail;
-    data = prodcution;
+    var data: ProductionDetail = prodcution;
+    var rankList: ProductionRankList[] = productionRankList;
 
     var images: string[] | null = (data.images) ? data.images.split(",") : null;
     var option: OptionData[] | null = (data.options) ? JSON.parse(data.options) : null;
     var attribute: Attribute[] | null = (data.attribute) ? JSON.parse(data.attribute) : null;
-
-    // const itemJoin = (items: string[]) => {
-    //     var item: string = "";
-    //     items.map((os) => {
-    //         item = item + "、" + os.replace(/(")+/gm, '');
-    //     })
-    //     return item.replace(/^、/g, '');
-    // };
 
     let theme = createTheme();
     theme = responsiveFontSizes(theme);
@@ -108,8 +128,8 @@ export default function ProductionIntroduce({ prodcution, currentUrl }: InferGet
                 </Grid>
 
                 <Grid container marginTop={2} direction="row" justifyContent="center" alignItems="flex-start">
-
-                    <Grid item xs={12} md={8} >
+                    {/* 產品圖片 */}
+                    <Grid item xs={12} md={8} paddingLeft={3} paddingRight={3}>
                         {images &&
                             <Grid item >
                                 <Carousel infiniteLoop={true} showStatus={false} autoPlay={true} interval={4000}>
@@ -126,7 +146,9 @@ export default function ProductionIntroduce({ prodcution, currentUrl }: InferGet
                             </Grid>
                         }
                     </Grid>
+                    {/* 產品圖片 */}
 
+                    {/* 產品簡易說明 */}
                     <Grid item xs={12} md={4}  >
                         <Grid item marginLeft={4} marginRight={4}>
                             <ThemeProvider theme={theme}>
@@ -221,10 +243,14 @@ export default function ProductionIntroduce({ prodcution, currentUrl }: InferGet
                             </Grid>
                         </Grid>
                     </Grid>
+                    {/* 產品簡易說明 */}
 
+                    {/* 分隔線 */}
                     <Grid item xs={12} md={12}>
                         <Divider />
                     </Grid>
+                    {/* 分隔線 */}
+
                     {/* 商品詳情 */}
                     <Grid container direction="row" justifyContent="flex-start" alignItems="flex-start">
                         <Grid item xs={12} md={8}>
@@ -248,13 +274,40 @@ export default function ProductionIntroduce({ prodcution, currentUrl }: InferGet
                                 }
                             </ThemeProvider>
                         </Grid>
-                        <Grid item xs={12} md={4}>
+                        <Grid container item xs={12} md={4} direction="column" justifyContent="center" alignItems="center">
+                            <ThemeProvider theme={theme}>
+                                <Typography variant="h5" color="text.primary" marginTop={4} marginBottom={4}>
+                                    推薦商品{/*推薦商品*/}
+                                </Typography>
+                                {
+                                    rankList?.map((r: ProductionRankList) => {
+                                        return (
+                                            <Grid item margin="10px" key={r.name + (r.url)}>
 
+                                                <ProductionCard
+                                                    url={domain + process.env.DEFAULT_PRODUCTION_INTRODUCE_URL + r.id}
+                                                    productionName={substring(r.name, 26)}
+                                                    productionCategory={substring(r.categories, 18)}
+                                                    productionIMG={r.image}
+                                                    productionDescript={substring(r.description, 75)}
+                                                    productionPrice={r.price}
+                                                    productionPriceMin={r.priceMin}
+                                                    shopeeUrl={r.url}
+                                                    urlName={process.env.DEFAULT_BUY_SHOPEE_NAME}
+                                                    alt={substring(r.name, 26)}
+                                                />
+                                            </Grid>
+                                        )
+                                    })
+                                }
+                            </ThemeProvider>
                         </Grid>
                     </Grid>
+                    {/* 商品詳情 */}
 
                 </Grid>
             </Grid>
         </Container>
     );
 }
+

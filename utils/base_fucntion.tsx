@@ -19,3 +19,14 @@ export function getDomain(context: GetServerSidePropsContext) {
 
     return currentDomain;
 }
+
+
+export const substring = (value: string | undefined, count: number) => {
+    let str = "";
+    if (value != undefined && value.length <= count) {
+        str = value;
+    } else {
+        str = value?.substring(0, count - 1) + "...";
+    }
+    return str;
+}

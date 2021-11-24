@@ -1,5 +1,5 @@
 import { Container, Grid, Pagination, Typography } from "@mui/material";
-import { getCurrentUrl, getDomain } from "@utils/base_fucntion";
+import { getCurrentUrl, getDomain, substring } from "@utils/base_fucntion";
 import HeaderTitle from "component/HeaderTitle";
 import ProductionCard from "component/ProductionCard";
 import SearchBar from "component/SearchBar";
@@ -152,16 +152,6 @@ export default function ProductionPage({ carousel, category, pList, pageData, cu
     const selectCountChange = (value: string) => {
         setSelectCount(Number(value));
     };
-
-    const substring = (value: string | undefined, count: number) => {
-        let str = "";
-        if (value != undefined && value.length <= count) {
-            str = value;
-        } else {
-            str = value?.substring(0, count - 1) + "...";
-        }
-        return str;
-    }
 
     return (
         <Container maxWidth="xl">
