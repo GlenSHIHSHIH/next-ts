@@ -10,14 +10,14 @@ interface CardProps {
     productionCategory?: string,
     productionIMG?: string,
     productionDescript?: string,
-    productionPrice?: Number,
-    productionPriceMin?: Number,
+    productionPrice?: number,
+    productionPriceMin?: number,
     shopeeUrl?: string,
     urlName?: string,
     alt: string,
-    imageWidth?: Number,
-    imageHeight?: Number,
-    cardWidth?: Number,
+    imageWidth?: number,
+    imageHeight?: number,
+    cardWidth?: number,
 }
 
 const ProductionCard: React.FC<CardProps> = (props) => {
@@ -42,7 +42,7 @@ const ProductionCard: React.FC<CardProps> = (props) => {
     theme = responsiveFontSizes(theme);
 
     return (
-        <Card sx={{ maxWidth: cardWidth.toString() }}>
+        <Card sx={{ maxWidth: cardWidth }}>
             <ThemeProvider theme={theme}>
                 <CardHeader
                     component={"a"}
@@ -53,8 +53,8 @@ const ProductionCard: React.FC<CardProps> = (props) => {
                 <a href={url ?? ""}>
                     <CardMedia
                         component="img"
-                        height={imageHeight.toString()}
-                        width={imageWidth.toString()}
+                        height={imageHeight}
+                        width={imageWidth}
                         image={productionIMG} //"圖片路徑"
                         alt={alt}
                     />

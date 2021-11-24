@@ -12,17 +12,17 @@ import { Carousel } from 'react-responsive-carousel';
 import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
 
 interface CarouselData {
-    id: Number,
+    id: number,
     name: string,
     image: string,
     url: string,
-    weight: Number,
+    weight: number,
 }
 
 interface PageData {
-    count: Number,
-    page: Number,
-    pageLimit: Number,
+    count: number,
+    page: number,
+    pageLimit: number,
     sort: string,
     sortColumn: string,
     search: string,
@@ -30,14 +30,14 @@ interface PageData {
 }
 
 interface ProductionCardData {
-    id: Number,
+    id: number,
     name: string,
     categories?: string,
     options?: string,
     description?: string,
     image?: string,
-    price?: Number,
-    priceMin?: Number,
+    price?: number,
+    priceMin?: number,
     url?: string,
 }
 

@@ -20,20 +20,20 @@ interface Attribute {
 }
 
 interface ProductionDetail {
-    id?: Number,
+    id?: number,
     name?: string,
     categories?: string,
     options?: string,
     description?: string,
     image?: string,
     images?: string,
-    price?: Number,
-    priceMin?: Number,
+    price?: number,
+    priceMin?: number,
     url?: string,
     attribute?: string,
-    likedCount?: Number,
-    historicalSold?: Number,
-    stock?: Number,
+    likedCount?: number,
+    historicalSold?: number,
+    stock?: number,
 }
 
 
@@ -230,11 +230,11 @@ export default function ProductionIntroduce({ prodcution, currentUrl }: InferGet
                         <Grid item xs={12} md={8}>
 
                             <ThemeProvider theme={theme}>
-                                <Typography variant="h4" color="text.primary" marginTop={4} marginBottom={4}>
+                                <Typography variant="h5" color="text.primary" marginTop={4} marginBottom={4}>
                                     商品詳情{/*商品詳情*/}
                                 </Typography>
                                 {/*描述descript*/}
-                                <Typography variant="h5" color="text.primary" component="div" marginTop={4} marginBottom={4} style={{ whiteSpace: 'pre-wrap' }}>
+                                <Typography variant="h6" color="text.primary" component="div" marginTop={4} marginBottom={4} style={{ whiteSpace: 'pre-wrap' }}>
                                     {data.description?.replace(/(<br>)/g, '\n')}
                                 </Typography>
                                 {
