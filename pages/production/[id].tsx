@@ -110,6 +110,7 @@ export default function ProductionIntroduce({ productionRankList, prodcution, cu
     let theme = createTheme();
     theme = responsiveFontSizes(theme);
 
+
     return (
         <Container maxWidth="xl">
             <HeaderTitle
@@ -281,32 +282,36 @@ export default function ProductionIntroduce({ productionRankList, prodcution, cu
                                 }
                             </ThemeProvider>
                         </Grid>
-                        <Grid container item xs={12} md={4} direction="column" justifyContent="center" alignItems="center">
+                        <Grid container xs={12} md={4} direction="column" justifyContent="center" alignItems="center">
                             <ThemeProvider theme={theme}>
-                                <Typography variant="h5" color="text.primary" marginTop={4} marginBottom={4}>
-                                    <b>推薦商品</b>{/*推薦商品*/}
-                                </Typography>
-                                {
-                                    rankList?.map((r: ProductionRankList) => {
-                                        return (
-                                            <Grid item margin="10px" key={r.name + (r.url)}>
+                                <Grid item className={styleProductionPage.poductionRankTitle}>
+                                    <Typography variant="h5" component="div" color="text.primary" marginTop={4} marginBottom={4}>
+                                        <b>推薦商品</b>{/*推薦商品*/}
+                                    </Typography>
+                                </Grid >
+                                <Grid item className={styleProductionPage.poductionRank}>
+                                    {
+                                        rankList?.map((r: ProductionRankList) => {
+                                            return (
+                                                <Grid item margin="10px" key={r.name + (r.url)}>
 
-                                                <ProductionCard
-                                                    url={domain + process.env.DEFAULT_PRODUCTION_INTRODUCE_URL + r.id}
-                                                    productionName={substring(r.name, 26)}
-                                                    productionCategory={substring(r.categories, 18)}
-                                                    productionIMG={r.image}
-                                                    productionDescript={substring(r.description, 75)}
-                                                    productionPrice={r.price}
-                                                    productionPriceMin={r.priceMin}
-                                                    shopeeUrl={r.url}
-                                                    urlName={process.env.DEFAULT_BUY_SHOPEE_NAME}
-                                                    alt={substring(r.name, 26)}
-                                                />
-                                            </Grid>
-                                        )
-                                    })
-                                }
+                                                    <ProductionCard
+                                                        url={domain + process.env.DEFAULT_PRODUCTION_INTRODUCE_URL + r.id}
+                                                        productionName={substring(r.name, 26)}
+                                                        productionCategory={substring(r.categories, 18)}
+                                                        productionIMG={r.image}
+                                                        productionDescript={substring(r.description, 75)}
+                                                        productionPrice={r.price}
+                                                        productionPriceMin={r.priceMin}
+                                                        shopeeUrl={r.url}
+                                                        urlName={process.env.DEFAULT_BUY_SHOPEE_NAME}
+                                                        alt={substring(r.name, 26)}
+                                                    />
+                                                </Grid>
+                                            )
+                                        })
+                                    }
+                                </Grid >
                             </ThemeProvider>
                         </Grid>
                     </Grid>

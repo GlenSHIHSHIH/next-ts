@@ -1,3 +1,15 @@
 .cardContent {
   height: 170px;
 }
+
+.cardContentDescript {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  height: 100px;
+}
+
+.cardSubtitle {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}

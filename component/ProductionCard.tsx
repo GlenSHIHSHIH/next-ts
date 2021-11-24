@@ -72,10 +72,7 @@ const ProductionCard: React.FC<CardProps> = (props) => {
                             <b>${productionPriceMin}</b> {/*/價格*/} <br />
                         </Typography>
                     </Grid>
-                    {/* <Typography variant="h5" marginTop={1} marginBottom={1}>
-                        ${productionPrice} <br />
-                    </Typography> */}
-                    <Typography variant="body1" color="text.secondary" minHeight={100}>
+                    <Typography variant="body1" color="text.secondary" className={cardStyle.cardContentDescript}>
                         {productionDescript} {/*/敘述*/}
                     </Typography>
                 </CardContent>
