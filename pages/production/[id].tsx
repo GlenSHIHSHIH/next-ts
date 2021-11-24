@@ -4,6 +4,7 @@ import { getProductionById, getProductionRank } from "@pages/api/productionDetai
 import styleProductionPage from "@styles/page/ProductionPage.module.css"; // requires a loader
 import { getCurrentUrl, getDomain, substring } from "@utils/base_fucntion";
 import HeaderTitle from "component/HeaderTitle";
+import PageTitle from "component/PageTitle";
 import ProductionCard from "component/ProductionCard";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import React from "react";
@@ -117,11 +118,17 @@ export default function ProductionIntroduce({ productionRankList, prodcution, cu
                 json={JSON.stringify(data)}
             />
 
-            <Grid container marginTop={2} direction="column" justifyContent="center" alignItems="flex-start">
+            <PageTitle
+                theme={theme}
+                className={styleProductionPage.pageTitle}
+                url={domain + process.env.DEFAULT_HOME_URL}
+            />
 
-                <Grid container item xs={12} md={12} marginTop={2} direction="row" justifyContent="center" alignItems="center">
+            <Grid container direction="column" justifyContent="center" alignItems="flex-start">
+
+                <Grid container item xs={12} md={12} marginTop={1} direction="row" justifyContent="center" alignItems="center">
                     <ThemeProvider theme={theme}>
-                        <Typography variant="h5" color="text.secondary">
+                        <Typography variant="h6" color="text.secondary">
                             {data.categories}
                         </Typography>
                     </ThemeProvider>
@@ -257,7 +264,7 @@ export default function ProductionIntroduce({ productionRankList, prodcution, cu
 
                             <ThemeProvider theme={theme}>
                                 <Typography variant="h5" color="text.primary" marginTop={4} marginBottom={4}>
-                                    商品詳情{/*商品詳情*/}
+                                    <b>商品詳情</b>{/*商品詳情*/}
                                 </Typography>
                                 {/*描述descript*/}
                                 <Typography variant="h6" color="text.primary" component="div" marginTop={4} marginBottom={4} style={{ whiteSpace: 'pre-wrap' }}>
@@ -277,7 +284,7 @@ export default function ProductionIntroduce({ productionRankList, prodcution, cu
                         <Grid container item xs={12} md={4} direction="column" justifyContent="center" alignItems="center">
                             <ThemeProvider theme={theme}>
                                 <Typography variant="h5" color="text.primary" marginTop={4} marginBottom={4}>
-                                    推薦商品{/*推薦商品*/}
+                                    <b>推薦商品</b>{/*推薦商品*/}
                                 </Typography>
                                 {
                                     rankList?.map((r: ProductionRankList) => {

@@ -2,13 +2,23 @@
   min-height: 450px;
 }
 
+.pageTitle {
+  max-height: 80px;
+}
+
 @media (max-width: 880px) {
   .poductionOption {
     min-height: 100%;
+  }
+  .pageTitle {
+    max-height: 35px;
   }
 }
 @media (min-width: 880.5px) and (max-width: 1150px) {
   .poductionOption {
     min-height: 160px;
+  }
+  .pageTitle {
+    max-height: 60px;
   }
 }
