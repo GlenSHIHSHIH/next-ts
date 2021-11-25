@@ -26,21 +26,21 @@ const PageTitle: React.FC<PageTitle> = (props) => {
 
 
     return (
-        <Grid container direction="row" justifyContent="flex-start" alignItems="center" style={{ backgroundColor: gridColor }}>
+        <Grid container direction="row" justifyContent="center" alignItems="center" style={{ backgroundColor: gridColor }}>
             <ThemeProvider theme={theme} >
-                <Grid item md={1} xs={1} >
-                    <a href={url}>
-                        <img src={icon} alt="" className={className} />
-                    </a>
-                </Grid>
-                <Grid container item md={11} xs={11} direction="column" justifyContent="center" alignItems="center">
-                    <a href={url}>
-                        <Typography marginBottom={1} marginTop={1} component="div" variant="h4" color={fontColor} className={className}>
-                            <b> {title}</b>
-                        </Typography>
+                {/* <Grid item md={1} xs={1} > */}
+                <a href={url}>
+                    <img src={icon} alt="" className={className} />
+                </a>
+                {/* </Grid> */}
+                {/* <Grid container item md={11} xs={11} direction="column" justifyContent="center" alignItems="center"> */}
+                <a href={url}>
+                    <Typography marginBottom={1} marginTop={1} component="div" variant="h4" color={fontColor} className={className}>
+                        <b> {title}</b>
+                    </Typography>
 
-                    </a>
-                </Grid>
+                </a>
+                {/* </Grid> */}
             </ThemeProvider>
         </Grid>
     );
