@@ -7,26 +7,14 @@
 }
 
 .poductionRankTitle {
-  max-height: 96px;
+  height: 96px;
 }
 
 .poductionRank {
-  max-height: 2100px;
+  height: 2100px;
   overflow: auto;
   scrollbar-width: auto;
   scrollbar-color: blue orange;
-}
-
-@media (max-width: 1024) {
-  .poductionRank {
-    max-height: 700px;
-    overflow: auto;
-    scrollbar-width: auto;
-    scrollbar-color: blue orange;
-  }
-  .poductionRankTitle {
-    max-height: 60px;
-  }
 }
 
 @media (max-width: 880px) {
@@ -36,6 +24,12 @@
   .pageTitle {
     max-height: 35px;
   }
+  .poductionRank {
+    height: 700px;
+  }
+  .poductionRankTitle {
+    height: 65px;
+  }
 }
 @media (min-width: 880.5px) and (max-width: 1150px) {
   .poductionOption {
@@ -44,4 +38,19 @@
   .pageTitle {
     max-height: 60px;
   }
+}
+
+/* 捲軸底色 */
+.poductionRank::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  background-color: #ffffff;
+}
+/* 捲軸寬度 */
+.poductionRank::-webkit-scrollbar {
+  width: 4px;
+  background-color: black;
+}
+/* 捲軸本體顏色 */
+.poductionRank::-webkit-scrollbar-thumb {
+  background-color: #505050;
 }
