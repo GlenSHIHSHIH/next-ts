@@ -1,16 +1,31 @@
-.poductionSelectSearchOption {
+.poductionSearch {
+  min-width: 180px;
+  max-width: 250px;
+  height: 40px;
+}
+
+.poductionSelectOption {
+  min-width: 120px;
+  height: 40px;
 }
 .poductionSelectPageOption {
+  width: 80px;
+  height: 40px;
 }
 .gridBody {
 }
 
 @media (max-width: 935px) {
+  .poductionSearch {
+    min-width: 120px;
+    max-width: 150px;
+    height: 40px;
+  }
   .gridBody {
     margin-top: 0;
   }
   .poductionSelectOption {
-    width: 120px;
+    min-width: 80px;
     height: 40px;
   }
   .poductionSelectPageOption {

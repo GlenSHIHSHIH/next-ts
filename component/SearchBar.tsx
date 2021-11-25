@@ -5,9 +5,10 @@ import Paper from '@mui/material/Paper';
 import * as React from 'react';
 
 interface SearchData {
-    searchSet: (text: string) => void;
-    searchCheckSet: () => void;
-    DefaultValue: string;
+    searchSet: (text: string) => void,
+    searchCheckSet: () => void,
+    DefaultValue: string,
+    className?:string,
 }
 
 const SearchBar: React.FC<SearchData> = (props) => {
@@ -16,12 +17,14 @@ const SearchBar: React.FC<SearchData> = (props) => {
         searchSet,
         searchCheckSet,
         DefaultValue,
+        className,
     } = props;
 
     return (
         <Paper
             component="form"
             sx={{ p: '2px 4px', display: 'flex', alignItems: 'center' }}
+            className={className}
         >
             <InputBase
                 sx={{ ml: 1, flex: 1 }}

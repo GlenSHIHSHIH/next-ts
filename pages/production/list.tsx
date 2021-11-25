@@ -1,4 +1,4 @@
-import { Container, Grid, Pagination, Typography } from "@mui/material";
+import { Container, createTheme, Grid, Pagination, responsiveFontSizes, ThemeProvider, Typography } from "@mui/material";
 import styleProductionList from "@styles/page/ProductionList.module.css";
 import { getCurrentUrl, getDomain, substring } from "@utils/base_fucntion";
 import HeaderTitle from "component/HeaderTitle";
@@ -154,6 +154,9 @@ export default function ProductionPage({ carousel, category, pList, pageData, cu
         setSelectCount(Number(value));
     };
 
+    let theme = createTheme();
+    theme = responsiveFontSizes(theme);
+
     return (
         <Container maxWidth="xl">
             <HeaderTitle
@@ -182,30 +185,33 @@ export default function ProductionPage({ carousel, category, pList, pageData, cu
                     </Grid>
                 }
                 <Grid container spacing={2} marginTop={2} direction="row" justifyContent="center" className={styleProductionList.gridBody}>
-                    <Grid item md={4} xs={10}>
-                        <SearchBar searchSet={searchChange} searchCheckSet={searchCheckChange} DefaultValue={searchMsg} />
-                    </Grid>
-                    <Grid item >
-                        <SelectBox className={styleProductionList.poductionSelectOption}
-                            selectName={'分類'}
-                            optionValue={category}
-                            defaultValue={selectCategory}
-                            selectSet={selectCategoryChange}
-                            optionAll={true}
-                        />
-                    </Grid>
-                    <Grid item >
-                        <SelectBox className={styleProductionList.poductionSelectPageOption}
-                            selectName={'筆數'}
-                            optionValue={process.env.PAGE_SIZE?.split(',') as string[]}
-                            defaultValue={selectCount.toString()}
-                            selectSet={selectCountChange}
-                            optionAll={false}
-                        />
-                    </Grid>
-                    <Grid container item md={4} xs={10} justifyContent="center" alignItems="center">
-                        <Pagination count={pageCount} page={page} onChange={pageChange} showFirstButton showLastButton siblingCount={0} boundaryCount={0} />
-                    </Grid>
+                    <ThemeProvider theme={theme}>
+                        <Grid item >
+                            <SearchBar searchSet={searchChange} searchCheckSet={searchCheckChange} DefaultValue={searchMsg}
+                                className={styleProductionList.poductionSearch}/>
+                        </Grid>
+                        <Grid item >
+                            <SelectBox className={styleProductionList.poductionSelectOption}
+                                selectName={'分類'}
+                                optionValue={category}
+                                defaultValue={selectCategory}
+                                selectSet={selectCategoryChange}
+                                optionAll={true}
+                            />
+                        </Grid>
+                        <Grid item >
+                            <SelectBox className={styleProductionList.poductionSelectPageOption}
+                                selectName={'筆數'}
+                                optionValue={process.env.PAGE_SIZE?.split(',') as string[]}
+                                defaultValue={selectCount.toString()}
+                                selectSet={selectCountChange}
+                                optionAll={false}
+                            />
+                        </Grid>
+                        <Grid item  justifyContent="center" alignItems="center">
+                            <Pagination count={pageCount} page={page} onChange={pageChange} showFirstButton showLastButton siblingCount={0} boundaryCount={0} />
+                        </Grid>
+                    </ThemeProvider>
                 </Grid>
             </Grid>
 
