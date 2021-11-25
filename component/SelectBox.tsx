@@ -12,11 +12,12 @@ interface SelectOption {
     optionAll: boolean,
     defaultValue?: string,
     selectSet: (value: string) => void,
+    className?:string,
 }
 
 const SelectBox: React.FC<SelectOption> = (props) => {
 
-    const { optionValue, optionAll, selectName, defaultValue, selectSet } = props;
+    const { optionValue, optionAll, selectName, defaultValue, selectSet,className } = props;
     const [selectValue, setSelectValue] = useState<string>();
 
     const selectHandleChange = (event: SelectChangeEvent) => {
@@ -29,10 +30,10 @@ const SelectBox: React.FC<SelectOption> = (props) => {
     };
 
     return (
-        <Box sx={{ minWidth: 120 }}>
+        <Box  >
             <FormControl fullWidth>
                 <InputLabel id="demo-simple-select-label">{selectName}</InputLabel>
-                <Select
+                <Select className={className}
                     labelId="demo-simple-select-label"
                     value={selectValue ?? defaultValue}
                     label={selectName}

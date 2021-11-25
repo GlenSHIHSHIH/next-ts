@@ -1,0 +1,20 @@
+.poductionSelectSearchOption {
+}
+.poductionSelectPageOption {
+}
+.gridBody {
+}
+
+@media (max-width: 935px) {
+  .gridBody {
+    margin-top: 0;
+  }
+  .poductionSelectOption {
+    width: 120px;
+    height: 40px;
+  }
+  .poductionSelectPageOption {
+    width: 70px;
+    height: 40px;
+  }
+}

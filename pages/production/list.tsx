@@ -1,4 +1,5 @@
 import { Container, Grid, Pagination, Typography } from "@mui/material";
+import styleProductionList from "@styles/page/ProductionList.module.css";
 import { getCurrentUrl, getDomain, substring } from "@utils/base_fucntion";
 import HeaderTitle from "component/HeaderTitle";
 import ProductionCard from "component/ProductionCard";
@@ -91,7 +92,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     }
 }
 
-export default function ProductionPage({ carousel, category, pList, pageData, currentUrl,domain }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function ProductionPage({ carousel, category, pList, pageData, currentUrl, domain }: InferGetServerSidePropsType<typeof getServerSideProps>) {
 
     const pageCount: number = Math.ceil(pageData.count / pageData.pageLimit);
     const firstUpdate = useRef(true);
@@ -161,7 +162,7 @@ export default function ProductionPage({ carousel, category, pList, pageData, cu
                 json={JSON.stringify(pList)}
             />
 
-            <Grid container spacing={2} marginTop={1} direction="column" justifyContent="center" >
+            <Grid container spacing={2} marginTop={1} direction="column" justifyContent="center" className={styleProductionList.gridBody}>
                 {carousel &&
                     <Grid item justifyContent="center">
                         <Carousel showThumbs={false} infiniteLoop={true} showStatus={false} autoPlay={true} interval={4000}>
@@ -180,12 +181,12 @@ export default function ProductionPage({ carousel, category, pList, pageData, cu
                         </Carousel>
                     </Grid>
                 }
-                <Grid container spacing={2} marginTop={2} direction="row" justifyContent="center">
+                <Grid container spacing={2} marginTop={2} direction="row" justifyContent="center" className={styleProductionList.gridBody}>
                     <Grid item md={4} xs={10}>
                         <SearchBar searchSet={searchChange} searchCheckSet={searchCheckChange} DefaultValue={searchMsg} />
                     </Grid>
                     <Grid item >
-                        <SelectBox
+                        <SelectBox className={styleProductionList.poductionSelectOption}
                             selectName={'分類'}
                             optionValue={category}
                             defaultValue={selectCategory}
@@ -194,7 +195,7 @@ export default function ProductionPage({ carousel, category, pList, pageData, cu
                         />
                     </Grid>
                     <Grid item >
-                        <SelectBox
+                        <SelectBox className={styleProductionList.poductionSelectPageOption}
                             selectName={'筆數'}
                             optionValue={process.env.PAGE_SIZE?.split(',') as string[]}
                             defaultValue={selectCount.toString()}
@@ -216,7 +217,7 @@ export default function ProductionPage({ carousel, category, pList, pageData, cu
                             <Grid item margin="10px" key={p.name + (p.url)}>
 
                                 <ProductionCard
-                                    url={domain+process.env.DEFAULT_PRODUCTION_INTRODUCE_URL+p.id}
+                                    url={domain + process.env.DEFAULT_PRODUCTION_INTRODUCE_URL + p.id}
                                     productionName={substring(p.name, 26)}
                                     productionCategory={substring(p.categories, 18)}
                                     productionIMG={p.image}

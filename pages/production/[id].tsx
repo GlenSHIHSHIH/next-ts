@@ -1,7 +1,7 @@
 import { Button, Container, Divider, Grid, Typography } from "@mui/material";
 import { createTheme, responsiveFontSizes, ThemeProvider } from '@mui/material/styles';
 import { getProductionById, getProductionRank } from "@pages/api/productionDetailApi";
-import styleProductionPage from "@styles/page/ProductionPage.module.css"; // requires a loader
+import styleProductionPage from "@styles/page/ProductionPage.module.css";
 import { getCurrentUrl, getDomain, substring } from "@utils/base_fucntion";
 import HeaderTitle from "component/HeaderTitle";
 import PageTitle from "component/PageTitle";
