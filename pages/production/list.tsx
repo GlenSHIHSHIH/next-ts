@@ -1,4 +1,5 @@
 import { Container, createTheme, Grid, Pagination, responsiveFontSizes, ThemeProvider, Typography } from "@mui/material";
+import { getConfig } from "@pages/api/baseConfig";
 import styleProductionList from "@styles/page/ProductionList.module.css";
 import { getCurrentUrl, getDomain, substring } from "@utils/base_fucntion";
 import HeaderTitle from "component/HeaderTitle";
@@ -59,6 +60,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         search: "",
         searchCategory: ""
     };
+
+    var baseConfig = JSON.parse(await getConfig() ?? "");
+    // console.log(baseConfig);
+
     await getCategoryList(null)?.then(res => {
         // console.log("get categories list");
         // console.log(res);
@@ -87,12 +92,12 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     return {
         props: {
             // "category": category, "pList": pList
-            carousel, category, pList, pageData, currentUrl, domain
+            baseConfig, carousel, category, pList, pageData, currentUrl, domain
         },
     }
 }
 
-export default function ProductionPage({ carousel, category, pList, pageData, currentUrl, domain }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function ProductionPage({ baseConfig, carousel, category, pList, pageData, currentUrl, domain }: InferGetServerSidePropsType<typeof getServerSideProps>) {
 
     const pageCount: number = Math.ceil(pageData.count / pageData.pageLimit);
     const firstUpdate = useRef(true);
@@ -188,7 +193,7 @@ export default function ProductionPage({ carousel, category, pList, pageData, cu
                     <ThemeProvider theme={theme}>
                         <Grid item >
                             <SearchBar searchSet={searchChange} searchCheckSet={searchCheckChange} DefaultValue={searchMsg}
-                                className={styleProductionList.poductionSearch}/>
+                                className={styleProductionList.poductionSearch} />
                         </Grid>
                         <Grid item >
                             <SelectBox className={styleProductionList.poductionSelectOption}
@@ -208,7 +213,7 @@ export default function ProductionPage({ carousel, category, pList, pageData, cu
                                 optionAll={false}
                             />
                         </Grid>
-                        <Grid item  justifyContent="center" alignItems="center">
+                        <Grid item justifyContent="center" alignItems="center">
                             <Pagination count={pageCount} page={page} onChange={pageChange} showFirstButton showLastButton siblingCount={0} boundaryCount={0} />
                         </Grid>
                     </ThemeProvider>
@@ -226,7 +231,7 @@ export default function ProductionPage({ carousel, category, pList, pageData, cu
                                     url={domain + process.env.DEFAULT_PRODUCTION_INTRODUCE_URL + p.id}
                                     productionName={substring(p.name, 26)}
                                     productionCategory={substring(p.categories, 18)}
-                                    productionIMG={p.image}
+                                    productionIMG={baseConfig.imgUrl + p.image}
                                     productionDescript={substring(p.description, 75)}
                                     productionPrice={p.price}
                                     productionPriceMin={p.priceMin}

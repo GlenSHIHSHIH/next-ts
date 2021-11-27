@@ -1,5 +1,6 @@
 import { Button, Container, Divider, Grid, Typography } from "@mui/material";
 import { createTheme, responsiveFontSizes, ThemeProvider } from '@mui/material/styles';
+import { getConfig } from "@pages/api/baseConfig";
 import { getProductionById, getProductionRank } from "@pages/api/productionDetailApi";
 import styleProductionPage from "@styles/page/ProductionPage.module.css";
 import { getCurrentUrl, getDomain, substring } from "@utils/base_fucntion";
@@ -64,6 +65,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     var prodcution: ProductionDetail | null = null;
     var productionRankList: ProductionRankList[] | null = null;
 
+    var baseConfig = JSON.parse(await getConfig() ?? "");
+
     await getProductionById(paramObj)?.then(res => {
         // console.log("get categories list");
         // console.log(res);
@@ -93,12 +96,12 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     return {
         props: {
             // "category": category, "pList": pList
-            productionRankList, prodcution, currentUrl, domain
+            baseConfig, productionRankList, prodcution, currentUrl, domain
         },
     }
 }
 
-export default function ProductionIntroduce({ productionRankList, prodcution, currentUrl, domain }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function ProductionIntroduce({ baseConfig, productionRankList, prodcution, currentUrl, domain }: InferGetServerSidePropsType<typeof getServerSideProps>) {
     // let data: ProductionDetail;
     var data: ProductionDetail = prodcution;
     var rankList: ProductionRankList[] = productionRankList;
@@ -145,7 +148,7 @@ export default function ProductionIntroduce({ productionRankList, prodcution, cu
                                         images.map((c) => {
                                             return (
                                                 <div key={"Carousel" + c} >
-                                                    <img src={c} />
+                                                    <img src={baseConfig.imgUrl + c} />
                                                 </div>
                                             )
                                         })
@@ -275,7 +278,7 @@ export default function ProductionIntroduce({ productionRankList, prodcution, cu
                                     data.images?.split(',').map((url) => {
                                         return (
                                             <div key={"image" + url}>
-                                                <img src={url} alt={data.name} width="100%" />
+                                                <img src={baseConfig.imgUrl + url} alt={data.name} width="100%" />
                                             </div>
                                         )
                                     })
@@ -289,29 +292,29 @@ export default function ProductionIntroduce({ productionRankList, prodcution, cu
                                         <b>推薦商品</b>{/*推薦商品*/}
                                     </Typography>
                                 </Grid >
-                                    <Grid item justifyContent="center" alignItems="center" className={styleProductionPage.poductionRank}>
-                                        {
-                                            rankList?.map((r: ProductionRankList) => {
-                                                return (
-                                                    <Grid item margin="10px" key={r.name + (r.url)}>
+                                <Grid item justifyContent="center" alignItems="center" className={styleProductionPage.poductionRank}>
+                                    {
+                                        rankList?.map((r: ProductionRankList) => {
+                                            return (
+                                                <Grid item margin="10px" key={r.name + (r.url)}>
 
-                                                        <ProductionCard
-                                                            url={domain + process.env.DEFAULT_PRODUCTION_INTRODUCE_URL + r.id}
-                                                            productionName={substring(r.name, 26)}
-                                                            productionCategory={substring(r.categories, 18)}
-                                                            productionIMG={r.image}
-                                                            productionDescript={substring(r.description, 75)}
-                                                            productionPrice={r.price}
-                                                            productionPriceMin={r.priceMin}
-                                                            shopeeUrl={r.url}
-                                                            urlName={process.env.DEFAULT_BUY_SHOPEE_NAME}
-                                                            alt={substring(r.name, 26)}
-                                                        />
-                                                    </Grid>
-                                                )
-                                            })
-                                        }
-                                    </Grid >
+                                                    <ProductionCard
+                                                        url={domain + process.env.DEFAULT_PRODUCTION_INTRODUCE_URL + r.id}
+                                                        productionName={substring(r.name, 26)}
+                                                        productionCategory={substring(r.categories, 18)}
+                                                        productionIMG={baseConfig.imgUrl + r.image}
+                                                        productionDescript={substring(r.description, 75)}
+                                                        productionPrice={r.price}
+                                                        productionPriceMin={r.priceMin}
+                                                        shopeeUrl={r.url}
+                                                        urlName={process.env.DEFAULT_BUY_SHOPEE_NAME}
+                                                        alt={substring(r.name, 26)}
+                                                    />
+                                                </Grid>
+                                            )
+                                        })
+                                    }
+                                </Grid >
                             </ThemeProvider>
                         </Grid>
                     </Grid>
