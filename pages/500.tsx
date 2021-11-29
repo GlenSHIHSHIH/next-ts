@@ -1,32 +1,13 @@
-import { GetStaticProps, InferGetStaticPropsType } from 'next';
 import { useRouter } from 'next/router';
-
-export const getStaticProps: GetStaticProps = async (ctx) => {
-
-    // const { res } = ctx.defaultLocale;
-    // if (process.env.NODE_ENV != 'development') {
-    //     return {
-    //         redirect: {
-    //             destination: '/production/list',
-    //             permanent: true,
-    //         },
-    //     };
-    // }
+import { useEffect } from 'react';
 
 
-    // res.setHeader("location", "/login");
-    // res.statusCode = 302;
-    // res.end();
-    return {
-        props: {
-            data: true,
-        }
-    };
-};
-
-export default function Custom500({ data }: InferGetStaticPropsType<typeof getStaticProps>) {
+export default function Custom500() {
     const router = useRouter();
-    console.log(router);
+    useEffect(() => {
+        router.push('/production/list');
+     }, [])
+    return (<h1>500 - something error</h1>)
 }
 
 
