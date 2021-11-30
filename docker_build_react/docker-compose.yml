@@ -8,6 +8,11 @@ services:
     volumes:
       - ${opt_path}/:/opt/shopee-ui
     working_dir: "/opt/shopee-ui"
+    ports:
+      - 3111:3111
+    networks:
+      shopee-network:
+        ipv4_address: 172.21.0.12
     logging:
       driver: "json-file"
       options:
@@ -17,46 +22,48 @@ services:
       - /bin/bash
       - -c
       - |
-        yarn install
+        npm install
         yarn build
         sleep 1
         rm -rf ${compiler_folder}/.next
         mkdir -p ${compiler_folder}/
         mv -f .next ${compiler_folder}/.next
-    network_mode: "host"
+        yarn start ${compiler_folder} -p 3111
+        tail -f /dev/null
     stdin_open: true
     tty: true
 
-  react_run_linux:
-      build:
-        context: .
-        dockerfile: dockerfile
-      depends_on:
-          react_build:
-            condition: service_completed_successfully
-      container_name: react_linux
-      volumes:
-        - ${opt_path}/docker_build_react/compiler:/opt/shopee-ui/compiler
-      restart: always
-      working_dir: "/opt/shopee-ui/compiler"
-      ports:
-        - 3111:3111
-      networks:
-        shopee-network:
-          ipv4_address: 172.21.0.12
-      logging:
-        driver: "json-file"
-        options:
-          max-size: "10240k"
-          max-file: "10"
-      command:
-        - /bin/bash
-        - -c
-        - |
-          yarn start
-          tail -f /dev/null
-      stdin_open: true
-      tty: true
+#   react_run_linux:
+#       build:
+#         context: .
+#         dockerfile: dockerfile
+#       depends_on:
+#           react_build:
+#             condition: service_completed_successfully
+#       container_name: react_linux
+#       volumes:
+#         - ${opt_path}/docker_build_react/compiler:/opt/shopee-ui/compiler
+#         - ${opt_path}/package.json:/opt/shopee-ui/package.json
+#       restart: always
+#       working_dir: "/opt/shopee-ui/compiler/.next"
+#       ports:
+#         - 3111:3111
+#       networks:
+#         shopee-network:
+#           ipv4_address: 172.21.0.12
+#       logging:
+#         driver: "json-file"
+#         options:
+#           max-size: "10240k"
+#           max-file: "10"
+#       command:
+#         - /bin/bash
+#         - -c
+#         - |
+#           yarn start -p 3111
+#           tail -f /dev/null
+#       stdin_open: true
+#       tty: true
 
 networks:
   shopee-network:
