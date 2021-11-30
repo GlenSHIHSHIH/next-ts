@@ -34,7 +34,7 @@ const HeaderTitle: React.FC<HeaderTitle> = (props) => {
 
     const {
         title = process.env.DEFAULT_TITLE,
-        icon = process.env.DEFAULT_ICON,
+        icon = process.env.DEFAULT_HEADER_ICON,
         description = defaultDescription,
         url,
         image,
@@ -51,7 +51,7 @@ const HeaderTitle: React.FC<HeaderTitle> = (props) => {
             <meta property="og:url" content={url} data-rh="true" />
             <meta property="og:image" content={image} data-rh="true" />
             <meta name="description" content={description} data-rh="true" />
-            <link rel="icon" href={icon} />
+            <link rel="icon" href={icon} type="image/x-icon" />
             <link rel="canonical" href={url} data-rh="true" />
             <script type="application/ld+json" data-rh="true">
                 {json}
