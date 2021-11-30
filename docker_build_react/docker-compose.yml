@@ -23,12 +23,10 @@ services:
       - -c
       - |
         npm install
-        yarn build
+        rm -rf ${compiler_folder}
         sleep 1
-        rm -rf ${compiler_folder}/.next
-        mkdir -p ${compiler_folder}/
-        mv -f .next ${compiler_folder}/.next
-        yarn start ${compiler_folder} -p 3111
+        yarn build
+        yarn start -p 3111
         tail -f /dev/null
     stdin_open: true
     tty: true
