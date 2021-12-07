@@ -1,5 +1,5 @@
 // production/list.tsx
-import api from "./baseApi";
+import api from "pages/api/baseApi";
 
 export const getProductionList = (data: null | any) => {
     return api("get", "/production/list", data, null)

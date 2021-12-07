@@ -1,5 +1,5 @@
 // user.js
-import api from "./baseApi";
+import api from "pages/api/baseApi";
 
 export const userSignUp = (signUpData: null | any) => {
     return api("post", "/user/sign-in", signUpData, null)

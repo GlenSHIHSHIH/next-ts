@@ -1,4 +1,4 @@
-import api from "./baseApi";
+import api from "pages/api/baseApi";
 // cookie  套件參考 https://dev.to/debosthefirst/how-to-use-cookies-for-persisting-users-in-nextjs-4617
 // import { useCookies } from "react-cookie"
 
