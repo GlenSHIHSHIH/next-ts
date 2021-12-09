@@ -58,7 +58,7 @@ export default function (method: string, url: string, data = null, config: Axios
         case "post":
             return instance.post(url, data, config);
         case "get":
-            return instance.get(url, { params: data });
+            return instance.get(url, config);
         case "delete":
             return instance.delete(url, { params: data });
         case "put":
