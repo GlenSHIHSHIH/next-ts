@@ -1,8 +1,9 @@
-import { Box, Button, Container, createTheme, Divider, FormControl, Grid, IconButton, InputAdornment, InputLabel, OutlinedInput, Paper, responsiveFontSizes, TextField, ThemeProvider, Typography } from "@mui/material";
-import React from "react";
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { Visibility, VisibilityOff } from "@mui/icons-material";
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import { Box, Button, Container, Divider, FormControl, Grid, IconButton, InputAdornment, InputLabel, OutlinedInput, Paper, Typography } from "@mui/material";
 import { login } from "@pages/api/backstage/login";
+import AlertFrame from "component/backstage/AlertFrame";
+import React, { useEffect, useState } from "react";
 
 interface State {
     amount: number,
@@ -23,13 +24,22 @@ interface Login {
 export default function Login() {
 
     const userNameMinLen = 4;
-    const pwdMinLen = 6
+    const pwdMinLen = 6;
+    const [errMsg, setErrMsg] = useState<string>();
 
-    const [userName, setUserName] = React.useState<Account>({
+    useEffect(() => {
+        if (errMsg?.length != 0) {
+            setTimeout(() => {
+                setErrMsg("");
+            }, 3000);
+        }
+    }, [errMsg]);
+
+    const [userName, setUserName] = useState<Account>({
         amount: userNameMinLen,
         userName: '',
     });
-    const [pwd, setPwd] = React.useState<State>({
+    const [pwd, setPwd] = useState<State>({
         amount: pwdMinLen,
         password: '',
         showPassword: false,
@@ -70,16 +80,25 @@ export default function Login() {
         }
 
         login(data)?.then(res => {
-            console.log("login data: ");
+            // console.log("login data: ");
             console.log(res);
             // category = res.data.category;
         }).catch(error => {
-            console.log("getCategoryList 錯誤");
+            setErrMsg(error.response.data.msg);
+            // console.log(error.response.data.msg);
+            // console.log(error.response);
+            // console.log("帳密錯誤");
         })
     }
 
     return (
         <Container maxWidth="xl">
+            {errMsg && <AlertFrame
+                content=''
+                strongContent={errMsg}
+                alertType="error"
+            />
+            }
             <Grid container direction="column" justifyContent="center" alignItems="center" style={{ minHeight: '100vh' }}>
                 <Box
                     sx={{

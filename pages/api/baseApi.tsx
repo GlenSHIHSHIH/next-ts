@@ -25,31 +25,31 @@ instance.interceptors.request.use(config => {
     return err;
 })
 
-instance.interceptors.response.use(response => {
-    return response.data;
-}, err => {
-    if (err && err.response) {
-        switch (err.response.status) {
-            case 400:
-                err.message = "請求錯誤";
-                break;
-            case 401:
-                err.message = "未授權訪問";
-                break;
-            case 404:
-                console.log("你要找的頁面不存在")
-                // go to 404 page
-                break
-            case 500:
-                console.log("程式發生問題")
-                // go to 500 page
-                break
-            default:
-                console.log(err.message)
-        }
-    }
-    return err;
-})
+// instance.interceptors.response.use(response => {
+//     return response.data;
+// }, err => {
+//     if (err && err.response) {
+//         switch (err.response.status) {
+//             case 400:
+//                 err.message = "請求錯誤";
+//                 break;
+//             case 401:
+//                 err.message = "未授權訪問";
+//                 break;
+//             case 404:
+//                 console.log("你要找的頁面不存在")
+//                 // go to 404 page
+//                 break
+//             case 500:
+//                 console.log("程式發生問題")
+//                 // go to 500 page
+//                 break
+//             default:
+//                 console.log(err.message)
+//         }
+//     }
+//     return err;
+// })
 
 // 此處的instance為我們create的實體
 export default function (method: string, url: string, data = null, config: AxiosRequestConfig<null> | any) {
