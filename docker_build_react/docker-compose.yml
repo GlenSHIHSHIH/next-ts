@@ -27,6 +27,7 @@ services:
       - |
         /usr/sbin/nginx
         /usr/sbin/nginx -s reload
+        certbot -d kumkum.ga
         npm install
         rm -rf ${compiler_folder}
         sleep 1
