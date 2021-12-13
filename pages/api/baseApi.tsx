@@ -25,8 +25,8 @@ instance.interceptors.request.use(config => {
     return err;
 })
 
-// instance.interceptors.response.use(response => {
-//     return response.data;
+instance.interceptors.response.use(response => {
+    return response.data;
 // }, err => {
 //     if (err && err.response) {
 //         switch (err.response.status) {
@@ -49,7 +49,7 @@ instance.interceptors.request.use(config => {
 //         }
 //     }
 //     return err;
-// })
+})
 
 // 此處的instance為我們create的實體
 export default function (method: string, url: string, data = null, config: AxiosRequestConfig<null> | any) {
@@ -60,7 +60,7 @@ export default function (method: string, url: string, data = null, config: Axios
         case "get":
             return instance.get(url, config);
         case "delete":
-            return instance.delete(url, { params: data });
+            return instance.delete(url, config);
         case "put":
             return instance.put(url, data, config);
         case "patch":
