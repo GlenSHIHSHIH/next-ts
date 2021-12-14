@@ -28,7 +28,7 @@ services:
         /usr/sbin/nginx
         /usr/sbin/nginx -s reload
         npm install
-        rm -rf ${compiler_folder}
+        rm -rf ./${compiler_folder}
         sleep 1
         yarn build
         yarn start -p 3111
