@@ -33,12 +33,13 @@ services:
     labels:
       - "traefik.docker.network=shopee-network"
       - "traefik.enable=true"
-      - "traefik.basic.frontend.rule=Host:kumkum.ga"
-      - "traefik.basic.port=3111"
-      - "traefik.basic.protocol=http"
-      - "traefik.admin.frontend.rule=Host:kumkum.ga"
-      - "traefik.admin.protocol=https"
-      - "traefik.admin.port=3111"
+      - "traefik.frontend.rule=Host:kumkum.ga"
+      - "traefik.protocol=https,http"
+      - "traefik.port=3111"
+      - "traefik.frontend.redirect.replacement=172.21.0.12"
+      # - "traefik.frontend.rule=Host:kumkum.ga"
+      # - "traefik.port=3111"
+      # - "traefik.protocol=http"
 
 networks:
   shopee-network:
