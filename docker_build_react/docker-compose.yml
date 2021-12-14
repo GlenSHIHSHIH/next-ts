@@ -31,14 +31,14 @@ services:
     stdin_open: true
     tty: true
     labels:
-      - "traefik.docker.network=web"
+      - "traefik.docker.network=shopee-network"
       - "traefik.enable=true"
       - "traefik.basic.frontend.rule=Host:kumkum.ga"
-      - "traefik.basic.port=80"
+      - "traefik.basic.port=3111"
       - "traefik.basic.protocol=http"
       - "traefik.admin.frontend.rule=Host:kumkum.ga"
       - "traefik.admin.protocol=https"
-      - "traefik.admin.port=443"
+      - "traefik.admin.port=3111"
 
 networks:
   shopee-network:
