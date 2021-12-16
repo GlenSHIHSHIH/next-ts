@@ -11,6 +11,8 @@ services:
       - ./ssl:/etc/nginx/ssl
     working_dir: "/opt/shopee-ui"
     ports:
+      - 80:80
+      - 443:443
       - 3111:3111
     networks:
       shopee-network:
