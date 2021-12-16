@@ -2,7 +2,7 @@
 import api from "pages/api/baseApi";
 
 export const getProductionList = (data: null | any) => {
-    return api("get", "/production/list", data, null)
+    return api("get", "/production/list?", data, { params: data })
 }
 
 export const getCategoryList = (data: null | any) => {
