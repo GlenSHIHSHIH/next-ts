@@ -120,26 +120,46 @@ export default function ProductionPage({ baseConfig, carousel, category, pList, 
         return router.pathname + parameter;
     };
 
+
+
+    useEffect(() => {
+        //enter 鍵調整
+        const listener = (event: KeyboardEvent) => {
+            if (event.code == "Enter" || event.code == "NumpadEnter") {
+                event.preventDefault();
+                refresh(1);
+            }
+        };
+        document.addEventListener("keydown", listener);
+        return () => {
+            document.removeEventListener("keydown", listener);
+        };
+    }, [searchMsg]);
+
+
     useEffect(() => { //需要換參數
         // console.log(firstUpdate.current);
+
         if (firstUpdate.current) {
             firstUpdate.current = false;
-            return;
         }
         else {
-            router.push(url(1, selectCount, 'asc',
-                'PId', searchMsg, selectCategory));
+            refresh(1);
             // console.log("page:" + page);
             // console.log("searchMsg:" + searchMsg);
             // console.log("selectCategory:" + selectCategory);
             // console.log("selectCount:" + selectCount);
         }
-    }, [searchCheck, selectCount])
+    }, [searchCheck, selectCount, selectCategory])
+
+    const refresh = (value: number) => {
+        router.push(url(value, selectCount, 'asc',
+            'PId', searchMsg, selectCategory));
+    }
 
     const pageChange = (event: React.ChangeEvent<unknown>, value: number) => {
         setPage(value);
-        router.push(url(value, selectCount, 'asc',
-            'PId', searchMsg, selectCategory));
+        refresh(value);
     };
 
     const searchChange = (value: string) => {
