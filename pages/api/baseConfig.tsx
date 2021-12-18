@@ -14,8 +14,8 @@ const getConfigByUrl = (data: null | any) => {
 export const getConfig = async () => {
 
     const cookies = new Cookies();
-    const cookieName = "config";
-    var config = cookies.get(cookieName);
+    const cookieBaseConfig = "BASE_CONFIG";
+    var config = cookies.get(cookieBaseConfig);
 
     if (config != null && config != undefined) {
         return config;
@@ -31,9 +31,9 @@ export const getConfig = async () => {
         console.log("getConfig 錯誤");
     })
 
-    cookies.set(cookieName, JSON.stringify(configData), {
+    cookies.set(cookieBaseConfig, JSON.stringify(configData), {
         path: "/",
-        maxAge: 300, // Expires after 5 minutes
+        maxAge: Number(process.env.DEFAULT_BASE_CONFIG_COOKIE_TIME), // Expires after 5 minutes
         sameSite: true,
     });
 
