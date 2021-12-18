@@ -33,3 +33,4 @@ yarn-error.log*
 # vercel
 .vercel
 docker_build_react/compiler/*
+.vscode/*
