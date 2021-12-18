@@ -12,7 +12,7 @@ import React from "react";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
 
-interface OptionData {
+interface OptionData { //對照 shopee 的 option
     Name?: string,
     Option?: string[],
 }

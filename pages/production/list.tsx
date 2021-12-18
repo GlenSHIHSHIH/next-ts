@@ -167,8 +167,7 @@ export default function ProductionPage({ baseConfig, carousel, category, pList, 
     };
 
     const searchCheckChange = () => {
-        // console.log(searchCheck + 1)
-        setSearchCheck(searchCheck + 1);
+        refresh(1);
     };
 
     const selectCategoryChange = (value: string) => {
