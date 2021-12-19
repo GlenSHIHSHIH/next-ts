@@ -1,9 +1,12 @@
+import SetUserInfo from "@context/actions";
+import { useAuthStateContext } from "@context/context";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { Box, Button, Container, Divider, FormControl, Grid, IconButton, InputAdornment, InputLabel, OutlinedInput, Paper, Typography } from "@mui/material";
 import { login } from "@pages/api/backstage/login";
 import AlertFrame from "component/backstage/AlertFrame";
 import React, { useEffect, useState } from "react";
+import { useRouter } from 'next/router';
 
 interface State {
     amount: number,
@@ -26,6 +29,8 @@ export default function Login() {
     const userNameMinLen = 4;
     const pwdMinLen = 6;
     const [errMsg, setErrMsg] = useState<string>();
+    const { state, dispatch } = useAuthStateContext();
+    const router = useRouter();
 
     useEffect(() => {
         if (errMsg?.length != 0) {
@@ -79,16 +84,22 @@ export default function Login() {
             password: pwd.password,
         }
 
+
+
         login(data)?.then(res => {
             // console.log("login data: ");
-            console.log(res);
             // category = res.data.category;
+            // console.log(res);
+            SetUserInfo(dispatch, res.data);
+            router.push("http://localhost:3000/backstage/dashboard");
         }).catch(error => {
-            setErrMsg(error.response.data.msg);
+            console.log(error.msg);
+            console.log(error.data?.msg);
+            // setErrMsg(error.msg);
             // console.log(error.response.data.msg);
             // console.log(error.response);
             // console.log("帳密錯誤");
-        })
+        });
     }
 
     return (

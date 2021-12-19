@@ -21,10 +21,10 @@ const cookies = new Cookies();
 export const cookieUserInfo = "USER_INFO";
 
 let userInfo = cookies.get(cookieUserInfo)
-    ? JSON.parse(cookies.get(cookieUserInfo)).userInfo
+    ? JSON?.parse(cookies.get(cookieUserInfo) ?? {})?.userInfo
     : null;
 let authorityJwt = cookies.get(cookieUserInfo)
-    ? JSON.parse(cookies.get(cookieUserInfo)).authorityJwt
+    ? JSON?.parse(cookies.get(cookieUserInfo) ?? {})?.authorityJwt
     : null;
 
 export const initialState: Auth = {
@@ -35,30 +35,30 @@ export const initialState: Auth = {
     loading: false
 };
 
-export const AuthReducer = (initialState: any, action: Auth) => {
+export const AuthReducer = (state: any, action: Auth) => {
     switch (action.type) {
         case "REQUEST_LOGIN":
             return {
-                ...initialState,
+                ...state,
                 loading: true
             };
         case "LOGIN_SUCCESS":
             return {
-                ...initialState,
+                ...state,
                 userInfo: action.userInfo,
                 authorityJwt: action.authorityJwt,
                 loading: false
             };
         case "LOGOUT":
             return {
-                ...initialState,
+                ...state,
                 userInfo: null,
                 authorityJwt: null
             };
 
         case "LOGIN_ERROR":
             return {
-                ...initialState,
+                ...state,
                 loading: false,
                 msg: action.msg
             };

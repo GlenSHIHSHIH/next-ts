@@ -1,4 +1,4 @@
-import axios, { AxiosRequestConfig } from 'axios';
+import axios, { AxiosRequestConfig, AxiosResponseHeaders } from 'axios';
 
 const TIMEOUT = 5000;
 const devBaseURL = process.env.DEVELOP_BASEURL;
@@ -25,30 +25,46 @@ instance.interceptors.request.use(config => {
     return err;
 })
 
+export interface AxiosResponse<T = any, D = any> {
+    data: T;
+    msg?: string;
+    status: number;
+    statusText: string;
+    headers: AxiosResponseHeaders;
+    config: AxiosRequestConfig<D>;
+    request?: any;
+}
+
 instance.interceptors.response.use(response => {
-    return response.data;
-// }, err => {
-//     if (err && err.response) {
-//         switch (err.response.status) {
-//             case 400:
-//                 err.message = "請求錯誤";
-//                 break;
-//             case 401:
-//                 err.message = "未授權訪問";
-//                 break;
-//             case 404:
-//                 console.log("你要找的頁面不存在")
-//                 // go to 404 page
-//                 break
-//             case 500:
-//                 console.log("程式發生問題")
-//                 // go to 500 page
-//                 break
-//             default:
-//                 console.log(err.message)
-//         }
-//     }
-//     return err;
+    let data: AxiosResponse = { ...response.data, msg: response.data.msg };
+    return data;
+}, err => {
+    if (err && err.response) {
+        let data: AxiosResponse = { ...err.response.data, msg: err.response.data.msg };
+        return data;
+    }
+    // }, err => {
+    //     if (err && err.response) {
+    //         switch (err.response.status) {
+    //             case 400:
+    //                 err.message = "請求錯誤";
+    //                 break;
+    //             case 401:
+    //                 err.message = "未授權訪問";
+    //                 break;
+    //             case 404:
+    //                 console.log("你要找的頁面不存在")
+    //                 // go to 404 page
+    //                 break
+    //             case 500:
+    //                 console.log("程式發生問題")
+    //                 // go to 500 page
+    //                 break
+    //             default:
+    //                 console.log(err.message)
+    //         }
+    //     }
+    //     return err;
 })
 
 // 此處的instance為我們create的實體

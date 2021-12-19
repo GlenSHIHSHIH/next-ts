@@ -1,17 +1,29 @@
-import React, { createContext, useReducer } from "react";
-import { AuthReducer, initialState } from "context/reducer";
+import { createContext, Dispatch, useContext, useMemo, useReducer, useState } from "react";
+import { Auth, AuthReducer, initialState } from "context/reducer";
 
-export const [userInfo, dispatch] = useReducer(AuthReducer, initialState);
-
-const AuthStateContext = createContext(userInfo);
-
-export function useAuthState() {
-    const context = React.useContext(AuthStateContext);
-    if (context.userInfo == null || context.authorityJwt == null) {
-        throw new Error("useAuthState must be used within a AuthProvider");
-    }
-
-    return context;
+interface IContextProps {
+    state: Auth;
+    dispatch: any;
 }
 
+const AuthStateContext = createContext<any>({ state: initialState, dispatch: { type: 'REQUEST_LOGIN' } });
+// const AuthStateContext = createContext({ state: initialState } as IContextProps);
+
+export default function UseAuthState({ children }: any) {
+    const [state, dispatch] = useReducer(AuthReducer, initialState);
+    // const [appState, setAppState] = useState({});
+    const contextValue = useMemo(() => {
+        return { state, dispatch };
+    }, [state, dispatch]);
+
+    return (
+        <AuthStateContext.Provider value={contextValue}>
+            {children}
+        </AuthStateContext.Provider>
+    );
+}
+
+export function useAuthStateContext() {
+    return useContext(AuthStateContext);
+}
 
