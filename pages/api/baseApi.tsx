@@ -38,11 +38,6 @@ export interface AxiosResponse<T = any, D = any> {
 instance.interceptors.response.use(response => {
     let data: AxiosResponse = { ...response.data, msg: response.data.msg };
     return data;
-}, err => {
-    if (err && err.response) {
-        let data: AxiosResponse = { ...err.response.data, msg: err.response.data.msg };
-        return data;
-    }
     // }, err => {
     //     if (err && err.response) {
     //         switch (err.response.status) {
@@ -68,7 +63,7 @@ instance.interceptors.response.use(response => {
 })
 
 // 此處的instance為我們create的實體
-export default function (method: string, url: string, data = null, config: AxiosRequestConfig<null> | any) {
+export default function api(method: string, url: string, data = null, config: AxiosRequestConfig<null> | any) {
     method = method.toLowerCase();
     switch (method) {
         case "post":

@@ -1,19 +1,18 @@
-import { createContext, Dispatch, useContext, useMemo, useReducer, useState } from "react";
 import { Auth, AuthReducer, initialState } from "context/reducer";
+import { createContext, useContext, useMemo, useReducer } from "react";
 
-interface IContextProps {
+interface ContextProps {
     state: Auth;
     dispatch: any;
 }
 
-const AuthStateContext = createContext<any>({ state: initialState, dispatch: { type: 'REQUEST_LOGIN' } });
-// const AuthStateContext = createContext({ state: initialState } as IContextProps);
+const AuthStateContext = createContext<any>({ state: initialState(), dispatch: { type: '' } } as ContextProps);
 
 export default function UseAuthState({ children }: any) {
-    const [state, dispatch] = useReducer(AuthReducer, initialState);
+    const [state, dispatch] = useReducer(AuthReducer, initialState());
     // const [appState, setAppState] = useState({});
     const contextValue = useMemo(() => {
-        return { state, dispatch };
+        return {state, dispatch};
     }, [state, dispatch]);
 
     return (

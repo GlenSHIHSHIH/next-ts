@@ -10,29 +10,47 @@ interface AuthorityJwt {
 }
 
 export interface Auth {
-    userInfo?: UserInfo,
-    authorityJwt?: AuthorityJwt,
+    userInfo?: UserInfo | null,
+    authorityJwt?: AuthorityJwt | null,
     msg?: string,
-    type: string,
+    type?: string,
     loading?: boolean
 }
 
 const cookies = new Cookies();
 export const cookieUserInfo = "USER_INFO";
 
-let userInfo = cookies.get(cookieUserInfo)
-    ? JSON?.parse(cookies.get(cookieUserInfo) ?? {})?.userInfo
-    : null;
-let authorityJwt = cookies.get(cookieUserInfo)
-    ? JSON?.parse(cookies.get(cookieUserInfo) ?? {})?.authorityJwt
-    : null;
+//儲存 cookie 登入資訊
+export const setCookieUserInfo = (data: Auth) => {
+    cookies.set(cookieUserInfo, JSON.stringify(data), {
+        path: process.env.DEFAULT_USER_INFO_COOKIE_PATH,
+        maxAge: Number(process.env.DEFAULT_BASE_CONFIG_COOKIE_TIME), // Expires after 5 minutes
+        sameSite: true,
+    });
+}
 
-export const initialState: Auth = {
-    userInfo: null || userInfo,
-    authorityJwt: null || authorityJwt,
-    msg: "",
-    type: "",
-    loading: false
+//刪除 cookie 登入資訊
+export const removeCookieUserInfo = () => {
+    cookies.remove(cookieUserInfo);
+}
+
+
+
+export const initialState = () => {
+    let userAuth: Auth = {};
+
+    if (cookies.get(cookieUserInfo)) {
+        userAuth = JSON.parse(JSON.stringify(cookies.get(cookieUserInfo)));
+        console.log(JSON.stringify(userAuth));
+        // userAuth = JSON.parse(cookies.get(cookieUserInfo));
+    } else {
+        userAuth.userInfo = null;
+        userAuth.authorityJwt = null;
+        userAuth.msg = "";
+        userAuth.type = "";
+        userAuth.loading = false;
+    }
+    return userAuth;
 };
 
 export const AuthReducer = (state: any, action: Auth) => {
