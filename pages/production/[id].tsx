@@ -1,7 +1,7 @@
 import { Button, Container, Divider, Grid, Typography } from "@mui/material";
 import { createTheme, responsiveFontSizes, ThemeProvider } from '@mui/material/styles';
-import { getConfig } from "@pages/api/baseConfig";
-import { getProductionById, getProductionRank } from "@pages/api/productionDetailApi";
+import { getConfigApi } from "@pages/api/baseConfigApi";
+import { getProductionByIdApi, getProductionRankApi } from "@pages/api/productionDetailApi";
 import styleProductionPage from "@styles/page/ProductionPage.module.css";
 import { getCurrentUrl, getDomain, substring } from "@utils/base_fucntion";
 import HeaderTitle from "component/HeaderTitle";
@@ -65,9 +65,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     var prodcution: ProductionDetail | null = null;
     var productionRankList: ProductionRankList[] | null = null;
 
-    var baseConfig = JSON.parse(await getConfig() ?? "");
+    var baseConfig = JSON.parse(await getConfigApi() ?? "");
 
-    await getProductionById(paramObj)?.then(res => {
+    await getProductionByIdApi(paramObj)?.then(res => {
         // console.log("get categories list");
         // console.log(res);
         prodcution = res.data.production;
@@ -75,7 +75,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         console.log("getProductionById 錯誤");
     })
 
-    await getProductionRank({ count: process.env.DEFAULT_RANK_COUNT })?.then(res => {
+    await getProductionRankApi({ count: process.env.DEFAULT_RANK_COUNT })?.then(res => {
         // console.log("get categories list");
         productionRankList = res.data.productionList;
         // console.log(productionRankList);

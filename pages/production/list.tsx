@@ -1,5 +1,5 @@
 import { Container, createTheme, Grid, Pagination, responsiveFontSizes, ThemeProvider, Typography } from "@mui/material";
-import { getConfig } from "@pages/api/baseConfig";
+import { getConfigApi } from "@pages/api/baseConfigApi";
 import styleProductionList from "@styles/page/ProductionList.module.css";
 import { getCurrentUrl, getDomain, substring } from "@utils/base_fucntion";
 import HeaderTitle from "component/HeaderTitle";
@@ -8,7 +8,7 @@ import SearchBar from "component/SearchBar";
 import SelectBox from "component/SelectBox";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { useRouter } from 'next/router';
-import { getCarouselList, getCategoryList, getProductionList } from "pages/api/productionApi";
+import { getCarouselListApi, getCategoryListApi, getProductionListApi } from "pages/api/productionApi";
 import React, { useEffect, useRef, useState } from "react";
 import { Carousel } from 'react-responsive-carousel';
 import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
@@ -61,10 +61,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         searchCategory: ""
     };
 
-    var baseConfig = JSON.parse(await getConfig() ?? "");
+    var baseConfig = JSON.parse(await getConfigApi() ?? "");
     // console.log(baseConfig);
 
-    await getCategoryList(null)?.then(res => {
+    await getCategoryListApi(null)?.then(res => {
         // console.log("get categories list");
         // console.log(res);
         category = res.data.category;
@@ -72,7 +72,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         console.log("getCategoryList 錯誤");
     })
 
-    await getCarouselList(null)?.then(res => {
+    await getCarouselListApi(null)?.then(res => {
         // console.log("get carousel list");
         // console.log(res);
         carousel = res.data.carousels;
@@ -80,7 +80,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         console.log("getCarouselList 錯誤");
     })
 
-    await getProductionList(context.query)?.then(res => {
+    await getProductionListApi(context.query)?.then(res => {
         // console.log("get production list");
         // console.log(res);
         pList = res.data.productionList;

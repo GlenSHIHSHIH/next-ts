@@ -1,14 +1,14 @@
 // production/list.tsx
 import api from "pages/api/baseApi";
 
-export const getProductionList = (data: null | any) => {
+export const getProductionListApi = (data: null | any) => {
     return api("get", "/production/list?", data, { params: data })
 }
 
-export const getCategoryList = (data: null | any) => {
+export const getCategoryListApi = (data: null | any) => {
     return api("get", "/category/list", data, null)
 }
 
-export const getCarouselList = (data: null | any) => {
+export const getCarouselListApi = (data: null | any) => {
     return api("get", "/carousel/list", data, null)
 }

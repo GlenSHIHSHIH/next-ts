@@ -3,7 +3,7 @@ import { useAuthStateContext } from "@context/context";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { Box, Button, Container, Divider, FormControl, Grid, IconButton, InputAdornment, InputLabel, OutlinedInput, Paper, Typography } from "@mui/material";
-import { login } from "@pages/api/backstage/login";
+import { loginApi } from "@pages/api/backstage/loginApi";
 import AlertFrame from "component/backstage/AlertFrame";
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from "react";
@@ -84,7 +84,7 @@ export default function Login() {
             password: pwd.password,
         }
 
-        login(data)?.then(res => {
+        loginApi(data)?.then(res => {
             // console.log("login data: ");
             // category = res.data.category;
             console.log(state);

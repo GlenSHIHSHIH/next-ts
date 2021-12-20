@@ -1,17 +1,16 @@
 import api from "pages/api/baseApi";
 // cookie  套件參考 https://dev.to/debosthefirst/how-to-use-cookies-for-persisting-users-in-nextjs-4617
 // import { useCookies } from "react-cookie"
-
 // cookie  套件參考 https://www.npmjs.com/package/universal-cookie
 import Cookies from 'universal-cookie';
 
 
-const getConfigByUrl = (data: null | any) => {
+const getConfigByUrlApi = (data: null | any) => {
     return api("get", "/forestage/config", data, null)
 }
 
 //實作取出 config 內容
-export const getConfig = async () => {
+export const getConfigApi = async () => {
 
     const cookies = new Cookies();
     const cookieBaseConfig = "BASE_CONFIG";
@@ -23,7 +22,7 @@ export const getConfig = async () => {
 
     var configData: any = "";
 
-    await getConfigByUrl(null)?.then(async res => {
+    await getConfigByUrlApi(null)?.then(async res => {
         // console.log("getConfig");
         // console.log(res);
         configData = res.data.baseConfig;
