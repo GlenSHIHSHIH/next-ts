@@ -6,7 +6,7 @@ export const getProductionListApi = (data: null | any) => {
 }
 
 export const getCategoryListApi = (data: null | any) => {
-    return api("get", "/category/list", data, null)
+    return api("get", "/production/category/list", data, null)
 }
 
 export const getCarouselListApi = (data: null | any) => {
