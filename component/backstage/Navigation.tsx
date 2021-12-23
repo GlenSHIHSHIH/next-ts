@@ -1,7 +1,7 @@
-import MailIcon from '@mui/icons-material/Mail';
+import { ExpandLess, ExpandMore, StarBorder } from '@mui/icons-material';
 import MenuIcon from '@mui/icons-material/Menu';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
-import { createTheme, Grid, responsiveFontSizes, ThemeProvider } from '@mui/material';
+import { Collapse, createTheme, Grid, ListItemButton, responsiveFontSizes, ThemeProvider } from '@mui/material';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -9,39 +9,49 @@ import Divider from '@mui/material/Divider';
 import Drawer from '@mui/material/Drawer';
 import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import PropTypes from 'prop-types';
 import * as React from 'react';
+import { useState } from 'react';
 
 interface NavigationProp {
     window?: any,
     menuName?: string,
     backGroundColor?: string,
     titleBackGroundColor?: string,
+    title?: string
     child?: any
 }
 
 const Navigation: React.FC = (props: any) => {
-    const drawerWidth = 240;
+
     const {
         child,
+        title,
         window,
         menuName = process.env.DEFAULT_TITLE,
         backGroundColor = process.env.DEFAULT_PAGE_BACKGROUND_COLOR,
         titleBackGroundColor = process.env.DEFAULT_TITLE_BACKGROUND_COLOR
     } = props;
-    const [mobileOpen, setMobileOpen] = React.useState(false);
+    const drawerWidth = 240;
+
+    let theme = createTheme();
+    theme = responsiveFontSizes(theme);
+
+    const [mobileOpen, setMobileOpen] = useState(false);
+    const [open, setOpen] = useState(true);
 
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
     };
 
-    let theme = createTheme();
-    theme = responsiveFontSizes(theme);
+    const handleClick = () => {
+        setOpen(!open);
+    };
+
 
     const drawer = (
         <div>
@@ -53,27 +63,27 @@ const Navigation: React.FC = (props: any) => {
                 </Grid>
             </Toolbar>
             <Divider />
+
             <List>
-                {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-                    <ListItem button key={text}>
-                        <ListItemIcon>
-                            {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                        </ListItemIcon>
-                        <ListItemText primary={text} />
-                    </ListItem>
-                ))}
+                <ListItemButton onClick={handleClick}>
+                    <ListItemIcon>
+                        <InboxIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Inbox" />
+                    {open ? <ExpandLess /> : <ExpandMore />}
+                </ListItemButton>
+                <Collapse in={open} timeout="auto" unmountOnExit>
+                    <List component="div" disablePadding>
+                        <ListItemButton sx={{ pl: 4 }}>
+                            <ListItemIcon>
+                                <StarBorder />
+                            </ListItemIcon>
+                            <ListItemText primary="Starred" />
+                        </ListItemButton>
+                    </List>
+                </Collapse>
             </List>
-            <Divider />
-            <List>
-                {['All mail', 'Trash', 'Spam'].map((text, index) => (
-                    <ListItem button key={text}>
-                        <ListItemIcon>
-                            {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                        </ListItemIcon>
-                        <ListItemText primary={text} />
-                    </ListItem>
-                ))}
-            </List>
+
         </div >
     );
 
@@ -102,7 +112,7 @@ const Navigation: React.FC = (props: any) => {
                             <MenuIcon />
                         </IconButton>
                         <Typography variant="h6" noWrap component="div" >
-                            Responsive drawer
+                            {title}
                         </Typography>
                     </Toolbar>
                 </AppBar>
