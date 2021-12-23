@@ -1,5 +1,6 @@
 import SetUserInfo from "@context/actions";
 import { useAuthStateContext } from "@context/context";
+import { jwtValidate } from "@middleware/jwtAuthMiddleware";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { Box, Button, Container, Divider, FormControl, Grid, IconButton, InputAdornment, InputLabel, OutlinedInput, Paper, Typography } from "@mui/material";
@@ -32,13 +33,29 @@ export default function Login() {
     const { state, dispatch } = useAuthStateContext();
     const router = useRouter();
 
+
     useEffect(() => {
         if (errMsg?.length != 0) {
             setTimeout(() => {
                 setErrMsg("");
             }, 3000);
         }
-    }, [errMsg]);
+        const fetchData = async () => {
+
+            if (state.authorityJwt?.token == undefined || state.authorityJwt?.token == null) {
+                return;
+            }
+            //判斷 是否已登入
+            const check = await jwtValidate(state);
+
+            console.log('data', check);
+            if (check == true) {
+                router.push('/backstage/dashboard');
+            }
+        };
+        fetchData();
+
+    }, []);
 
     const [userName, setUserName] = useState<Account>({
         amount: userNameMinLen,
