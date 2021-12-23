@@ -89,7 +89,7 @@ export default function Login() {
             // category = res.data.category;
             console.log(state);
             SetUserInfo(dispatch, res.data);
-            router.push("http://localhost:3000/backstage/dashboard");
+            router.push("/backstage/dashboard");
         }).catch(error => {
             // console.log("error:");
             setErrMsg(error.response?.data?.msg);

@@ -63,7 +63,7 @@ instance.interceptors.response.use(response => {
 })
 
 // 此處的instance為我們create的實體
-export default function api(method: string, url: string, data = null, config: AxiosRequestConfig<null> | any) {
+export default function api(method: string, url: string, data: null | any = null, config: AxiosRequestConfig<null> | any) {
     method = method.toLowerCase();
     switch (method) {
         case "post":

@@ -9,6 +9,7 @@
       "@styles/*": ["styles/*"],
       "@utils/*": ["utils/*"],
       "@context/*": ["context/*"],
+      "@middleware/*": ["middleware/*"],
     },
 
     "target": "es5",

@@ -41,7 +41,7 @@ export const initialState = () => {
 
     if (cookies.get(cookieUserInfo)) {
         userAuth = JSON.parse(JSON.stringify(cookies.get(cookieUserInfo)));
-        console.log(JSON.stringify(userAuth));
+        // console.log(JSON.stringify(userAuth));
         // userAuth = JSON.parse(cookies.get(cookieUserInfo));
     } else {
         userAuth.userInfo = null;
