@@ -56,7 +56,7 @@ async function jwtRefesh(auth: Auth): Promise<boolean> {
 
 //驗證 jwt
 export async function jwtValidate(auth: Auth): Promise<boolean> {
-    var apiData = api("post", "/backstage/jwt/check", null, { headers: { Authorization: "Bearer " + auth.authorityJwt?.token } });
+    var apiData = api("get", "/backstage/jwt/check", null, { headers: { Authorization: "Bearer " + auth.authorityJwt?.token } });
     var returnBool = await apiData?.then(res => {
         if (res.data.id > 0) {
             console.log("驗證 jwt成功");
