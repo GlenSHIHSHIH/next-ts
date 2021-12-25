@@ -13,6 +13,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
+import { getNaviApi } from '@pages/api/backstage/navigationApi';
 import PropTypes from 'prop-types';
 import * as React from 'react';
 import { useState } from 'react';
@@ -51,6 +52,8 @@ const Navigation: React.FC = (props: any) => {
     const handleClick = () => {
         setOpen(!open);
     };
+
+    const navigation = JSON.parse(getNaviApi() ?? "");
 
 
     const drawer = (
