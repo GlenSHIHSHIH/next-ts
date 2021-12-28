@@ -1,97 +1,190 @@
+import { useAuthStateContext } from '@context/context';
 import { ExpandLess, ExpandMore, StarBorder } from '@mui/icons-material';
 import MenuIcon from '@mui/icons-material/Menu';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
-import { Collapse, createTheme, Grid, ListItemButton, responsiveFontSizes, ThemeProvider } from '@mui/material';
+import { Collapse, createTheme, Divider, Grid, List, ListItemButton, ListItemIcon, ListItemText, responsiveFontSizes, ThemeProvider } from '@mui/material';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import CssBaseline from '@mui/material/CssBaseline';
-import Divider from '@mui/material/Divider';
 import Drawer from '@mui/material/Drawer';
 import IconButton from '@mui/material/IconButton';
-import List from '@mui/material/List';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import { getNaviApi } from '@pages/api/backstage/navigationApi';
 import PropTypes from 'prop-types';
 import * as React from 'react';
-import { useState } from 'react';
-
+import { useEffect, useState } from 'react';
 interface NavigationProp {
     window?: any,
     menuName?: string,
     backGroundColor?: string,
     titleBackGroundColor?: string,
     title?: string
-    child?: any
+    children?: any
+}
+interface MenuNestData {
+    id: number,
+    name: string,
+    key: string,
+    url: string,
+    feature: string,
+    parent: number,
+    child: MenuNestData[];
 }
 
-const Navigation: React.FC = (props: any) => {
+interface OpenValue {
+    id: number,
+    isopen: boolean
+}
+
+const Navigation: React.FC<NavigationProp> = (props: any) => {
 
     const {
-        child,
+        children,
         title,
         window,
         menuName = process.env.DEFAULT_TITLE,
         backGroundColor = process.env.DEFAULT_PAGE_BACKGROUND_COLOR,
         titleBackGroundColor = process.env.DEFAULT_TITLE_BACKGROUND_COLOR
     } = props;
+
     const drawerWidth = 240;
 
     let theme = createTheme();
     theme = responsiveFontSizes(theme);
 
     const [mobileOpen, setMobileOpen] = useState(false);
-    const [open, setOpen] = useState(true);
+    const [openValue, setOpenValue] = useState<OpenValue[]>();
+    const [menuList, setMenuList] = useState<MenuNestData[]>();
+
 
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
     };
 
-    const handleClick = () => {
-        setOpen(!open);
+    const handleClick = (id: number) => () => {
+        console.log(id);
+        setOpenBoolean(id, true);
     };
 
-    const navigation = JSON.parse(getNaviApi() ?? "");
+    const isOpenBoolean = (id: number) => {
+        if (openValue != undefined) {
+            for (var ov of openValue) {
+                if (ov.id == id) {
+                    return ov.isopen;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    const setOpenBoolean = (id: number, value: boolean) => {
+        let o = isOpenBoolean(id);
+
+        if (o == value) {
+            return;
+        }
+
+        if (o == null) {
+            let open: OpenValue = {
+                id: id,
+                isopen: true
+            }
+            let setValue = openValue?.concat(open);
+            setOpenValue(setValue);
+            return;
+        }
+
+        if (openValue != undefined) {
+            for (var ov of openValue) {
+                if (ov.id == id) {
+                    ov.isopen = value;
+                    break;
+                }
+            }
+            return;
+        }
+
+    }
+
+    const setNavData = (navigation: MenuNestData[] | undefined) => {
+        if (navigation == undefined) {
+            return (
+                <div>
+                    <Toolbar style={{ background: backGroundColor }}>
+                        <Grid container item direction="column" justifyContent="center" alignItems="center">
+                            <Typography variant="h6" noWrap component="div">
+                                {menuName ?? "Menu"}
+                            </Typography>
+                        </Grid>
+                    </Toolbar>
+                    <Divider />
+                </div>
+            )
+        } else if ("object" === typeof navigation) {
+            return (
+                <div>
+                    <Toolbar style={{ background: backGroundColor }}>
+                        <Grid container item direction="column" justifyContent="center" alignItems="center">
+                            <Typography variant="h6" noWrap component="div">
+                                {menuName ?? "Menu"}
+                            </Typography>
+                        </Grid>
+                    </Toolbar>
+                    <Divider />
 
 
-    const drawer = (
-        <div>
-            <Toolbar style={{ background: backGroundColor }}>
-                <Grid container item direction="column" justifyContent="center" alignItems="center">
-                    <Typography variant="h6" noWrap component="div">
-                        {menuName ?? "Menu"}
-                    </Typography>
-                </Grid>
-            </Toolbar>
-            <Divider />
-
-            <List>
-                <ListItemButton onClick={handleClick}>
-                    <ListItemIcon>
-                        <InboxIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="Inbox" />
-                    {open ? <ExpandLess /> : <ExpandMore />}
-                </ListItemButton>
-                <Collapse in={open} timeout="auto" unmountOnExit>
-                    <List component="div" disablePadding>
-                        <ListItemButton sx={{ pl: 4 }}>
-                            <ListItemIcon>
-                                <StarBorder />
-                            </ListItemIcon>
-                            <ListItemText primary="Starred" />
-                        </ListItemButton>
+                    <List>
+                        {navigation.map(({ id, name, child }: MenuNestData) => {
+                            const open = isOpenBoolean(id) || false;
+                            return (
+                                <div key={id}>
+                                    <ListItemButton onClick={handleClick(id)}>
+                                        <ListItemIcon>
+                                            <InboxIcon />
+                                        </ListItemIcon>
+                                        <ListItemText primary={name} />
+                                        {open ? <ExpandLess /> : <ExpandMore />}
+                                    </ListItemButton>
+                                    <Collapse in={open} timeout="auto" unmountOnExit>
+                                        <List component="div" disablePadding>
+                                            {child.map(({ id, name }: MenuNestData) => (
+                                                <ListItemButton key={id} sx={{ pl: 4 }}>
+                                                    <ListItemIcon>
+                                                        <StarBorder />
+                                                    </ListItemIcon>
+                                                    <ListItemText primary={name} />
+                                                </ListItemButton>
+                                            ))}
+                                        </List>
+                                    </Collapse>
+                                </div >
+                            );
+                        })}
                     </List>
-                </Collapse>
-            </List>
 
-        </div >
-    );
+                </div >
+            );
+        }
+    }
+
+    const { state } = useAuthStateContext();
+    useEffect(() => {
+        // STEP 1：在 useEffect 中定義 async function 取名為 fetchData
+        let fetchData = async () => {
+            // STEP 2：使用 Promise.all 搭配 await 等待兩個 API 都取得回應後才繼續
+            var navigation: MenuNestData[] = await getNaviApi(state);
+            // var navigation: MenuNestData[] = JSON.parse(await getNaviApi(state) ?? "{}");
+            if (navigation != null && navigation != undefined) {
+                setMenuList(navigation);
+            }
+
+        };
+        fetchData();
+    }, []);
 
     const container = window !== undefined ? () => window().document.body : undefined;
-
     return (
         <Box sx={{ display: 'flex' }}>
             <ThemeProvider theme={theme}>
@@ -138,7 +231,7 @@ const Navigation: React.FC = (props: any) => {
                             '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
                         }}
                     >
-                        {drawer}
+                        {setNavData(menuList)}
                     </Drawer>
                     <Drawer
                         variant="permanent"
@@ -148,7 +241,8 @@ const Navigation: React.FC = (props: any) => {
                         }}
                         open
                     >
-                        {drawer}
+                        {setNavData(menuList)}
+
                     </Drawer>
                 </Box>
                 <Box
@@ -156,7 +250,7 @@ const Navigation: React.FC = (props: any) => {
                     sx={{ flexGrow: 1, p: 3, width: { sm: `calc(100% - ${drawerWidth}px)` } }}
                 >
                     <Toolbar />
-                    {child}
+                    {children}
                 </Box>
             </ThemeProvider>
         </Box>
@@ -171,3 +265,7 @@ Navigation.propTypes = {
     window: PropTypes.func,
 };
 export default Navigation;
+
+
+
+

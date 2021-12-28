@@ -1,3 +1,4 @@
+import { Auth } from "context/reducer";
 import api from "pages/api/baseApi";
 // cookie  套件參考 https://dev.to/debosthefirst/how-to-use-cookies-for-persisting-users-in-nextjs-4617
 // import { useCookies } from "react-cookie"
@@ -10,31 +11,37 @@ const getNavigationApi = (data: null | any) => {
 }
 
 //實作取出 config 內容
-export const getNaviApi = () => {
+export const getNaviApi = async (auth: Auth) => {
 
     const cookies = new Cookies();
     const cookieName = "NAVIGATION_MENU_LIST";
     var data = cookies.get(cookieName);
 
     if (data != null && data != undefined) {
+        // console.log("cache NAVIGATION");
+        // console.log(data);
         return data;
     }
 
     var navigationData: any = "";
 
-    getNavigationApi(null)?.then(async res => {
-        // console.log("getConfig");
+    await getNavigationApi({ headers: { Authorization: "Bearer " + auth.authorityJwt?.token } })?.then(async res => {
+        // console.log("response NAVIGATION");
         // console.log(res);
         navigationData = res.data.menu;
     }).catch(error => {
         console.log("Navigation 錯誤");
+        return;
     })
 
-    cookies.set(cookieName, JSON.stringify(navigationData), {
-        path: "/backstage",
-        maxAge: Number(process.env.DEFAULT_BASE_CONFIG_COOKIE_TIME), // Expires after 5 minutes
-        sameSite: true,
-    });
+    if (navigationData != "" && navigationData != null && navigationData != undefined) {
+
+        cookies.set(cookieName, JSON.stringify(navigationData), {
+            path: "/backstage",
+            maxAge: Number(process.env.DEFAULT_BASE_CONFIG_COOKIE_TIME), // Expires after 5 minutes
+            sameSite: true,
+        });
+    }
 
     return JSON.stringify(navigationData);
 
