@@ -34,3 +34,6 @@ yarn-error.log*
 .vercel
 docker_build_react/compiler/*
 .vscode/*
+
+# .env
+docker_build_react/.env
