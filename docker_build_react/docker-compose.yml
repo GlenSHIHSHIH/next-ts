@@ -7,13 +7,7 @@ services:
     container_name: react_compiler
     volumes:
       - ${opt_path}/:/opt/shopee-ui
-      - ./nginx.conf:/etc/nginx/nginx.conf
-      - ./ssl:/etc/nginx/ssl
     working_dir: "/opt/shopee-ui"
-    ports:
-      - 80:80
-      - 443:443
-      - 3111:3111
     networks:
       shopee-network:
         ipv4_address: 172.21.0.12
@@ -26,25 +20,20 @@ services:
       - /bin/bash
       - -c
       - |
-        /usr/sbin/nginx
-        /usr/sbin/nginx -s reload
         npm install
         rm -rf ./${compiler_folder}
         sleep 1
         yarn build
-        yarn start -p 3111
+        yarn start -p 80
         tail -f /dev/null
     stdin_open: true
     tty: true
-    # labels:
-    #   - "traefik.docker.network=shopee-network"
-    #   - "traefik.enable=true"
-    #   - "traefik.frontend.rule=Host:kumkum.ga"
-    #   - "traefik.protocol=https"
-    #   - "traefik.port=3111"
-    #   - "traefik.frontend.rule=Host:kumkum.ga"
-    #   - "traefik.port=3111"
-    #   - "traefik.protocol=http"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.whoami.rule=Host(`kumkumtraefik.ml`)"
+      # - "traefik.port=443"
+      - "traefik.http.routers.whoami.entrypoints=websecure"
+      - "traefik.http.routers.whoami.tls.certresolver=myresolver"
 
 networks:
   shopee-network:
