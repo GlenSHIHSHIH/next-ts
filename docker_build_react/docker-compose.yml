@@ -1,5 +1,28 @@
 version: "3.7"
 services:
+  traefik:
+    image: "traefik:v2.5"
+    container_name: "traefik"
+    restart: always
+    command:
+      - "--log.level=DEBUG"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+      #- "--certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+      - "--certificatesresolvers.myresolver.acme.email=a0935745150@gmail.com"
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+    ports:
+      - 80:80
+      - 443:443
+    networks:
+      - shopee-network
+    volumes:
+      - "./letsencrypt:/letsencrypt"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+
   react_build:
     build:
       context: .
@@ -24,14 +47,14 @@ services:
         rm -rf ./${compiler_folder}
         sleep 1
         yarn build
-        yarn start -p 80
+        yarn start -p 3111
         tail -f /dev/null
     stdin_open: true
     tty: true
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.react_build.rule=Host(`kumkumtraefik.ml`)"
-      - "traefik.http.services.react_build.loadbalancer.server.port=80"
+      - "traefik.http.routers.react_build.rule=Host(`kumkum.ga`)"
+      - "traefik.http.services.react_build.loadbalancer.server.port=3111"
       - "traefik.http.routers.react_build.entrypoints=websecure"
       - "traefik.http.routers.react_build.tls.certresolver=myresolver"
 
