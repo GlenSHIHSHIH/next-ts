@@ -3,10 +3,12 @@ import Navigation from "component/backstage/Navigation";
 import React from "react";
 
 export default function DashBoard() {
-
+ let children="dashboard test";
     return (
         <AuthLayout>
-            <Navigation />
+            <Navigation>
+                {children}
+            </Navigation>
         </AuthLayout>
     )
 }

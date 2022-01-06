@@ -1,7 +1,6 @@
 import { useAuthStateContext } from '@context/context';
-import { ExpandLess, ExpandMore, StarBorder } from '@mui/icons-material';
+import { ExpandLess, ExpandMore } from '@mui/icons-material';
 import MenuIcon from '@mui/icons-material/Menu';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
 import { Collapse, createTheme, Divider, Grid, List, ListItemButton, ListItemIcon, ListItemText, responsiveFontSizes, ThemeProvider } from '@mui/material';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -11,9 +10,11 @@ import IconButton from '@mui/material/IconButton';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import { getNaviApi } from '@pages/api/backstage/navigationApi';
+import Link from "next/link";
 import PropTypes from 'prop-types';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
+
 interface NavigationProp {
     window?: any,
     menuName?: string,
@@ -56,6 +57,24 @@ const Navigation: React.FC<NavigationProp> = (props: any) => {
     const [mobileOpen, setMobileOpen] = useState(false);
     const [openValue, setOpenValue] = useState<OpenValue[]>();
     const [menuList, setMenuList] = useState<MenuNestData[]>();
+    const { state } = useAuthStateContext();
+
+
+    useEffect(() => {
+        // STEP 1：在 useEffect 中定義 async function 取名為 fetchData
+        let fetchData = async () => {
+            // STEP 2：使用 Promise.all 搭配 await 等待兩個 API 都取得回應後才繼續
+            var menusData: MenuNestData[] = await getNaviApi(state);
+            // var navigation: MenuNestData[] = JSON.parse(await getNaviApi(state) ?? "{}");
+            if (menusData != null && menusData != undefined) {
+                setMenuList(menusData);
+            }
+
+        };
+        fetchData();
+    }, [menuList]);
+
+
 
 
     const handleDrawerToggle = () => {
@@ -63,8 +82,7 @@ const Navigation: React.FC<NavigationProp> = (props: any) => {
     };
 
     const handleClick = (id: number) => () => {
-        console.log(id);
-        setOpenBoolean(id, true);
+        setOpenBoolean(id);
     };
 
     const isOpenBoolean = (id: number) => {
@@ -79,37 +97,43 @@ const Navigation: React.FC<NavigationProp> = (props: any) => {
         return null;
     }
 
-    const setOpenBoolean = (id: number, value: boolean) => {
+    const setOpenBoolean = (id: number) => {
         let o = isOpenBoolean(id);
-
-        if (o == value) {
-            return;
-        }
 
         if (o == null) {
             let open: OpenValue = {
                 id: id,
                 isopen: true
             }
-            let setValue = openValue?.concat(open);
+
+            let setValue: OpenValue[];
+            if (openValue == undefined) {
+                setValue = [open];
+            } else {
+                setValue = openValue?.concat(open);
+            }
+
             setOpenValue(setValue);
             return;
+
         }
 
         if (openValue != undefined) {
             for (var ov of openValue) {
                 if (ov.id == id) {
-                    ov.isopen = value;
+                    ov.isopen = !o;
                     break;
                 }
             }
+            let openData = [...openValue]
+            setOpenValue(openData);
             return;
         }
 
     }
 
-    const setNavData = (navigation: MenuNestData[] | undefined) => {
-        if (navigation == undefined) {
+    const setNavData = (menusData: MenuNestData[] | undefined) => {
+        if (menusData == undefined) {
             return (
                 <div>
                     <Toolbar style={{ background: backGroundColor }}>
@@ -122,7 +146,7 @@ const Navigation: React.FC<NavigationProp> = (props: any) => {
                     <Divider />
                 </div>
             )
-        } else if ("object" === typeof navigation) {
+        } else if ("object" === typeof menusData) {
             return (
                 <div>
                     <Toolbar style={{ background: backGroundColor }}>
@@ -133,56 +157,45 @@ const Navigation: React.FC<NavigationProp> = (props: any) => {
                         </Grid>
                     </Toolbar>
                     <Divider />
-
-
                     <List>
-                        {navigation.map(({ id, name, child }: MenuNestData) => {
+                        {menusData.map(({ id, name, child }: MenuNestData) => {
                             const open = isOpenBoolean(id) || false;
                             return (
                                 <div key={id}>
                                     <ListItemButton onClick={handleClick(id)}>
                                         <ListItemIcon>
-                                            <InboxIcon />
+                                            {/* <InboxIcon /> */}
                                         </ListItemIcon>
                                         <ListItemText primary={name} />
                                         {open ? <ExpandLess /> : <ExpandMore />}
                                     </ListItemButton>
-                                    <Collapse in={open} timeout="auto" unmountOnExit>
-                                        <List component="div" disablePadding>
-                                            {child.map(({ id, name }: MenuNestData) => (
-                                                <ListItemButton key={id} sx={{ pl: 4 }}>
-                                                    <ListItemIcon>
-                                                        <StarBorder />
-                                                    </ListItemIcon>
-                                                    <ListItemText primary={name} />
-                                                </ListItemButton>
-                                            ))}
+                                    <Collapse key={"col" + id} in={open} component="li" timeout="auto" unmountOnExit>
+                                        <List disablePadding> {/*disablePadding */}
+                                            {child.map((c: MenuNestData) => {
+                                                if (c.feature == "P") {
+                                                    return (
+                                                        <Link href={c.url} passHref>
+                                                            <ListItemButton component="a" key={c.id} sx={{ pl: 4 }}>
+                                                                <ListItemIcon>
+                                                                    {/* <StarBorder /> */}
+                                                                </ListItemIcon>
+                                                                <ListItemText primary={c.name} />
+                                                            </ListItemButton >
+                                                        </Link>
+                                                    );
+                                                }
+                                            })}
                                         </List>
                                     </Collapse>
                                 </div >
                             );
                         })}
                     </List>
-
                 </div >
             );
         }
     }
 
-    const { state } = useAuthStateContext();
-    useEffect(() => {
-        // STEP 1：在 useEffect 中定義 async function 取名為 fetchData
-        let fetchData = async () => {
-            // STEP 2：使用 Promise.all 搭配 await 等待兩個 API 都取得回應後才繼續
-            var navigation: MenuNestData[] = await getNaviApi(state);
-            // var navigation: MenuNestData[] = JSON.parse(await getNaviApi(state) ?? "{}");
-            if (navigation != null && navigation != undefined) {
-                setMenuList(navigation);
-            }
-
-        };
-        fetchData();
-    }, []);
 
     const container = window !== undefined ? () => window().document.body : undefined;
     return (
