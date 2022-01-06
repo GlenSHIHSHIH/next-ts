@@ -18,16 +18,12 @@ export const getNaviApi = async (auth: Auth) => {
     var data = cookies.get(cookieName);
 
     if (data != null && data != undefined) {
-        // console.log("cache NAVIGATION");
-        // console.log(data);
         return data;
     }
 
     var navigationData: any = "";
 
     await getNavigationApi({ headers: { Authorization: "Bearer " + auth.authorityJwt?.token } })?.then(async res => {
-        // console.log("response NAVIGATION");
-        // console.log(res);
         navigationData = res.data.menu;
     }).catch(error => {
         console.log("Navigation 錯誤");

@@ -64,10 +64,10 @@ const Navigation: React.FC<NavigationProp> = (props: any) => {
         // STEP 1：在 useEffect 中定義 async function 取名為 fetchData
         let fetchData = async () => {
             // STEP 2：使用 Promise.all 搭配 await 等待兩個 API 都取得回應後才繼續
-            var menusData: MenuNestData[] = await getNaviApi(state);
+            var menuString: string = await getNaviApi(state);
             // var navigation: MenuNestData[] = JSON.parse(await getNaviApi(state) ?? "{}");
-            if (menusData != null && menusData != undefined) {
-                setMenuList(menusData);
+            if (menuString.length > 0) {
+                setMenuList(JSON.parse(menuString));
             }
 
         };
@@ -146,7 +146,7 @@ const Navigation: React.FC<NavigationProp> = (props: any) => {
                     <Divider />
                 </div>
             )
-        } else if ("object" === typeof menusData) {
+        } else if (menusData?.length > 0) {
             return (
                 <div>
                     <Toolbar style={{ background: backGroundColor }}>
