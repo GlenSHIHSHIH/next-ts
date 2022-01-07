@@ -1,3 +1,4 @@
+import { removeNavCookie } from '@pages/api/backstage/navigationApi';
 import { Auth, initialState, removeCookieUserInfo, setCookieUserInfo } from 'context/reducer';
 
 
@@ -21,5 +22,6 @@ export default function SetUserInfo(dispatch: any, data: Auth) {
 
 export function logoutRemoveCookie(dispatch: any) {
     removeCookieUserInfo();
+    removeNavCookie();
     dispatch({ type: 'LOGOUT' });
 }

@@ -165,12 +165,12 @@ const Navigation: React.FC<NavigationProp> = (props: any) => {
                         </Grid>
                     </Toolbar>
                     <Divider />
-                    <List>
+                    <List key="oneList">
                         {menusData.map(({ id, name, child }: MenuNestData) => {
                             const open = isOpenBoolean(id) || false;
                             return (
-                                <div key={id}>
-                                    <ListItemButton onClick={handleClick(id)}>
+                                <div >
+                                    <ListItemButton key={id} onClick={handleClick(id)}>
                                         <ListItemIcon>
                                             {/* <InboxIcon /> */}
                                         </ListItemIcon>
@@ -178,7 +178,7 @@ const Navigation: React.FC<NavigationProp> = (props: any) => {
                                         {open ? <ExpandLess /> : <ExpandMore />}
                                     </ListItemButton>
                                     <Collapse key={"col" + id} in={open} component="li" timeout="auto" unmountOnExit>
-                                        <List disablePadding> {/*disablePadding */}
+                                        <List disablePadding key={"twoList" + id} > {/*disablePadding */}
                                             {child.map((c: MenuNestData) => {
                                                 if (c.feature == "P") {
                                                     return (
@@ -257,7 +257,7 @@ const Navigation: React.FC<NavigationProp> = (props: any) => {
                         <Grid container item spacing={2} marginRight={1} wrap="wrap" direction="row" justifyContent="right" alignItems="center">
                             <Grid item>
                                 <Typography variant="h6" noWrap component="div" >
-                                    welcome {state?.userInfo?.name}
+                                    <p>  {"welcome "}</p> <p> {state?.userInfo?.name ?? ""}</p>
                                 </Typography>
                             </Grid>
                             <Grid item>

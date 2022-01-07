@@ -65,7 +65,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     var prodcution: ProductionDetail | null = null;
     var productionRankList: ProductionRankList[] | null = null;
 
-    var baseConfig = JSON.parse(await getConfigApi() ?? "");
+    var baseConfig = JSON.parse(await getConfigApi(context) ?? "");
 
     await getProductionByIdApi(paramObj)?.then(res => {
         // console.log("get categories list");

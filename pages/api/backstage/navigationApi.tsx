@@ -14,12 +14,19 @@ const getNavigationApi = (data: null | any) => {
     return api("get", "/backstage/menu/list", null, data);
 }
 
-//實作取出 config 內容
+const cookies = new Cookies();
+const cookieNavigation = "NAVIGATION_MENU_LIST";
+
+export const removeNavCookie = () => {
+    const cookies = new Cookies();
+    cookies.remove(cookieNavigation);
+}
+//取出 菜單 內容
 export const getNaviApi = async (auth: Auth) => {
 
-    const cookies = new Cookies();
-    const cookieName = "NAVIGATION_MENU_LIST";
-    var data = cookies.get(cookieName);
+    var data = cookies.get(cookieNavigation);
+    console.log(cookieNavigation);
+    console.log(data);
 
     if (data != null && data != undefined) {
         return data;
@@ -29,20 +36,43 @@ export const getNaviApi = async (auth: Auth) => {
 
     await getNavigationApi(setAuthHeader(auth))?.then(async res => {
         navigationData = res.data.menu;
+        if (navigationData != "" && navigationData != null && navigationData != undefined) {
+
+            let jsonData =JSON.stringify(navigationData);
+            console.log("configData:");
+            console.log(process.env.DEFAULT_BACKSTAGE_COOKIE_PATH);
+            console.log(process.env.DEFAULT_BASE_CONFIG_COOKIE_TIME);
+            console.log("jsonData:");
+            console.log(jsonData);
+
+            cookies.set(cookieNavigation, navigationData, {
+                path: process.env.DEFAULT_BACKSTAGE_COOKIE_PATH,
+                maxAge: Number(process.env.DEFAULT_BASE_CONFIG_COOKIE_TIME), // Expires after 5 minutes
+                sameSite: true,
+            });
+        }
     }).catch(error => {
         console.log("Navigation 錯誤");
         return;
     })
 
-    if (navigationData != "" && navigationData != null && navigationData != undefined) {
+    // if (navigationData != "" && navigationData != null && navigationData != undefined) {
 
-        cookies.set(cookieName, JSON.stringify(navigationData), {
-            path: "/backstage",
-            maxAge: Number(process.env.DEFAULT_BASE_CONFIG_COOKIE_TIME), // Expires after 5 minutes
-            sameSite: true,
-        });
-    }
+    //     let jsonData =JSON.stringify(navigationData);
+    //     console.log("configData:");
+    //     console.log(process.env.DEFAULT_BACKSTAGE_COOKIE_PATH);
+    //     console.log(process.env.DEFAULT_BASE_CONFIG_COOKIE_TIME);
+    //     console.log("jsonData:");
+    //     console.log(jsonData);
 
+    //     cookies.set(cookieNavigation, JSON.stringify(navigationData), {
+    //         path: process.env.DEFAULT_BACKSTAGE_COOKIE_PATH,
+    //         maxAge: Number(process.env.DEFAULT_BASE_CONFIG_COOKIE_TIME), // Expires after 5 minutes
+    //         sameSite: true,
+    //     });
+    // }
+
+    console.log(cookies.get(cookieNavigation));
     return JSON.stringify(navigationData);
 
 }

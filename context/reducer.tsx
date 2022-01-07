@@ -18,12 +18,12 @@ export interface Auth {
 }
 
 const cookies = new Cookies();
-export const cookieUserInfo = "USER_INFO";
+const cookieUserInfo = "USER_INFO";
 
 //儲存 cookie 登入資訊
 export const setCookieUserInfo = (data: Auth) => {
     cookies.set(cookieUserInfo, JSON.stringify(data), {
-        path: process.env.DEFAULT_USER_INFO_COOKIE_PATH,
+        path: process.env.DEFAULT_BACKSTAGE_COOKIE_PATH,
         maxAge: Number(process.env.DEFAULT_BASE_CONFIG_COOKIE_TIME), // Expires after 5 minutes
         sameSite: true,
     });
@@ -33,8 +33,6 @@ export const setCookieUserInfo = (data: Auth) => {
 export const removeCookieUserInfo = () => {
     cookies.remove(cookieUserInfo);
 }
-
-
 
 export const initialState = () => {
     let userAuth: Auth = {};
