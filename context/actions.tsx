@@ -1,5 +1,4 @@
 import { Auth, initialState, removeCookieUserInfo, setCookieUserInfo } from 'context/reducer';
-import { useAuthStateContext } from './context';
 
 
 export default function SetUserInfo(dispatch: any, data: Auth) {
@@ -20,8 +19,7 @@ export default function SetUserInfo(dispatch: any, data: Auth) {
     }
 }
 
-export async function logout() {
-    const { state, dispatch } = useAuthStateContext();
-    dispatch({ type: 'LOGOUT' });
+export function logoutRemoveCookie(dispatch: any) {
     removeCookieUserInfo();
+    dispatch({ type: 'LOGOUT' });
 }

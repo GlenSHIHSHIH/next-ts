@@ -4,10 +4,14 @@ import api from "pages/api/baseApi";
 // import { useCookies } from "react-cookie"
 // cookie  套件參考 https://www.npmjs.com/package/universal-cookie
 import Cookies from 'universal-cookie';
+import { setAuthHeader } from "./utilApi";
 
+export const logoutApi = (auth: Auth) => {
+    return api("post", "/backstage/admin/logout", null, setAuthHeader(auth))
+}
 
 const getNavigationApi = (data: null | any) => {
-    return api("get", "/backstage/menu/list", null, data)
+    return api("get", "/backstage/menu/list", null, data);
 }
 
 //實作取出 config 內容
@@ -23,7 +27,7 @@ export const getNaviApi = async (auth: Auth) => {
 
     var navigationData: any = "";
 
-    await getNavigationApi({ headers: { Authorization: "Bearer " + auth.authorityJwt?.token } })?.then(async res => {
+    await getNavigationApi(setAuthHeader(auth))?.then(async res => {
         navigationData = res.data.menu;
     }).catch(error => {
         console.log("Navigation 錯誤");

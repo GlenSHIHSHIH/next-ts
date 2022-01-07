@@ -1,3 +1,4 @@
+import { logoutRemoveCookie } from '@context/actions';
 import { useAuthStateContext } from '@context/context';
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -9,11 +10,12 @@ import Drawer from '@mui/material/Drawer';
 import IconButton from '@mui/material/IconButton';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
-import { getNaviApi } from '@pages/api/backstage/navigationApi';
+import { getNaviApi, logoutApi } from '@pages/api/backstage/navigationApi';
 import Link from "next/link";
-import PropTypes from 'prop-types';
+import { useRouter } from 'next/router';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
+import AlertFrame from './AlertFrame';
 
 interface NavigationProp {
     window?: any,
@@ -54,13 +56,22 @@ const Navigation: React.FC<NavigationProp> = (props: any) => {
     let theme = createTheme();
     theme = responsiveFontSizes(theme);
 
+    const router = useRouter();
+
     const [mobileOpen, setMobileOpen] = useState(false);
     const [openValue, setOpenValue] = useState<OpenValue[]>();
     const [menuList, setMenuList] = useState<MenuNestData[]>();
-    const { state } = useAuthStateContext();
+    const [errMsg, setErrMsg] = useState<string>();
+    const { state, dispatch } = useAuthStateContext();
 
 
     useEffect(() => {
+        if (errMsg?.length != 0) {
+            setTimeout(() => {
+                setErrMsg("");
+            }, 3000);
+        }
+
         // STEP 1：在 useEffect 中定義 async function 取名為 fetchData
         let fetchData = async () => {
             // STEP 2：使用 Promise.all 搭配 await 等待兩個 API 都取得回應後才繼續
@@ -72,10 +83,7 @@ const Navigation: React.FC<NavigationProp> = (props: any) => {
 
         };
         fetchData();
-    }, [menuList]);
-
-
-
+    }, []);
 
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
@@ -196,10 +204,29 @@ const Navigation: React.FC<NavigationProp> = (props: any) => {
         }
     }
 
+    const logout = () => {
+        logoutApi(state)?.then(res => {
+            // console.log("login data: ");
+            // category = res.data.category;
+            console.log(res);
+            logoutRemoveCookie(dispatch);
+            router.push("/backstage/login");
+        }).catch(error => {
+            console.log("error:");
+            console.log(error);
+            setErrMsg(error.response?.data?.msg);
+        });
+    };
 
     const container = window !== undefined ? () => window().document.body : undefined;
     return (
         <Box sx={{ display: 'flex' }}>
+            {errMsg && <AlertFrame
+                content=''
+                strongContent={errMsg}
+                alertType="error"
+            />
+            }
             <ThemeProvider theme={theme}>
                 <CssBaseline />
                 <AppBar
@@ -220,9 +247,27 @@ const Navigation: React.FC<NavigationProp> = (props: any) => {
                         >
                             <MenuIcon />
                         </IconButton>
-                        <Typography variant="h6" noWrap component="div" >
-                            {title}
-                        </Typography>
+                        <Grid container spacing={2} wrap="wrap" direction="row" justifyContent="left" alignItems="center">
+                            <Grid item>
+                                <Typography variant="h6" noWrap component="div" >
+                                    {title}
+                                </Typography>
+                            </Grid>
+                        </Grid>
+                        <Grid container item spacing={2} marginRight={1} wrap="wrap" direction="row" justifyContent="right" alignItems="center">
+                            <Grid item>
+                                <Typography variant="h6" noWrap component="div" >
+                                    welcome {state?.userInfo?.name}
+                                </Typography>
+                            </Grid>
+                            <Grid item>
+                                <Typography variant="h6" noWrap component="div" >
+                                    <Link href="#" passHref>
+                                        <a onClick={logout}>  登出</a>
+                                    </Link>
+                                </Typography>
+                            </Grid>
+                        </Grid>
                     </Toolbar>
                 </AppBar>
                 <Box
@@ -263,20 +308,23 @@ const Navigation: React.FC<NavigationProp> = (props: any) => {
                     sx={{ flexGrow: 1, p: 3, width: { sm: `calc(100% - ${drawerWidth}px)` } }}
                 >
                     <Toolbar />
-                    {children}
+                    <div key="children Navigation">
+                        {children}
+                    </div>
                 </Box>
             </ThemeProvider>
         </Box>
     );
 }
 
-Navigation.propTypes = {
-    /**
-     * Injected by the documentation to work in an iframe.
-     * You won't need it on your project.
-     */
-    window: PropTypes.func,
-};
+// Navigation.propTypes = {
+//     /**
+//      * Injected by the documentation to work in an iframe.
+//      * You won't need it on your project.
+//      */
+//     window: PropTypes.func,
+// };
+
 export default Navigation;
 
 
