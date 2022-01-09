@@ -1,9 +1,10 @@
 import { GetServerSidePropsContext } from "next";
+import { useCookie } from "next-cookie";
 import api from "pages/api/baseApi";
 // cookie  套件參考 https://dev.to/debosthefirst/how-to-use-cookies-for-persisting-users-in-nextjs-4617
-// import { useCookies } from "react-cookie"
 // cookie  套件參考 https://www.npmjs.com/package/universal-cookie
 import Cookies from 'universal-cookie';
+
 
 const cookieBaseConfig = "BASE_CONFIG";
 
@@ -14,11 +15,12 @@ const getConfigByUrlApi = (data: null | any) => {
 //實作取出 config 內容
 export const getConfigApi = async (context: GetServerSidePropsContext) => {
 
-    const cookies = new Cookies(context.req.headers.cookie);
+    // const cookies = new Cookies(context.req.headers.cookie);
+    var cookies = useCookie(context);
     var config = cookies.get(cookieBaseConfig);
 
     if (config != null && config != undefined) {
-        return config;
+        return JSON.stringify(config);
     }
 
     var configData: any = "";
@@ -35,10 +37,9 @@ export const getConfigApi = async (context: GetServerSidePropsContext) => {
         cookies.set(cookieBaseConfig, JSON.stringify(configData), {
             path: process.env.DEFAULT_FORESTAGE_COOKIE_PATH,
             maxAge: Number(process.env.DEFAULT_BASE_CONFIG_COOKIE_TIME), // Expires after 5 minutes
-            sameSite: true,
-            domain:"http://localhost:3000"
+            sameSite: true
         });
-        console.log(cookies.get(cookieBaseConfig));
+        // console.log(cookies.get(cookieBaseConfig));
     }
 
     return JSON.stringify(configData);

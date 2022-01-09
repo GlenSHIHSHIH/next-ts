@@ -61,8 +61,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         searchCategory: ""
     };
 
-    var baseConfig = JSON.parse(await getConfigApi(context) ?? "");
-    // console.log(baseConfig);
+    var baseConfig = JSON.parse(await getConfigApi(context));
 
     await getCategoryListApi(null)?.then(res => {
         // console.log("get categories list");

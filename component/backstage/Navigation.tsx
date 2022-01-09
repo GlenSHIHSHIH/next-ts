@@ -257,7 +257,7 @@ const Navigation: React.FC<NavigationProp> = (props: any) => {
                         <Grid container item spacing={2} marginRight={1} wrap="wrap" direction="row" justifyContent="right" alignItems="center">
                             <Grid item>
                                 <Typography variant="h6" noWrap component="div" >
-                                    <p>  {"welcome "}</p> <p> {state?.userInfo?.name ?? ""}</p>
+                                    <span>  {"welcome "}</span> <span> {state?.userInfo?.name ?? ""}</span>
                                 </Typography>
                             </Grid>
                             <Grid item>
