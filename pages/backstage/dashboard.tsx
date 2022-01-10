@@ -3,8 +3,8 @@ import Navigation from "component/backstage/Navigation";
 import React from "react";
 
 export default function DashBoard() {
-let title ="dashboard";
- let children="dashboard test";
+    let title = "dashboard";
+    let children = "dashboard test";
     return (
         <AuthLayout>
             <Navigation title={title}>
