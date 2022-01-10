@@ -3,7 +3,6 @@ import { useCookie } from "next-cookie";
 import api from "pages/api/baseApi";
 // cookie  套件參考 https://dev.to/debosthefirst/how-to-use-cookies-for-persisting-users-in-nextjs-4617
 // cookie  套件參考 https://www.npmjs.com/package/universal-cookie
-import Cookies from 'universal-cookie';
 
 
 const cookieBaseConfig = "BASE_CONFIG";

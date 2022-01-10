@@ -15,6 +15,7 @@ import Link from "next/link";
 import { useRouter } from 'next/router';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
+import Cookies from 'universal-cookie';
 import AlertFrame from './AlertFrame';
 
 interface NavigationProp {
@@ -74,11 +75,10 @@ const Navigation: React.FC<NavigationProp> = (props: any) => {
 
         // STEP 1：在 useEffect 中定義 async function 取名為 fetchData
         let fetchData = async () => {
-            // STEP 2：使用 Promise.all 搭配 await 等待兩個 API 都取得回應後才繼續
-            var menuString: string = await getNaviApi(state);
-            // var navigation: MenuNestData[] = JSON.parse(await getNaviApi(state) ?? "{}");
-            if (menuString.length > 0) {
-                setMenuList(JSON.parse(menuString));
+
+            var data = await getNaviApi(state);
+            if (data.length > 0) {
+                setMenuList(JSON.parse(data));
             }
 
         };
@@ -165,7 +165,7 @@ const Navigation: React.FC<NavigationProp> = (props: any) => {
                         </Grid>
                     </Toolbar>
                     <Divider />
-                    <List key="oneList">
+                    <List >
                         {menusData.map(({ id, name, child }: MenuNestData) => {
                             const open = isOpenBoolean(id) || false;
                             return (
@@ -177,15 +177,15 @@ const Navigation: React.FC<NavigationProp> = (props: any) => {
                                         <ListItemText primary={name} />
                                         {open ? <ExpandLess /> : <ExpandMore />}
                                     </ListItemButton>
-                                    <Collapse key={"col" + id} in={open} component="li" timeout="auto" unmountOnExit>
-                                        <List disablePadding key={"twoList" + id} > {/*disablePadding */}
+                                    <Collapse in={open} component="div" timeout="auto" unmountOnExit>
+                                        <List disablePadding > {/*disablePadding */}
                                             {child.map((c: MenuNestData) => {
                                                 if (c.feature == "P") {
                                                     return (
                                                         <Link href={c.url} passHref>
-                                                            <ListItemButton component="a" key={c.id} sx={{ pl: 4 }}>
+                                                            <ListItemButton component="a" sx={{ pl: 4 }}>
                                                                 <ListItemIcon>
-                                                                    {/* <StarBorder /> */}
+                                                                    {/*   <StarBorder />*/}
                                                                 </ListItemIcon>
                                                                 <ListItemText primary={c.name} />
                                                             </ListItemButton >
