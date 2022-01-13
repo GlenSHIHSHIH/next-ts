@@ -113,6 +113,7 @@ export default function Menu() {
         menuSearchData["feature"] = selectFeature;
         menuSearchData["parent"] = selectParent;
         pageSearchData.search = menuSearchData;
+        pageSearchData.page = 1;
         setPageMutlSearchData(pageSearchData);
         let count: number = sendCount;
         setSendCount(++count);
