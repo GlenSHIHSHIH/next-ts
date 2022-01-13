@@ -6,7 +6,7 @@ export interface PageMutlSearchData {
     pageLimit: number,
     sort: string,
     sortColumn: string,
-    search?: Map<string, string>,
+    search?: any,
 }
 
 

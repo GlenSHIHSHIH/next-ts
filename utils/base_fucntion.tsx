@@ -30,3 +30,26 @@ export const substring = (value: string | undefined, count: number) => {
     }
     return str;
 }
+
+
+export function interfacePropertyToMap<T, K extends keyof T>(obj: T) {
+
+    var map = new Map();
+    (Object.keys(obj) as Array<keyof T>).forEach(
+        (value) => {
+            map.set(value.toString(),obj[value]);
+        }
+    );
+    return map;
+}
+
+export function setValueToInterfaceProperty<T, K extends keyof T>(obj: T, key: K, value: any) {
+    obj[key] = value;
+    return obj
+}
+
+export function objArrtoMap(objData: any) {
+    return objData?.map((p: any) => {
+        return [p.name.toString(), p.id.toString()]
+    })
+}

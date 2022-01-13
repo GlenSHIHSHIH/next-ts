@@ -8,25 +8,29 @@ import { useState } from 'react';
 
 interface SelectOption {
     selectName: string,
-    optionValue: string[],
+    optionValue?: string[],
+    optionMapValue?: Map<string, string>,
     optionAll: boolean,
     defaultValue?: string,
     selectSet: (value: string) => void,
-    className?:string,
+    className?: string,
 }
 
 const SelectBox: React.FC<SelectOption> = (props) => {
 
-    const { optionValue, optionAll, selectName, defaultValue, selectSet,className } = props;
+    const { optionValue, optionMapValue, optionAll, selectName, defaultValue, selectSet, className } = props;
     const [selectValue, setSelectValue] = useState<string>();
+
+    const MapValue: JSX.Element[] = [];
+    optionMapValue?.forEach((oValue: string, okey: string) => {
+        MapValue.push(<MenuItem key={selectName + okey} value={oValue}>{okey} </MenuItem>);
+    })
 
     const selectHandleChange = (event: SelectChangeEvent) => {
         setSelectValue(event.target.value);
         if (selectSet) {
             selectSet(event.target.value);
         }
-
-
     };
 
     return (
@@ -42,10 +46,13 @@ const SelectBox: React.FC<SelectOption> = (props) => {
                 >
                     {optionAll && <MenuItem key={"All"} value={""}>{"All"} </MenuItem>}
                     {
-                        optionValue.map((oValue) => {
+                        optionValue && optionValue.map((oValue) => {
                             return (<MenuItem key={selectName + oValue} value={oValue}>{oValue} </MenuItem>)
                         })
                     }
+
+                    {MapValue && MapValue}
+
                 </Select>
             </FormControl>
         </Box>

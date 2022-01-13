@@ -1,12 +1,17 @@
 import { useAuthStateContext } from "@context/context";
 import { Auth } from "@context/reducer";
-import { Grid, Pagination } from "@mui/material";
+import Search from "@mui/icons-material/Search";
+import { Button, Grid, Pagination, TextField } from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { menuApi } from "@pages/api/backstage/menu/menuApi";
+import { menuApi, menuParentListApi } from "@pages/api/backstage/menu/menuApi";
 import { PageMutlSearchData } from "@pages/api/backstage/utilApi";
+import MenuStyle from "@styles/page/backstage/Menu.module.css";
+import { objArrtoMap, setValueToInterfaceProperty } from "@utils/base_fucntion";
 import AuthLayout from "component/backstage/AuthLayout";
 import Navigation from "component/backstage/Navigation";
+import SelectBox from "component/SelectBox";
 import React, { ChangeEvent, useEffect, useState } from "react";
+
 interface MenuViewList {
     id: number,
     name: string,
@@ -18,11 +23,29 @@ interface MenuViewList {
     status: boolean,
 }
 
+interface MenuParentList {
+    id: number,
+    name: string,
+}
+
+interface MenuSearch {
+    name?: string,
+    key?: string,
+    url?: string,
+    feature?: string,
+    parent?: string,
+}
+
 export default function Menu() {
     let title = "Menu";
 
     const { state, dispatch } = useAuthStateContext();
     const [menuViewList, setMenuViewList] = useState<MenuViewList[]>([]);
+    const [menuParentList, setMenuParentList] = useState<MenuParentList[]>([]);
+    const [selectFeature, setSelectFeature] = useState<string>("");
+    const [selectParent, setSelectParent] = useState<string>("");
+    const [sendCount, setSendCount] = useState<number>(0);
+    const [menuSearch, setMenuSearch] = useState<MenuSearch>();
     const [pageMutlSearchData, setPageMutlSearchData] = useState<PageMutlSearchData>
         ({
             count: 0,
@@ -35,8 +58,8 @@ export default function Menu() {
 
     useEffect(() => {
         getMenuList();
-
-    }, [pageMutlSearchData.page])
+        getMenuParentList();
+    }, [pageMutlSearchData.page, sendCount])
 
     const getMenuList = () => {
         let auth: Auth = state;
@@ -52,6 +75,50 @@ export default function Menu() {
         });
     }
 
+    const getMenuParentList = () => {
+        let auth: Auth = state;
+        menuParentListApi(null, auth)?.then((resp: any) => {
+            // console.log("resp");
+            // console.log(resp);
+            setMenuParentList(resp.data.menuParentList);
+        }).catch(error => {
+            // console.log("error:");
+            // console.log(error);
+            // setErrMsg(error.response?.data?.msg);
+        });
+    }
+
+    const setSearchData = (searchName: any, value: string) => {
+        let search: MenuSearch;
+        if (menuSearch == undefined) {
+            search = {};
+        } else {
+            search = { ...menuSearch };
+        }
+        // search[searchName]=value;
+        search = setValueToInterfaceProperty(search, searchName, value);
+        setMenuSearch(search);
+    }
+
+    const pageHandle = (event: ChangeEvent<unknown>, page: number) => {
+        console.log(page);
+        let pageData = { ...pageMutlSearchData };
+        pageData.page = page;
+        setPageMutlSearchData(pageData);
+    }
+
+    const sendHandle = () => {
+        let pageSearchData = { ...pageMutlSearchData };
+        let menuSearchData = { ...menuSearch };
+        menuSearchData["feature"] = selectFeature;
+        menuSearchData["parent"] = selectParent;
+        pageSearchData.search = menuSearchData;
+        setPageMutlSearchData(pageSearchData);
+        let count: number = sendCount;
+        setSendCount(++count);
+    }
+
+    const optionMapValue: Map<string, string> = new Map([["標題", "T"], ["頁面", "P"], ["按鍵功能", "F"]]);
 
     const columns: GridColDef[] = [
         { field: 'id', headerName: 'id', minWidth: 100 },
@@ -74,8 +141,14 @@ export default function Menu() {
             editable: true,
         },
         {
+            field: 'parent',
+            headerName: '父類別',
+            minWidth: 200,
+            editable: true,
+        },
+        {
             field: 'feature',
-            headerName: '頁面功能',
+            headerName: '功能',
             sortable: false,
             minWidth: 160,
         },
@@ -92,22 +165,50 @@ export default function Menu() {
         },
     ];
 
-    const pageHandle = (event: ChangeEvent<unknown>, page: number) => {
-        console.log(page);
-        let pageData = { ...pageMutlSearchData };
-        pageData.page = page;
-        setPageMutlSearchData(pageData);
-    }
-
     return (
         <AuthLayout>
             <Navigation title={title}>
                 <Grid container direction="column" justifyContent="flex-start" alignItems="center">
-                    <Grid container item direction="row" xs={10} >
+                    <Grid container direction="row" spacing={2} marginBottom={2} justifyContent="flex-start" alignItems="center" >
+                        <Grid item >
+                            <TextField id="outlined-search" label="名稱" type="search" onChange={e => setSearchData("name", e.target.value)} />
+                        </Grid>
+                        <Grid item >
+                            <TextField id="outlined-search" label="網址" type="search" onChange={e => setSearchData("url", e.target.value)} />
+                        </Grid>
+                        <Grid item >
+                            <TextField id="outlined-search" label="識別碼" type="search" onChange={e => setSearchData("key", e.target.value)} />
+                        </Grid>
+                        <Grid item >
+                            <SelectBox
+                                className={MenuStyle.dropDownList}
+                                selectName={'功能'}
+                                optionMapValue={optionMapValue}
+                                defaultValue={selectFeature}
+                                selectSet={(selectValue: string) => { setSelectFeature(selectValue) }}
+                                optionAll={true}
+                            />
+                        </Grid>
+                        <Grid item >
+                            <SelectBox
+                                className={MenuStyle.dropDownList}
+                                selectName={'父類別'}
+                                optionMapValue={new Map([...(objArrtoMap(menuParentList))])}
+                                defaultValue={selectParent}
+                                selectSet={(selectValue: string) => { setSelectParent(selectValue) }}
+                                optionAll={true}
+                            />
+                        </Grid>
+                        <Grid item >
+                            <Button variant="contained" color="warning" size="large" style={{ height: '56px' }} endIcon={<Search />}
+                                onClick={sendHandle}>
+                                Search
+                            </Button>
+                        </Grid>
 
                     </Grid>
                     <Grid container item direction="row" xs={10} >
-                        <div style={{ width: '1200px' }}>
+                        <div style={{ width: '1400px' }}>
                             <DataGrid
                                 autoHeight
                                 rows={menuViewList}
