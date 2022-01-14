@@ -1,8 +1,9 @@
 import { useAuthStateContext } from "@context/context";
 import { Auth } from "@context/reducer";
+import { Add, Delete, Edit } from "@mui/icons-material";
 import Search from "@mui/icons-material/Search";
 import { Button, Grid, Pagination, TextField } from "@mui/material";
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridSortModel } from "@mui/x-data-grid";
 import { menuApi, menuParentListApi } from "@pages/api/backstage/menu/menuApi";
 import { PageMutlSearchData } from "@pages/api/backstage/utilApi";
 import MenuStyle from "@styles/page/backstage/Menu.module.css";
@@ -107,11 +108,17 @@ export default function Menu() {
         setPageMutlSearchData(pageData);
     }
 
-    const sendHandle = () => {
+    function send() {
+        sendHandle();
+    }
+
+    function sendHandle(sortModel?: GridSortModel) {
         let pageSearchData = { ...pageMutlSearchData };
         let menuSearchData = { ...menuSearch };
         menuSearchData["feature"] = selectFeature;
         menuSearchData["parent"] = selectParent;
+        pageSearchData.sortColumn = (sortModel && sortModel[0].field) ?? ""
+        pageSearchData.sort = (sortModel && sortModel[0].sort) ?? ""
         pageSearchData.search = menuSearchData;
         pageSearchData.page = 1;
         setPageMutlSearchData(pageSearchData);
@@ -122,30 +129,30 @@ export default function Menu() {
     const optionMapValue: Map<string, string> = new Map([["標題", "T"], ["頁面", "P"], ["按鍵功能", "F"]]);
 
     const columns: GridColDef[] = [
-        { field: 'id', headerName: 'id', minWidth: 100 },
+        {
+            field: 'id',
+            headerName: 'id',
+            minWidth: 100
+        },
         {
             field: 'name',
             headerName: '名稱',
             minWidth: 150,
-            editable: true,
         },
         {
             field: 'key',
             headerName: '識別碼',
             minWidth: 150,
-            editable: true,
         },
         {
             field: 'url',
             headerName: '網址',
             minWidth: 200,
-            editable: true,
         },
         {
             field: 'parent',
             headerName: '父類別',
             minWidth: 200,
-            editable: true,
         },
         {
             field: 'feature',
@@ -201,12 +208,27 @@ export default function Menu() {
                             />
                         </Grid>
                         <Grid item >
-                            <Button variant="contained" color="warning" size="large" style={{ height: '56px' }} endIcon={<Search />}
-                                onClick={sendHandle}>
+                            <Button variant="contained" color="warning" size="large" style={{ height: '56px' }} endIcon={<Search />} onClick={send}>
                                 Search
                             </Button>
                         </Grid>
-
+                    </Grid>
+                    <Grid container direction="row" spacing={1} marginBottom={2} justifyContent="flex-start" alignItems="center" >
+                        <Grid item >
+                            <Button variant="contained" color="primary" size="medium" style={{ height: '56px' }} endIcon={<Add />} onClick={send}>
+                                Add
+                            </Button>
+                        </Grid>
+                        <Grid item >
+                            <Button variant="contained" color="success" size="medium" style={{ height: '56px' }} endIcon={<Edit />} onClick={send}>
+                                Edit
+                            </Button>
+                        </Grid>
+                        <Grid item >
+                            <Button variant="contained" color="error" size="medium" style={{ height: '56px' }} endIcon={<Delete />} onClick={send}>
+                                Delete
+                            </Button>
+                        </Grid>
                     </Grid>
                     <Grid container item direction="row" xs={10} >
                         <div style={{ width: '1400px' }}>
@@ -215,12 +237,15 @@ export default function Menu() {
                                 rows={menuViewList}
                                 columns={columns}
                                 checkboxSelection
+                                onSelectionModelChange={(selectionModel,details) => { console.log("rowId:" + selectionModel)}}
                                 disableSelectionOnClick
-
+                                disableColumnMenu
                                 pageSize={pageMutlSearchData.pageLimit}
                                 // onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
                                 // rowsPerPageOptions={process.env.PAGE_SIZE?.split(',') as unknown as number[]}
-
+                                // sortModel={sortModel}
+                                sortingMode="server"
+                                onSortModelChange={(model) => sendHandle(model)}
                                 components={{
                                     Pagination: Pagination,
                                 }}
