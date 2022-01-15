@@ -4,7 +4,7 @@ import { Add, Delete, Edit } from "@mui/icons-material";
 import Search from "@mui/icons-material/Search";
 import { Button, Grid, Pagination, TextField } from "@mui/material";
 import { DataGrid, GridColDef, GridSortModel } from "@mui/x-data-grid";
-import { menuApi, menuParentListApi } from "@pages/api/backstage/menu/menuApi";
+import { deleteMenuApi, menuApi, menuParentListApi } from "@pages/api/backstage/menu/menuApi";
 import { PageMutlSearchData } from "@pages/api/backstage/utilApi";
 import MenuStyle from "@styles/page/backstage/Menu.module.css";
 import { objArrtoMap, setValueToInterfaceProperty } from "@utils/base_fucntion";
@@ -45,6 +45,7 @@ export default function Menu() {
     const [menuParentList, setMenuParentList] = useState<MenuParentList[]>([]);
     const [selectFeature, setSelectFeature] = useState<string>("");
     const [selectParent, setSelectParent] = useState<string>("");
+    const [deleteItem, setDeleteItem] = useState<string>("");
     const [sendCount, setSendCount] = useState<number>(0);
     const [menuSearch, setMenuSearch] = useState<MenuSearch>();
     const [pageMutlSearchData, setPageMutlSearchData] = useState<PageMutlSearchData>
@@ -106,6 +107,26 @@ export default function Menu() {
         let pageData = { ...pageMutlSearchData };
         pageData.page = page;
         setPageMutlSearchData(pageData);
+    }
+
+
+    const deleteItemHandle = () => {
+
+        if (deleteItem == "") {
+            return;
+        }
+
+        let auth: Auth = state;
+        deleteMenuApi(deleteItem, auth)?.then((resp: any) => {
+            // console.log("resp");
+            // console.log(resp);
+            sendHandle();
+        }).catch(error => {
+            console.log("error:");
+            console.log(error);
+            // setErrMsg(error.response?.data?.msg);
+        });
+
     }
 
     function send() {
@@ -225,7 +246,7 @@ export default function Menu() {
                             </Button>
                         </Grid>
                         <Grid item >
-                            <Button variant="contained" color="error" size="medium" style={{ height: '56px' }} endIcon={<Delete />} onClick={send}>
+                            <Button variant="contained" color="error" size="medium" style={{ height: '56px' }} endIcon={<Delete />} onClick={deleteItemHandle}>
                                 Delete
                             </Button>
                         </Grid>
@@ -237,7 +258,7 @@ export default function Menu() {
                                 rows={menuViewList}
                                 columns={columns}
                                 checkboxSelection
-                                onSelectionModelChange={(selectionModel,details) => { console.log("rowId:" + selectionModel)}}
+                                onSelectionModelChange={(selectionModel) => setDeleteItem(selectionModel.join(','))}
                                 disableSelectionOnClick
                                 disableColumnMenu
                                 pageSize={pageMutlSearchData.pageLimit}
