@@ -14,11 +14,12 @@ interface SelectOption {
     defaultValue?: string,
     selectSet: (value: string) => void,
     className?: string,
+    required?: boolean,
 }
 
 const SelectBox: React.FC<SelectOption> = (props) => {
 
-    const { optionValue, optionMapValue, optionAll, selectName, defaultValue, selectSet, className } = props;
+    const { optionValue, optionMapValue, optionAll, selectName, defaultValue, selectSet, className, required = false } = props;
     const [selectValue, setSelectValue] = useState<string>();
 
     const MapValue: JSX.Element[] = [];
@@ -43,6 +44,7 @@ const SelectBox: React.FC<SelectOption> = (props) => {
                     label={selectName}
                     onChange={selectHandleChange}
                     defaultValue={defaultValue ?? ""}
+                    required={required}
                 >
                     {optionAll && <MenuItem key={"All"} value={""}>{"All"} </MenuItem>}
                     {

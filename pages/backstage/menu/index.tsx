@@ -2,13 +2,14 @@ import { useAuthStateContext } from "@context/context";
 import { Auth } from "@context/reducer";
 import { Add, Delete, Edit } from "@mui/icons-material";
 import Search from "@mui/icons-material/Search";
-import { Button, Grid, Pagination, TextField } from "@mui/material";
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, FormControlLabel, Grid, Pagination, Switch, TextField, Typography } from "@mui/material";
 import { DataGrid, GridColDef, GridSortModel } from "@mui/x-data-grid";
 import { deleteMenuApi, menuApi, menuParentListApi } from "@pages/api/backstage/menu/menuApi";
 import { PageMutlSearchData } from "@pages/api/backstage/utilApi";
 import MenuStyle from "@styles/page/backstage/Menu.module.css";
 import { objArrtoMap, setValueToInterfaceProperty } from "@utils/base_fucntion";
 import AuthLayout from "component/backstage/AuthLayout";
+import DraggableDialog from "component/backstage/Dialogs";
 import Navigation from "component/backstage/Navigation";
 import SelectBox from "component/SelectBox";
 import React, { ChangeEvent, useEffect, useState } from "react";
@@ -37,6 +38,12 @@ interface MenuSearch {
     parent?: string,
 }
 
+interface DialogOption {
+    title?: string,
+    className?: string,
+    menu?: MenuViewList,
+}
+
 export default function Menu() {
     let title = "Menu";
 
@@ -46,6 +53,7 @@ export default function Menu() {
     const [selectFeature, setSelectFeature] = useState<string>("");
     const [selectParent, setSelectParent] = useState<string>("");
     const [deleteItem, setDeleteItem] = useState<string>("");
+    const [dialogOption, setDialogOption] = useState<DialogOption>({});
     const [sendCount, setSendCount] = useState<number>(0);
     const [menuSearch, setMenuSearch] = useState<MenuSearch>();
     const [pageMutlSearchData, setPageMutlSearchData] = useState<PageMutlSearchData>
@@ -149,6 +157,59 @@ export default function Menu() {
 
     const optionMapValue: Map<string, string> = new Map([["標題", "T"], ["頁面", "P"], ["按鍵功能", "F"]]);
 
+    // dialog
+    const [open, setOpen] = React.useState(false);
+
+    const handleClickOpen = () => {
+        setOpen(true);
+    };
+
+    const handleClose = () => {
+        setOpen(false);
+    };
+
+    const saveHandle = () => {
+        if (dialogOption?.title == "新增") {
+
+        } else {
+
+        }
+    };
+
+
+    //add
+    const addHandle = () => {
+        handleClickOpen();
+        var dialogOptionData: DialogOption = dialogOption;
+        dialogOptionData.title = "新增";
+        dialogOptionData.className = MenuStyle.dialogAddTitle;
+        dialogOptionData.menu = emptyInitial();
+        setDialogOption(dialogOptionData)
+    }
+
+    const emptyInitial = () => {
+        var menu: MenuViewList = {
+            id: 0,
+            name: "",
+            key: "",
+            url: "",
+            feature: "",
+            parent: "",
+            weight: 0,
+            status: true,
+        };
+        return menu;
+    }
+    //edit
+    const editHandle = () => {
+        handleClickOpen();
+        var dialogOptionData: DialogOption = dialogOption;
+        dialogOptionData.title = "修改";
+        dialogOptionData.className = MenuStyle.dialogEditTitle;
+        // dialogOptionData.menu = null;
+        setDialogOption(dialogOptionData)
+    }
+
     const columns: GridColDef[] = [
         {
             field: 'id',
@@ -173,6 +234,7 @@ export default function Menu() {
         {
             field: 'parent',
             headerName: '父類別',
+            sortable: false,
             minWidth: 200,
         },
         {
@@ -191,6 +253,12 @@ export default function Menu() {
             headerName: '狀態',
             minWidth: 120,
             type: 'boolean',
+        },
+        {
+            field: 'remark',
+            headerName: '備註',
+            sortable: false,
+            minWidth: 200,
         },
     ];
 
@@ -236,12 +304,12 @@ export default function Menu() {
                     </Grid>
                     <Grid container direction="row" spacing={1} marginBottom={2} justifyContent="flex-start" alignItems="center" >
                         <Grid item >
-                            <Button variant="contained" color="primary" size="medium" style={{ height: '56px' }} endIcon={<Add />} onClick={send}>
+                            <Button variant="contained" color="primary" size="medium" style={{ height: '56px' }} endIcon={<Add />} onClick={addHandle}>
                                 Add
                             </Button>
                         </Grid>
                         <Grid item >
-                            <Button variant="contained" color="success" size="medium" style={{ height: '56px' }} endIcon={<Edit />} onClick={send}>
+                            <Button variant="contained" color="success" size="medium" style={{ height: '56px' }} endIcon={<Edit />} onClick={editHandle}>
                                 Edit
                             </Button>
                         </Grid>
@@ -252,7 +320,101 @@ export default function Menu() {
                         </Grid>
                     </Grid>
                     <Grid container item direction="row" xs={10} >
-                        <div style={{ width: '1400px' }}>
+                        <DraggableDialog
+                            title={dialogOption.title ?? ""}
+                            open={open}
+                            closeHandle={handleClose}
+                            saveHandle={saveHandle}
+                            className={dialogOption.className ?? ""}
+                        >
+                            <Grid container direction="column" justifyContent="center" alignItems="flex-start">
+                                <Grid container direction="row" justifyContent="flex-start" alignItems="center" marginBottom={2}>
+                                    <Grid item xs={2} md={2}>
+                                        <Typography align="right">名稱：</Typography>
+                                    </Grid>
+                                    <Grid item xs={9} md={9} marginLeft={2}>
+                                        <TextField fullWidth id="outlined-search" required label="名稱" type="search" onChange={e => setSearchData("name", e.target.value)} />
+                                    </Grid>
+                                </Grid>
+                                <Grid container direction="row" justifyContent="flex-start" alignItems="center" marginBottom={2}>
+                                    <Grid item xs={2} md={2}>
+                                        <Typography align="right">識別碼：</Typography>
+                                    </Grid>
+                                    <Grid item xs={9} md={9} marginLeft={2}>
+                                        <TextField fullWidth id="outlined-search" required label="識別碼" type="search" onChange={e => setSearchData("name", e.target.value)} />
+                                    </Grid>
+                                </Grid>
+                                <Grid container direction="row" justifyContent="flex-start" alignItems="center" marginBottom={2}>
+                                    <Grid item xs={2} md={2}>
+                                        <Typography align="right">網址：</Typography>
+                                    </Grid>
+                                    <Grid item xs={9} md={9} marginLeft={2}>
+                                        <TextField fullWidth id="outlined-search" required label="網址" type="search" onChange={e => setSearchData("name", e.target.value)} />
+                                    </Grid>
+                                </Grid>
+                                <Grid container direction="row" justifyContent="flex-start" alignItems="center" marginBottom={2}>
+                                    <Grid item xs={2} md={2}>
+                                        <Typography align="right">權重：</Typography>
+                                    </Grid>
+                                    <Grid item xs={9} md={9} marginLeft={2}>
+                                        <TextField fullWidth id="outlined-search" required label="權重" type="search" onChange={e => setSearchData("name", e.target.value)} />
+                                    </Grid>
+                                </Grid>
+                                <Grid container direction="row" justifyContent="flex-start" alignItems="center" marginBottom={2}>
+                                    <Grid item xs={2} md={2}>
+                                        <Typography align="right">備註：</Typography>
+                                    </Grid>
+                                    <Grid item xs={9} md={9} marginLeft={2}>
+                                        <TextField fullWidth id="outlined-multiline-static" label="備註" multiline rows={4} />
+                                    </Grid>
+                                </Grid>
+
+                                <Grid container direction="row" justifyContent="flex-start" alignItems="center" marginBottom={2}>
+                                    <Grid item xs={2} md={2}>
+                                        <Typography align="right">父類別：</Typography>
+                                    </Grid>
+                                    <Grid item xs={9} md={9} marginLeft={2}>
+                                        <SelectBox
+                                            className={MenuStyle.dropDownList}
+                                            selectName={'父類別'}
+                                            optionMapValue={new Map([...(objArrtoMap(menuParentList))])}
+                                            defaultValue={selectParent}
+                                            selectSet={(selectValue: string) => { setSelectParent(selectValue) }}
+                                            optionAll={true}
+                                            required={true}
+                                        />
+                                    </Grid>
+                                </Grid>
+                                <Grid container direction="row" justifyContent="flex-start" alignItems="center" marginBottom={2}>
+                                    <Grid item xs={2} md={2}>
+                                        <Typography align="right">功能：</Typography>
+                                    </Grid>
+                                    <Grid item xs={9} md={9} marginLeft={2}>
+                                        <SelectBox
+                                            className={MenuStyle.dropDownList}
+                                            selectName={'功能'}
+                                            optionMapValue={optionMapValue}
+                                            defaultValue={selectFeature}
+                                            selectSet={(selectValue: string) => { setSelectFeature(selectValue) }}
+                                            optionAll={true}
+                                            required={true}
+                                        />
+                                    </Grid>
+                                </Grid>
+                                <Grid container direction="row" justifyContent="flex-start" alignItems="center" >
+                                    <Grid item xs={2} md={2}>
+                                        <Typography align="right">狀態：</Typography>
+                                    </Grid>
+                                    <Grid item xs={9} md={9} marginLeft={2}>
+                                        <FormControlLabel label="狀態" control={<Switch defaultChecked />} />
+                                    </Grid>
+                                </Grid>
+                            </Grid>
+
+                        </DraggableDialog>
+                    </Grid>
+                    <Grid container item direction="row" xs={10} >
+                        <div style={{ width: '1600px' }}>
                             <DataGrid
                                 autoHeight
                                 rows={menuViewList}
@@ -276,12 +438,9 @@ export default function Menu() {
                             />
                         </div>
                     </Grid>
-                    <Grid container item direction="row" xs={10} >
-
-                    </Grid>
                 </Grid>
-            </Navigation>
-        </AuthLayout>
+            </Navigation >
+        </AuthLayout >
     )
 }
 

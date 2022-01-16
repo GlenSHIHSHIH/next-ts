@@ -1,3 +1,11 @@
 .dropDownList {
-    min-width: 100px;
-  }
+  min-width: 100px;
+}
+
+.dialogAddTitle {
+  background-color: #1976d2;
+}
+
+.dialogEditTitle {
+  background-color: #1b5e20;
+}
