@@ -1,11 +1,10 @@
-import * as React from 'react';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Paper, { PaperProps } from '@mui/material/Paper';
+import * as React from 'react';
 import Draggable from 'react-draggable';
 
 function PaperComponent(props: PaperProps) {
@@ -22,7 +21,7 @@ function PaperComponent(props: PaperProps) {
 interface DialogProp {
     title: string,
     closeHandle: () => void,
-    saveHandle: () => void,
+    saveHandle: (e: any) => void,
     children?: any,
     open: boolean,
     className: string,

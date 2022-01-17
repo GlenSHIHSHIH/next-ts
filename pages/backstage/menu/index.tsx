@@ -2,9 +2,9 @@ import { useAuthStateContext } from "@context/context";
 import { Auth } from "@context/reducer";
 import { Add, Delete, Edit } from "@mui/icons-material";
 import Search from "@mui/icons-material/Search";
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, FormControlLabel, Grid, Pagination, Switch, TextField, Typography } from "@mui/material";
+import { Button, FormControlLabel, Grid, Pagination, Switch, TextField, Typography } from "@mui/material";
 import { DataGrid, GridColDef, GridSortModel } from "@mui/x-data-grid";
-import { deleteMenuApi, menuApi, menuParentListApi } from "@pages/api/backstage/menu/menuApi";
+import { deleteMenuApi, menuAddApi, menuApi, menuByIdApi, menuEditByIdApi, menuParentListApi } from "@pages/api/backstage/menu/menuApi";
 import { PageMutlSearchData } from "@pages/api/backstage/utilApi";
 import MenuStyle from "@styles/page/backstage/Menu.module.css";
 import { objArrtoMap, setValueToInterfaceProperty } from "@utils/base_fucntion";
@@ -23,6 +23,7 @@ interface MenuViewList {
     parent: string,
     weight: number,
     status: boolean,
+    remark: string,
 }
 
 interface MenuParentList {
@@ -48,10 +49,9 @@ export default function Menu() {
     let title = "Menu";
 
     const { state, dispatch } = useAuthStateContext();
+    const auth: Auth = state;
     const [menuViewList, setMenuViewList] = useState<MenuViewList[]>([]);
     const [menuParentList, setMenuParentList] = useState<MenuParentList[]>([]);
-    const [selectFeature, setSelectFeature] = useState<string>("");
-    const [selectParent, setSelectParent] = useState<string>("");
     const [deleteItem, setDeleteItem] = useState<string>("");
     const [dialogOption, setDialogOption] = useState<DialogOption>({});
     const [sendCount, setSendCount] = useState<number>(0);
@@ -72,11 +72,10 @@ export default function Menu() {
     }, [pageMutlSearchData.page, sendCount])
 
     const getMenuList = () => {
-        let auth: Auth = state;
         menuApi(pageMutlSearchData, auth)?.then((resp: any) => {
             // console.log("resp");
             // console.log(resp);
-            setMenuViewList(resp.data.menuViewList);
+            setMenuViewList(resp.data.menuViewList ?? []);
             setPageMutlSearchData(resp.data.pageData);
         }).catch(error => {
             // console.log("error:");
@@ -138,18 +137,19 @@ export default function Menu() {
     }
 
     function send() {
-        sendHandle();
+        sendHandle(1);
     }
 
-    function sendHandle(sortModel?: GridSortModel) {
+    function sendHandle(page?: number, sortModel?: GridSortModel) {
         let pageSearchData = { ...pageMutlSearchData };
         let menuSearchData = { ...menuSearch };
-        menuSearchData["feature"] = selectFeature;
-        menuSearchData["parent"] = selectParent;
+
         pageSearchData.sortColumn = (sortModel && sortModel[0].field) ?? ""
         pageSearchData.sort = (sortModel && sortModel[0].sort) ?? ""
         pageSearchData.search = menuSearchData;
-        pageSearchData.page = 1;
+        if (page != undefined) {
+            pageSearchData.page = page;
+        }
         setPageMutlSearchData(pageSearchData);
         let count: number = sendCount;
         setSendCount(++count);
@@ -168,12 +168,30 @@ export default function Menu() {
         setOpen(false);
     };
 
-    const saveHandle = () => {
+    const saveHandle = (e: any) => {
+        e.preventDefault();
         if (dialogOption?.title == "新增") {
-
+            menuAddApi(dialogOption.menu, auth)?.then((resp: any) => {
+                // console.log("resp");
+                // console.log(resp);
+                sendHandle();
+            }).catch(error => {
+                console.log("error:");
+                console.log(error);
+                // setErrMsg(error.response?.data?.msg);
+            });
         } else {
-
+            menuEditByIdApi(dialogOption.menu, auth)?.then((resp: any) => {
+                // console.log("resp");
+                // console.log(resp);
+                sendHandle();
+            }).catch(error => {
+                console.log("error:");
+                console.log(error);
+                // setErrMsg(error.response?.data?.msg);
+            });
         }
+        handleClose();
     };
 
 
@@ -197,17 +215,41 @@ export default function Menu() {
             parent: "",
             weight: 0,
             status: true,
+            remark: "",
         };
         return menu;
     }
     //edit
     const editHandle = () => {
-        handleClickOpen();
-        var dialogOptionData: DialogOption = dialogOption;
-        dialogOptionData.title = "修改";
-        dialogOptionData.className = MenuStyle.dialogEditTitle;
-        // dialogOptionData.menu = null;
-        setDialogOption(dialogOptionData)
+        menuByIdApi(deleteItem, auth)?.then((resp: any) => {
+            // console.log("resp");
+            // console.log(resp);
+            var dialogOptionData: DialogOption = dialogOption;
+            dialogOptionData.title = "修改";
+            dialogOptionData.className = MenuStyle.dialogEditTitle;
+            dialogOptionData.menu = resp.data.menuById;
+            setDialogOption(dialogOptionData);
+            handleClickOpen();
+        }).catch(error => {
+            console.log("error:");
+            console.log(error);
+            // setErrMsg(error.response?.data?.msg);
+        });
+    }
+
+    const setdialogData = (name: any, value: any) => {
+        let dialogOptionData: DialogOption;
+        let menuData: MenuViewList;
+        dialogOptionData = { ...dialogOption };
+        if (dialogOptionData.menu == undefined) {
+            menuData = emptyInitial();
+        } else {
+            menuData = { ...dialogOptionData.menu };
+        }
+        menuData = setValueToInterfaceProperty(menuData, name, value);
+        dialogOptionData.menu = menuData;
+        setDialogOption(dialogOptionData);
+        // console.log(dialogOptionData);
     }
 
     const columns: GridColDef[] = [
@@ -224,6 +266,7 @@ export default function Menu() {
         {
             field: 'key',
             headerName: '識別碼',
+            sortable: false,
             minWidth: 150,
         },
         {
@@ -268,21 +311,21 @@ export default function Menu() {
                 <Grid container direction="column" justifyContent="flex-start" alignItems="center">
                     <Grid container direction="row" spacing={2} marginBottom={2} justifyContent="flex-start" alignItems="center" >
                         <Grid item >
-                            <TextField id="outlined-search" label="名稱" type="search" onChange={e => setSearchData("name", e.target.value)} />
+                            <TextField id="outlined-search" label="名稱" type="search" value={menuSearch?.name} onChange={e => setSearchData("name", e.target.value)} />
                         </Grid>
                         <Grid item >
-                            <TextField id="outlined-search" label="網址" type="search" onChange={e => setSearchData("url", e.target.value)} />
+                            <TextField id="outlined-search" label="網址" type="search" value={menuSearch?.url} onChange={e => setSearchData("url", e.target.value)} />
                         </Grid>
                         <Grid item >
-                            <TextField id="outlined-search" label="識別碼" type="search" onChange={e => setSearchData("key", e.target.value)} />
+                            <TextField id="outlined-search" label="識別碼" type="search" value={menuSearch?.key} onChange={e => setSearchData("key", e.target.value)} />
                         </Grid>
                         <Grid item >
                             <SelectBox
                                 className={MenuStyle.dropDownList}
                                 selectName={'功能'}
                                 optionMapValue={optionMapValue}
-                                defaultValue={selectFeature}
-                                selectSet={(selectValue: string) => { setSelectFeature(selectValue) }}
+                                defaultValue={menuSearch?.feature}
+                                selectSet={(selectValue: string) => { setSearchData("feature", selectValue) }}
                                 optionAll={true}
                             />
                         </Grid>
@@ -291,8 +334,8 @@ export default function Menu() {
                                 className={MenuStyle.dropDownList}
                                 selectName={'父類別'}
                                 optionMapValue={new Map([...(objArrtoMap(menuParentList))])}
-                                defaultValue={selectParent}
-                                selectSet={(selectValue: string) => { setSelectParent(selectValue) }}
+                                defaultValue={menuSearch?.parent}
+                                selectSet={(selectValue: string) => { setSearchData("parent", selectValue) }}
                                 optionAll={true}
                             />
                         </Grid>
@@ -309,7 +352,8 @@ export default function Menu() {
                             </Button>
                         </Grid>
                         <Grid item >
-                            <Button variant="contained" color="success" size="medium" style={{ height: '56px' }} endIcon={<Edit />} onClick={editHandle}>
+                            <Button variant="contained" color="success" size="medium" style={{ height: '56px' }} endIcon={<Edit />} onClick={editHandle}
+                                disabled={(deleteItem.split(",").length != 1 || deleteItem == "")}>
                                 Edit
                             </Button>
                         </Grid>
@@ -333,7 +377,8 @@ export default function Menu() {
                                         <Typography align="right">名稱：</Typography>
                                     </Grid>
                                     <Grid item xs={9} md={9} marginLeft={2}>
-                                        <TextField fullWidth id="outlined-search" required label="名稱" type="search" onChange={e => setSearchData("name", e.target.value)} />
+                                        <TextField fullWidth id="outlined-search" required label="名稱" value={dialogOption.menu?.name}
+                                            onChange={e => setdialogData("name", e.target.value)} />
                                     </Grid>
                                 </Grid>
                                 <Grid container direction="row" justifyContent="flex-start" alignItems="center" marginBottom={2}>
@@ -341,7 +386,8 @@ export default function Menu() {
                                         <Typography align="right">識別碼：</Typography>
                                     </Grid>
                                     <Grid item xs={9} md={9} marginLeft={2}>
-                                        <TextField fullWidth id="outlined-search" required label="識別碼" type="search" onChange={e => setSearchData("name", e.target.value)} />
+                                        <TextField fullWidth id="outlined-search" required label="識別碼" value={dialogOption.menu?.key}
+                                            onChange={e => setdialogData("key", e.target.value)} />
                                     </Grid>
                                 </Grid>
                                 <Grid container direction="row" justifyContent="flex-start" alignItems="center" marginBottom={2}>
@@ -349,7 +395,8 @@ export default function Menu() {
                                         <Typography align="right">網址：</Typography>
                                     </Grid>
                                     <Grid item xs={9} md={9} marginLeft={2}>
-                                        <TextField fullWidth id="outlined-search" required label="網址" type="search" onChange={e => setSearchData("name", e.target.value)} />
+                                        <TextField fullWidth id="outlined-search" required label="網址" value={dialogOption.menu?.url}
+                                            onChange={e => setdialogData("url", e.target.value)} />
                                     </Grid>
                                 </Grid>
                                 <Grid container direction="row" justifyContent="flex-start" alignItems="center" marginBottom={2}>
@@ -357,7 +404,8 @@ export default function Menu() {
                                         <Typography align="right">權重：</Typography>
                                     </Grid>
                                     <Grid item xs={9} md={9} marginLeft={2}>
-                                        <TextField fullWidth id="outlined-search" required label="權重" type="search" onChange={e => setSearchData("name", e.target.value)} />
+                                        <TextField fullWidth id="outlined-search" required label="權重" type="number" value={dialogOption.menu?.weight}
+                                            onChange={e => setdialogData("weight", Number(e.target.value))} />
                                     </Grid>
                                 </Grid>
                                 <Grid container direction="row" justifyContent="flex-start" alignItems="center" marginBottom={2}>
@@ -365,7 +413,8 @@ export default function Menu() {
                                         <Typography align="right">備註：</Typography>
                                     </Grid>
                                     <Grid item xs={9} md={9} marginLeft={2}>
-                                        <TextField fullWidth id="outlined-multiline-static" label="備註" multiline rows={4} />
+                                        <TextField fullWidth id="outlined-multiline-static" label="備註" multiline rows={4} value={dialogOption.menu?.remark}
+                                            onChange={e => setdialogData("remark", e.target.value)} />
                                     </Grid>
                                 </Grid>
 
@@ -378,10 +427,9 @@ export default function Menu() {
                                             className={MenuStyle.dropDownList}
                                             selectName={'父類別'}
                                             optionMapValue={new Map([...(objArrtoMap(menuParentList))])}
-                                            defaultValue={selectParent}
-                                            selectSet={(selectValue: string) => { setSelectParent(selectValue) }}
+                                            defaultValue={dialogOption.menu?.parent}
+                                            selectSet={(selectValue: string) => { setdialogData("parent", selectValue) }}
                                             optionAll={true}
-                                            required={true}
                                         />
                                     </Grid>
                                 </Grid>
@@ -394,8 +442,8 @@ export default function Menu() {
                                             className={MenuStyle.dropDownList}
                                             selectName={'功能'}
                                             optionMapValue={optionMapValue}
-                                            defaultValue={selectFeature}
-                                            selectSet={(selectValue: string) => { setSelectFeature(selectValue) }}
+                                            defaultValue={dialogOption.menu?.feature}
+                                            selectSet={(selectValue: string) => { setdialogData("feature", selectValue) }}
                                             optionAll={true}
                                             required={true}
                                         />
@@ -406,7 +454,8 @@ export default function Menu() {
                                         <Typography align="right">狀態：</Typography>
                                     </Grid>
                                     <Grid item xs={9} md={9} marginLeft={2}>
-                                        <FormControlLabel label="狀態" control={<Switch defaultChecked />} />
+                                        <FormControlLabel label="狀態" control={<Switch defaultChecked={dialogOption.menu?.status}
+                                            onChange={(e, checked) => setdialogData("status", checked)} />} />
                                     </Grid>
                                 </Grid>
                             </Grid>
@@ -428,7 +477,7 @@ export default function Menu() {
                                 // rowsPerPageOptions={process.env.PAGE_SIZE?.split(',') as unknown as number[]}
                                 // sortModel={sortModel}
                                 sortingMode="server"
-                                onSortModelChange={(model) => sendHandle(model)}
+                                onSortModelChange={(model) => sendHandle(1, model)}
                                 components={{
                                     Pagination: Pagination,
                                 }}

@@ -37,7 +37,7 @@ export function interfacePropertyToMap<T, K extends keyof T>(obj: T) {
     var map = new Map();
     (Object.keys(obj) as Array<keyof T>).forEach(
         (value) => {
-            map.set(value.toString(),obj[value]);
+            map.set(value.toString(), obj[value]);
         }
     );
     return map;
