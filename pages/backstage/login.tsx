@@ -29,11 +29,15 @@ export default function Login() {
 
     const userNameMinLen = 4;
     const pwdMinLen = 6;
-    const [alertMsg, setAlertMsg] = useState<AlertMsg>({ msg: "", count: 0 });
+    const [alertMsg, setAlertMsg] = useState<AlertMsg>({ msg: "", show: false });
     const { state, dispatch } = useAuthStateContext();
     const router = useRouter();
 
-    useEffect(() => { },[alertMsg.count]);
+    const setAlertClose = () => {
+        let alertData = { ...alertMsg }
+        alertData.show = false;
+        setAlertMsg(alertData);
+    }
 
     useEffect(() => {
         const fetchData = async () => {
@@ -104,18 +108,19 @@ export default function Login() {
         }).catch(error => {
             var alertData = { ...alertMsg };
             alertData.msg = error.response?.data?.msg ?? "連線被拒絕，請工程師查看api";
-            alertData.count = alertData.count + 1;
+            alertData.show = true;
             setAlertMsg(alertData);
         });
     }
 
     return (
         <Container maxWidth="xl">
-            {alertMsg && <AlertFrame
+            {alertMsg.show && <AlertFrame
                 strongContent={alertMsg.msg}
                 alertType="error"
-                isOpen={true}
-                autoHide={5000} />}
+                isOpen={alertMsg.show}
+                setClose={setAlertClose}
+                autoHide={3000} />}
             <Grid container direction="column" justifyContent="center" alignItems="center" style={{ minHeight: '100vh' }}>
                 <Box
                     sx={{

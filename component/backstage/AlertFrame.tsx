@@ -2,8 +2,8 @@ import { Alert, AlertTitle, Box, Snackbar, Stack } from "@mui/material";
 import React from "react";
 
 export interface AlertMsg {
-    msg:string,
-    count:number,
+    msg: string,
+    show: boolean,
 }
 
 type AlertColor = 'success' | 'info' | 'warning' | 'error';
@@ -11,12 +11,13 @@ interface AlertProps {
     strongContent: string,
     alertType: AlertColor,
     isOpen: boolean,
+    setClose: () => void,
     autoHide: number,
 }
 
-const AlertFrame: React.FC<AlertProps> = (props) => {
-    let { strongContent, alertType, isOpen, autoHide } = props;
 
+const AlertFrame: React.FC<AlertProps> = (props) => {
+    let { strongContent, alertType, isOpen, autoHide, setClose } = props;
     const [open, setOpen] = React.useState(isOpen);
 
     const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
@@ -24,6 +25,7 @@ const AlertFrame: React.FC<AlertProps> = (props) => {
             return;
         }
 
+        setClose();
         setOpen(false);
     };
 
