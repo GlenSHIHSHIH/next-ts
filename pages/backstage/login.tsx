@@ -5,7 +5,7 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { Box, Button, Container, Divider, FormControl, Grid, IconButton, InputAdornment, InputLabel, OutlinedInput, Paper, Typography } from "@mui/material";
 import { loginApi } from "@pages/api/backstage/loginApi";
-import AlertFrame from "component/backstage/AlertFrame";
+import AlertFrame, { AlertMsg } from "component/backstage/AlertFrame";
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from "react";
 
@@ -29,17 +29,13 @@ export default function Login() {
 
     const userNameMinLen = 4;
     const pwdMinLen = 6;
-    const [errMsg, setErrMsg] = useState<string>();
+    const [alertMsg, setAlertMsg] = useState<AlertMsg>({ msg: "", count: 0 });
     const { state, dispatch } = useAuthStateContext();
     const router = useRouter();
 
+    useEffect(() => { },[alertMsg.count]);
 
     useEffect(() => {
-        if (errMsg?.length != 0) {
-            setTimeout(() => {
-                setErrMsg("");
-            }, 3000);
-        }
         const fetchData = async () => {
 
             if (state.authorityJwt?.token == undefined || state.authorityJwt?.token == null) {
@@ -102,28 +98,24 @@ export default function Login() {
         }
 
         loginApi(data)?.then(res => {
-            // console.log("login data: ");
-            // category = res.data.category;
-            console.log(state);
+            // console.log(state);
             SetUserInfo(dispatch, res.data);
             router.push("/backstage/dashboard");
         }).catch(error => {
-            // console.log("error:");
-            setErrMsg(error.response?.data?.msg);
-            // console.log(error.response.data.msg);
-            // console.log(error.response);
-            // console.log("帳密錯誤");
+            var alertData = { ...alertMsg };
+            alertData.msg = error.response?.data?.msg ?? "連線被拒絕，請工程師查看api";
+            alertData.count = alertData.count + 1;
+            setAlertMsg(alertData);
         });
     }
 
     return (
         <Container maxWidth="xl">
-            {errMsg && <AlertFrame
-                content=''
-                strongContent={errMsg}
+            {alertMsg && <AlertFrame
+                strongContent={alertMsg.msg}
                 alertType="error"
-            />
-            }
+                isOpen={true}
+                autoHide={5000} />}
             <Grid container direction="column" justifyContent="center" alignItems="center" style={{ minHeight: '100vh' }}>
                 <Box
                     sx={{
@@ -201,6 +193,3 @@ export default function Login() {
     )
 }
 
-function handleChange(arg0: string): React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> | undefined {
-    throw new Error("Function not implemented.");
-}

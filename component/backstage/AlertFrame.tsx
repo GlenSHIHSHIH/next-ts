@@ -1,27 +1,51 @@
-import { Alert, AlertTitle, Stack } from "@mui/material";
+import { Alert, AlertTitle, Box, Snackbar, Stack } from "@mui/material";
 import React from "react";
 
-type AlertColor = 'success' | 'info' | 'warning' | 'error';
+export interface AlertMsg {
+    msg:string,
+    count:number,
+}
 
+type AlertColor = 'success' | 'info' | 'warning' | 'error';
 interface AlertProps {
-    content: string,
     strongContent: string,
-    alertType: AlertColor
+    alertType: AlertColor,
+    isOpen: boolean,
+    autoHide: number,
 }
 
 const AlertFrame: React.FC<AlertProps> = (props) => {
-    const { content, strongContent, alertType } = props;
-    var firstUpper = alertType.substring(0, 1).toUpperCase();
-    var otherLower = alertType.substring(1, alertType.length+1).toLowerCase();
-    var title = firstUpper + otherLower;
-    console.log(title);
+    let { strongContent, alertType, isOpen, autoHide } = props;
+
+    const [open, setOpen] = React.useState(isOpen);
+
+    const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+
+        setOpen(false);
+    };
+
+
     return (
-        <Stack sx={{ width: '100%' }} >
-            <Alert severity={alertType}>
-                <AlertTitle>{title}</AlertTitle>
-                {content}<strong>{strongContent}</strong>
-            </Alert>
-        </Stack>
+
+        <Snackbar open={open} autoHideDuration={autoHide} onClose={handleClose} sx={{ width: '100%' }}
+            anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'center',
+            }}>
+            <Box sx={{ width: '100%' }} >
+                {strongContent &&
+                    <Stack sx={{ width: '100%' }} >
+                        <Alert severity={alertType}>
+                            <AlertTitle>{alertType}</AlertTitle>
+                            <strong>{strongContent}</strong>
+                        </Alert>
+                    </Stack>
+                }
+            </Box>
+        </Snackbar>
     )
 }
 
