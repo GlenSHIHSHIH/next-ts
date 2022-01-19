@@ -8,6 +8,7 @@ import { deleteMenuApi, menuAddApi, menuApi, menuByIdApi, menuEditByIdApi, menuP
 import { PageMutlSearchData } from "@pages/api/backstage/utilApi";
 import MenuStyle from "@styles/page/backstage/Menu.module.css";
 import { objArrtoMap, setValueToInterfaceProperty } from "@utils/base_fucntion";
+import AlertFrame, { AlertMsg, setAlertAutoClose, setAlertData } from "component/backstage/AlertFrame";
 import AuthLayout from "component/backstage/AuthLayout";
 import DraggableDialog from "component/backstage/Dialogs";
 import Navigation from "component/backstage/Navigation";
@@ -56,6 +57,7 @@ export default function Menu() {
     const [dialogOption, setDialogOption] = useState<DialogOption>({});
     const [sendCount, setSendCount] = useState<number>(0);
     const [menuSearch, setMenuSearch] = useState<MenuSearch>();
+    const [alertMsg, setAlertMsg] = useState<AlertMsg>({ msg: "", show: false });
     const [pageMutlSearchData, setPageMutlSearchData] = useState<PageMutlSearchData>
         ({
             count: 0,
@@ -66,37 +68,40 @@ export default function Menu() {
             sortColumn: "",
         });
 
+    //alert 關閉通知
+    const setAlertClose = () => {
+        let alertData = setAlertAutoClose(alertMsg);
+        setAlertMsg(alertData);
+    }
+
+    //取資料
     useEffect(() => {
         getMenuList();
         getMenuParentList();
     }, [pageMutlSearchData.page, sendCount])
 
+    //取表單資料 by 參數
     const getMenuList = () => {
         menuApi(pageMutlSearchData, auth)?.then((resp: any) => {
-            // console.log("resp");
-            // console.log(resp);
             setMenuViewList(resp.data.menuViewList ?? []);
             setPageMutlSearchData(resp.data.pageData);
         }).catch(error => {
-            // console.log("error:");
-            // console.log(error);
-            // setErrMsg(error.response?.data?.msg);
+            var alertData = setAlertData(alertMsg, error.response?.data?.msg ?? "資料讀取錯誤", true, "error");
+            setAlertMsg(alertData);
         });
     }
 
+    //取表單父類別資料
     const getMenuParentList = () => {
-        let auth: Auth = state;
         menuParentListApi(null, auth)?.then((resp: any) => {
-            // console.log("resp");
-            // console.log(resp);
             setMenuParentList(resp.data.menuParentList);
         }).catch(error => {
-            // console.log("error:");
-            // console.log(error);
-            // setErrMsg(error.response?.data?.msg);
+            var alertData = setAlertData(alertMsg, error.response?.data?.msg ?? "父類別選項資料錯誤", true, "error");
+            setAlertMsg(alertData);
         });
     }
 
+    //設定搜尋參數 to object
     const setSearchData = (searchName: any, value: string) => {
         let search: MenuSearch;
         if (menuSearch == undefined) {
@@ -109,6 +114,7 @@ export default function Menu() {
         setMenuSearch(search);
     }
 
+    //頁碼刷新
     const pageHandle = (event: ChangeEvent<unknown>, page: number) => {
         console.log(page);
         let pageData = { ...pageMutlSearchData };
@@ -117,35 +123,40 @@ export default function Menu() {
     }
 
 
+    //刪除功能
     const deleteItemHandle = () => {
 
         if (deleteItem == "") {
             return;
         }
 
-        let auth: Auth = state;
         deleteMenuApi(deleteItem, auth)?.then((resp: any) => {
-            // console.log("resp");
-            // console.log(resp);
+            var alertData = setAlertData(alertMsg, deleteItem + " 刪除成功", true, "success");
+            setAlertMsg(alertData);
             sendHandle();
         }).catch(error => {
-            console.log("error:");
-            console.log(error);
-            // setErrMsg(error.response?.data?.msg);
+            var alertData = setAlertData(alertMsg, deleteItem + error.response?.data?.msg ?? " 刪除失敗", true, "error");
+            setAlertMsg(alertData);
         });
 
     }
 
+    //送出相關搜尋參數，重整頁碼回第一頁
     function send() {
+        //搜尋頁數
         sendHandle(1);
     }
 
+    //送出搜尋資料參數
     function sendHandle(page?: number, sortModel?: GridSortModel) {
         let pageSearchData = { ...pageMutlSearchData };
         let menuSearchData = { ...menuSearch };
 
-        pageSearchData.sortColumn = (sortModel && sortModel[0].field) ?? ""
-        pageSearchData.sort = (sortModel && sortModel[0].sort) ?? ""
+        if (sortModel!=undefined) {
+            pageSearchData.sortColumn = (sortModel[0]?.field) ?? ""
+            pageSearchData.sort = (sortModel[0]?.sort) ?? ""
+        }
+
         pageSearchData.search = menuSearchData;
         if (page != undefined) {
             pageSearchData.page = page;
@@ -157,7 +168,7 @@ export default function Menu() {
 
     const optionMapValue: Map<string, string> = new Map([["標題", "T"], ["頁面", "P"], ["按鍵功能", "F"]]);
 
-    // dialog
+    // 新增與修改彈跳視窗 dialog
     const [open, setOpen] = React.useState(false);
 
     const handleClickOpen = () => {
@@ -172,23 +183,22 @@ export default function Menu() {
         e.preventDefault();
         if (dialogOption?.title == "新增") {
             menuAddApi(dialogOption.menu, auth)?.then((resp: any) => {
-                // console.log("resp");
-                // console.log(resp);
+                var alertData = setAlertData(alertMsg, "新增成功", true, "success");
+                setAlertMsg(alertData);
                 sendHandle();
             }).catch(error => {
-                console.log("error:");
-                console.log(error);
-                // setErrMsg(error.response?.data?.msg);
+                var alertData = setAlertData(alertMsg, "新增失敗", true, "error");
+                setAlertMsg(alertData);
             });
+
         } else {
             menuEditByIdApi(dialogOption.menu, auth)?.then((resp: any) => {
-                // console.log("resp");
-                // console.log(resp);
+                var alertData = setAlertData(alertMsg, dialogOption.menu?.id + " 修改成功", true, "success");
+                setAlertMsg(alertData);
                 sendHandle();
             }).catch(error => {
-                console.log("error:");
-                console.log(error);
-                // setErrMsg(error.response?.data?.msg);
+                var alertData = setAlertData(alertMsg, dialogOption.menu?.id + error.response?.data?.msg ?? " 修改失敗", true, "error");
+                setAlertMsg(alertData);
             });
         }
         handleClose();
@@ -237,6 +247,7 @@ export default function Menu() {
         });
     }
 
+    //設定dialog 資料儲存
     const setdialogData = (name: any, value: any) => {
         let dialogOptionData: DialogOption;
         let menuData: MenuViewList;
@@ -308,6 +319,12 @@ export default function Menu() {
     return (
         <AuthLayout>
             <Navigation title={title}>
+                {alertMsg.show && <AlertFrame
+                    strongContent={alertMsg.msg}
+                    alertType={alertMsg.type ?? "error"}
+                    isOpen={alertMsg.show}
+                    setClose={setAlertClose}
+                    autoHide={4000} />}
                 <Grid container direction="column" justifyContent="flex-start" alignItems="center">
                     <Grid container direction="row" spacing={2} marginBottom={2} justifyContent="flex-start" alignItems="center" >
                         <Grid item >

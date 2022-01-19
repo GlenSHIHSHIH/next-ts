@@ -5,7 +5,7 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { Box, Button, Container, Divider, FormControl, Grid, IconButton, InputAdornment, InputLabel, OutlinedInput, Paper, Typography } from "@mui/material";
 import { loginApi } from "@pages/api/backstage/loginApi";
-import AlertFrame, { AlertMsg } from "component/backstage/AlertFrame";
+import AlertFrame, { AlertMsg, setAlertAutoClose, setAlertData } from "component/backstage/AlertFrame";
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from "react";
 
@@ -33,9 +33,9 @@ export default function Login() {
     const { state, dispatch } = useAuthStateContext();
     const router = useRouter();
 
+     //alert 關閉通知
     const setAlertClose = () => {
-        let alertData = { ...alertMsg }
-        alertData.show = false;
+        let alertData = setAlertAutoClose(alertMsg);
         setAlertMsg(alertData);
     }
 
@@ -102,13 +102,10 @@ export default function Login() {
         }
 
         loginApi(data)?.then(res => {
-            // console.log(state);
             SetUserInfo(dispatch, res.data);
             router.push("/backstage/dashboard");
         }).catch(error => {
-            var alertData = { ...alertMsg };
-            alertData.msg = error.response?.data?.msg ?? "連線被拒絕，請工程師查看api";
-            alertData.show = true;
+            var alertData = setAlertData(alertMsg, error.response?.data?.msg ?? "連線被拒絕，請工程師查看api", true, "error");
             setAlertMsg(alertData);
         });
     }
@@ -120,7 +117,7 @@ export default function Login() {
                 alertType="error"
                 isOpen={alertMsg.show}
                 setClose={setAlertClose}
-                autoHide={3000} />}
+                autoHide={4000} />}
             <Grid container direction="column" justifyContent="center" alignItems="center" style={{ minHeight: '100vh' }}>
                 <Box
                     sx={{

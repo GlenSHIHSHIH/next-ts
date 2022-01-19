@@ -4,6 +4,21 @@ import React from "react";
 export interface AlertMsg {
     msg: string,
     show: boolean,
+    type?: AlertColor,
+}
+
+export function setAlertData(data: AlertMsg,msg:string,show:boolean,type:AlertColor){
+    var alertData = { ...data };
+    alertData.msg = msg;
+    alertData.show = show;
+    alertData.type = type;
+    return alertData;
+}
+
+export function setAlertAutoClose(data: AlertMsg){
+    var alertData = { ...data };
+    alertData.show = false;
+    return alertData;
 }
 
 type AlertColor = 'success' | 'info' | 'warning' | 'error';
@@ -32,9 +47,9 @@ const AlertFrame: React.FC<AlertProps> = (props) => {
 
     return (
 
-        <Snackbar open={open} autoHideDuration={autoHide} onClose={handleClose} sx={{ width: '100%' }}
+        <Snackbar open={open} autoHideDuration={autoHide} onClose={handleClose} sx={{ width: '50%' }}
             anchorOrigin={{
-                vertical: 'bottom',
+                vertical: 'top',
                 horizontal: 'center',
             }}>
             <Box sx={{ width: '100%' }} >
