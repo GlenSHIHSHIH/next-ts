@@ -30,7 +30,7 @@ export const menuParentListApi = (data: any, auth: Auth) => {
     return api("get", "/backstage/menu/parent/list", null, { ...setAuthHeader(auth), params: data })
 }
 
-export const deleteMenuApi = (data: any, auth: Auth) => {
+export const menuDeleteApi = (data: any, auth: Auth) => {
     // console.log("values");
     // console.log({ ...setAuthHeader(auth), params: data });
     return api("delete", "/backstage/menu/delete/" + data, null, { ...setAuthHeader(auth) })
