@@ -33,7 +33,7 @@ export default function Login() {
     const { state, dispatch } = useAuthStateContext();
     const router = useRouter();
 
-     //alert 關閉通知
+    //alert 關閉通知
     const setAlertClose = () => {
         let alertData = setAlertAutoClose(alertMsg);
         setAlertMsg(alertData);

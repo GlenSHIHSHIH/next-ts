@@ -62,10 +62,9 @@ export default function Menu() {
         ({
             count: 0,
             page: 1,
-            // pageLimit: Number(process.env.BACKSTAGE_PAGE_SIZE_DEFAULT ?? 30),
-            pageLimit: 5,
-            sort: "",
-            sortColumn: "",
+            pageLimit: Number(process.env.BACKSTAGE_PAGE_SIZE_DEFAULT ?? 30),
+            sort: "asc",
+            sortColumn: "id",
         });
 
     //alert 關閉通知

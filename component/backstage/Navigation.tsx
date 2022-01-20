@@ -15,8 +15,7 @@ import Link from "next/link";
 import { useRouter } from 'next/router';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import Cookies from 'universal-cookie';
-import AlertFrame from './AlertFrame';
+import AlertFrame, { AlertMsg, setAlertAutoClose, setAlertData } from './AlertFrame';
 
 interface NavigationProp {
     window?: any,
@@ -62,17 +61,16 @@ const Navigation: React.FC<NavigationProp> = (props: any) => {
     const [mobileOpen, setMobileOpen] = useState(false);
     const [openValue, setOpenValue] = useState<OpenValue[]>();
     const [menuList, setMenuList] = useState<MenuNestData[]>();
-    const [errMsg, setErrMsg] = useState<string>();
+    const [alertMsg, setAlertMsg] = useState<AlertMsg>({ msg: "", show: false });
     const { state, dispatch } = useAuthStateContext();
 
+    //alert 關閉通知
+    const setAlertClose = () => {
+        let alertData = setAlertAutoClose(alertMsg);
+        setAlertMsg(alertData);
+    }
 
     useEffect(() => {
-        if (errMsg?.length != 0) {
-            setTimeout(() => {
-                setErrMsg("");
-            }, 3000);
-        }
-
         // STEP 1：在 useEffect 中定義 async function 取名為 fetchData
         let fetchData = async () => {
 
@@ -206,27 +204,24 @@ const Navigation: React.FC<NavigationProp> = (props: any) => {
 
     const logout = () => {
         logoutApi(state)?.then(res => {
-            // console.log("login data: ");
-            // category = res.data.category;
-            console.log(res);
             logoutRemoveCookie(dispatch);
             router.push("/backstage/login");
         }).catch(error => {
-            console.log("error:");
-            console.log(error);
-            setErrMsg(error.response?.data?.msg);
+            var alertData = setAlertData(alertMsg, error.response?.data?.msg ?? "菜單資料讀取錯誤", true, "error");
+            setAlertMsg(alertData);
         });
     };
 
     const container = window !== undefined ? () => window().document.body : undefined;
     return (
         <Box sx={{ display: 'flex' }}>
-            {errMsg && <AlertFrame
-                content=''
-                strongContent={errMsg}
+             {alertMsg.show && <AlertFrame
+                strongContent={alertMsg.msg}
                 alertType="error"
-            />
-            }
+                isOpen={alertMsg.show}
+                setClose={setAlertClose}
+                autoHide={4000} />}
+
             <ThemeProvider theme={theme}>
                 <CssBaseline />
                 <AppBar
