@@ -180,6 +180,7 @@ export default function Menu() {
                 var alertData = setAlertData(alertMsg, "新增成功", true, "success");
                 setAlertMsg(alertData);
                 sendHandle();
+                handleClose();
             }).catch(error => {
                 var alertData = setAlertData(alertMsg, "新增失敗", true, "error");
                 setAlertMsg(alertData);
@@ -190,12 +191,13 @@ export default function Menu() {
                 var alertData = setAlertData(alertMsg, dialogOption.data?.id + " 修改成功", true, "success");
                 setAlertMsg(alertData);
                 sendHandle();
+                handleClose();
             }).catch(error => {
                 var alertData = setAlertData(alertMsg, dialogOption.data?.id + error.response?.data?.msg ?? " 修改失敗", true, "error");
                 setAlertMsg(alertData);
             });
         }
-        handleClose();
+
     };
 
 
@@ -235,9 +237,8 @@ export default function Menu() {
             setDialogOption(dialogOptionData);
             handleClickOpen();
         }).catch(error => {
-            console.log("error:");
-            console.log(error);
-            // setErrMsg(error.response?.data?.msg);
+            var alertData = setAlertData(alertMsg, error.response?.data?.msg ?? " 抓取資料錯誤", true, "error");
+            setAlertMsg(alertData);
         });
     }
 
@@ -370,7 +371,7 @@ export default function Menu() {
                         </Grid>
                         <Grid item >
                             <Button variant="contained" color="error" size="medium" style={{ height: '56px' }} endIcon={<Delete />} onClick={deleteItemHandle}
-                                disabled={(checkboxItem.split(",").length != 1 || checkboxItem == "")}>
+                                disabled={(checkboxItem.split(",").length < 1 || checkboxItem == "")}>
                                 Delete
                             </Button>
                         </Grid>
@@ -475,29 +476,30 @@ export default function Menu() {
                         </DraggableDialog>
                     </Grid>
                     <Grid container item direction="row" xs={10} >
-                        <div style={{ width: '1600px' }}>
-                            <DataGrid
-                                autoHeight
-                                rows={menuViewList}
-                                columns={columns}
-                                checkboxSelection
-                                onSelectionModelChange={(selectionModel) => setCheckboxItem(selectionModel.join(','))}
-                                disableSelectionOnClick
-                                disableColumnMenu
-                                pageSize={pageMutlSearchData.pageLimit}
-                                // onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-                                // rowsPerPageOptions={process.env.PAGE_SIZE?.split(',') as unknown as number[]}
-                                // sortModel={sortModel}
-                                sortingMode="server"
-                                onSortModelChange={(model) => sendHandle(1, model)}
-                                components={{
-                                    Pagination: Pagination,
-                                }}
-                                componentsProps={{
-                                    pagination: { count: Math.ceil(pageMutlSearchData.count / pageMutlSearchData.pageLimit), page: pageMutlSearchData.page, onChange: pageHandle, showFirstButton: true, showLastButton: true },
-                                }}
-                            />
-                        </div>
+
+                        <DataGrid
+                            sx={{ width: '1600px', minHeight: '500px', textAlign: 'center' }}
+                            autoHeight
+                            rows={menuViewList}
+                            columns={columns}
+                            checkboxSelection
+                            onSelectionModelChange={(selectionModel) => setCheckboxItem(selectionModel.join(','))}
+                            disableSelectionOnClick
+                            disableColumnMenu
+                            pageSize={pageMutlSearchData.pageLimit}
+                            // onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+                            // rowsPerPageOptions={process.env.PAGE_SIZE?.split(',') as unknown as number[]}
+                            // sortModel={sortModel}
+                            sortingMode="server"
+                            onSortModelChange={(model) => sendHandle(1, model)}
+                            components={{
+                                Pagination: Pagination,
+                            }}
+                            componentsProps={{
+                                pagination: { count: Math.ceil(pageMutlSearchData.count / pageMutlSearchData.pageLimit), page: pageMutlSearchData.page, onChange: pageHandle, showFirstButton: true, showLastButton: true },
+                            }}
+                        />
+
                     </Grid>
                 </Grid>
             </Navigation >

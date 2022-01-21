@@ -30,6 +30,6 @@ export const roleDeleteApi = (data: any, auth: Auth) => {
     return api("delete", "/backstage/role/delete/" + data, null, { ...setAuthHeader(auth) })
 }
 
-export const getNavigationAllApi = (data: any, auth: Auth) => {
+export const navigationAllApi = (auth: Auth) => {
     return api("get", "/backstage/menu/all", null, { ...setAuthHeader(auth) })
 }

@@ -3,8 +3,8 @@ import { Auth } from "@context/reducer";
 import { Add, Delete, Edit } from "@mui/icons-material";
 import Search from "@mui/icons-material/Search";
 import { Button, FormControlLabel, Grid, Pagination, Switch, TextField, Typography } from "@mui/material";
-import { DataGrid, GridColDef, GridSortModel } from "@mui/x-data-grid";
-import { getNavigationAllApi, roleAddApi, roleApi, roleByIdApi, roleDeleteApi, roleEditByIdApi } from "@pages/api/backstage/role/roleApi";
+import { DataGrid, GridColDef, GridSortModel, GridValueFormatterParams } from "@mui/x-data-grid";
+import { navigationAllApi, roleAddApi, roleApi, roleByIdApi, roleDeleteApi, roleEditByIdApi } from "@pages/api/backstage/role/roleApi";
 import { PageMutlSearchData } from "@pages/api/backstage/utilApi";
 import BaseStyle from "@styles/page/backstage/base.module.css";
 import { setValueToInterfaceProperty } from "@utils/base_fucntion";
@@ -12,7 +12,8 @@ import AlertFrame, { AlertMsg, setAlertAutoClose, setAlertData } from "component
 import AuthLayout from "component/backstage/AuthLayout";
 import DraggableDialog from "component/backstage/Dialogs";
 import Navigation from "component/backstage/Navigation";
-import RecursiveTreeView from "component/backstage/TreeFrame";
+import RecursiveTreeView, { RenderTree } from "component/backstage/TreeFrame";
+import moment from "moment";
 import React, { ChangeEvent, useEffect, useState } from "react";
 
 interface RoleList {
@@ -35,6 +36,7 @@ interface RoleData {
     weight: number,
     status: boolean,
     remark: string,
+    select: string[],
 }
 
 interface RoleSearch {
@@ -54,6 +56,7 @@ export default function Role() {
     const { state, dispatch } = useAuthStateContext();
     const auth: Auth = state;
     const [roleList, setRoleList] = useState<RoleList[]>([]);
+    const [menuAllList, setMenuAllList] = useState<RenderTree[]>([]);
     const [checkboxItem, setCheckboxItem] = useState<string>("");
     const [dialogOption, setDialogOption] = useState<DialogOption>({});
     const [sendCount, setSendCount] = useState<number>(0);
@@ -64,8 +67,8 @@ export default function Role() {
             count: 0,
             page: 1,
             pageLimit: Number(process.env.BACKSTAGE_PAGE_SIZE_DEFAULT ?? 30),
-            sort: "",
-            sortColumn: "",
+            sort: "asc",
+            sortColumn: "id",
         });
 
     //alert 關閉通知
@@ -93,9 +96,8 @@ export default function Role() {
 
     //取菜單權限tree
     const getNavigationAllList = () => {
-        getNavigationAllApi(pageMutlSearchData, auth)?.then((resp: any) => {
-            setRoleList(resp.data.roleList ?? []);
-            setPageMutlSearchData(resp.data.pageData);
+        navigationAllApi(auth)?.then((resp: any) => {
+            setMenuAllList(resp.data.menu ?? []);
         }).catch(error => {
             var alertData = setAlertData(alertMsg, error.response?.data?.msg ?? "菜單權限讀取錯誤", true, "error");
             setAlertMsg(alertData);
@@ -118,7 +120,6 @@ export default function Role() {
 
     //頁碼刷新
     const pageHandle = (event: ChangeEvent<unknown>, page: number) => {
-        console.log(page);
         let pageData = { ...pageMutlSearchData };
         pageData.page = page;
         setPageMutlSearchData(pageData);
@@ -175,11 +176,15 @@ export default function Role() {
 
     const saveHandle = (e: any) => {
         e.preventDefault();
+        // role_menu tree 存入Dialog
+        setDialogTree();
+
         if (dialogOption?.title == "新增") {
             roleAddApi(dialogOption.data, auth)?.then((resp: any) => {
                 var alertData = setAlertData(alertMsg, "新增成功", true, "success");
                 setAlertMsg(alertData);
                 sendHandle();
+                handleClose();
             }).catch(error => {
                 var alertData = setAlertData(alertMsg, "新增失敗", true, "error");
                 setAlertMsg(alertData);
@@ -190,12 +195,13 @@ export default function Role() {
                 var alertData = setAlertData(alertMsg, dialogOption.data?.id + " 修改成功", true, "success");
                 setAlertMsg(alertData);
                 sendHandle();
+                handleClose();
             }).catch(error => {
                 var alertData = setAlertData(alertMsg, dialogOption.data?.id + error.response?.data?.msg ?? " 修改失敗", true, "error");
                 setAlertMsg(alertData);
             });
         }
-        handleClose();
+
     };
 
     //add
@@ -217,24 +223,23 @@ export default function Role() {
             weight: 0,
             status: true,
             remark: "",
+            select: [],
         };
         return data;
     }
     //edit
     const editHandle = () => {
         roleByIdApi(checkboxItem, auth)?.then((resp: any) => {
-            // console.log("resp");
-            // console.log(resp);
             var dialogOptionData: DialogOption = dialogOption;
             dialogOptionData.title = "修改";
             dialogOptionData.className = BaseStyle.dialogEditTitle;
             dialogOptionData.data = resp.data.roleById;
             setDialogOption(dialogOptionData);
+            setSelected(resp.data.roleById.select ?? []);
             handleClickOpen();
         }).catch(error => {
-            console.log("error:");
-            console.log(error);
-            // setErrMsg(error.response?.data?.msg);
+            var alertData = setAlertData(alertMsg, error.response?.data?.msg ?? "抓取資料錯誤", true, "error");
+            setAlertMsg(alertData);
         });
     }
 
@@ -242,14 +247,13 @@ export default function Role() {
     const [selected, setSelected] = React.useState<string[]>([]);
     const setSelect = (vlaue: string[]) => {
         setSelected(vlaue);
-    }
-
-    const showSelect = () => {
         console.log(selected);
+        console.log("selected");
+        console.log(vlaue);
     }
 
     //設定dialog 資料儲存
-    const setdialogData = (name: any, value: any) => {
+    const setDialogData = (name: any, value: any) => {
         let dialogOptionData: DialogOption;
         let diaData: RoleData;
         dialogOptionData = { ...dialogOption };
@@ -261,7 +265,15 @@ export default function Role() {
         diaData = setValueToInterfaceProperty(diaData, name, value);
         dialogOptionData.data = diaData;
         setDialogOption(dialogOptionData);
-        // console.log(dialogOptionData);
+    }
+
+    //設定tree 權限 資料儲存
+    const setDialogTree = () => {
+        let dialogOptionData = { ...dialogOption };
+        if (dialogOptionData.data != undefined) {
+            dialogOptionData.data.select = selected;
+        }
+        setDialogOption(dialogOptionData);
     }
 
     const columns: GridColDef[] = [
@@ -301,14 +313,22 @@ export default function Role() {
         {
             field: 'createTime',
             headerName: '新增時間',
+            type: 'dateTime',
             sortable: false,
             minWidth: 200,
+            valueFormatter: (params: GridValueFormatterParams) => {
+                return moment(params.value?.toString()).format("yyyy-MM-DD HH:mm:ss");
+            }
         },
         {
             field: 'updateTime',
             headerName: '更新時間',
+            type: 'dateTime',
             sortable: false,
             minWidth: 200,
+            valueFormatter: (params: GridValueFormatterParams) => {
+                return moment(params.value?.toString()).format("yyyy-MM-DD HH:mm:ss");
+            }
         },
         {
             field: 'createUser',
@@ -361,7 +381,7 @@ export default function Role() {
                         </Grid>
                         <Grid item >
                             <Button variant="contained" color="error" size="medium" style={{ height: '56px' }} endIcon={<Delete />} onClick={deleteItemHandle}
-                                disabled={(checkboxItem.split(",").length != 1 || checkboxItem == "")}>
+                                disabled={(checkboxItem.split(",").length < 1 || checkboxItem == "")}>
                                 Delete
                             </Button>
                         </Grid>
@@ -381,7 +401,7 @@ export default function Role() {
                                     </Grid>
                                     <Grid item xs={9} md={9} marginLeft={2}>
                                         <TextField fullWidth id="outlined-search" required label="名稱" value={dialogOption.data?.name}
-                                            onChange={e => setdialogData("name", e.target.value)} />
+                                            onChange={e => setDialogData("name", e.target.value)} />
                                     </Grid>
                                 </Grid>
                                 <Grid container direction="row" justifyContent="flex-start" alignItems="center" marginBottom={2}>
@@ -390,7 +410,7 @@ export default function Role() {
                                     </Grid>
                                     <Grid item xs={9} md={9} marginLeft={2}>
                                         <TextField fullWidth id="outlined-search" required label="識別碼" value={dialogOption.data?.key}
-                                            onChange={e => setdialogData("key", e.target.value)} />
+                                            onChange={e => setDialogData("key", e.target.value)} />
                                     </Grid>
                                 </Grid>
                                 <Grid container direction="row" justifyContent="flex-start" alignItems="center" marginBottom={2}>
@@ -399,7 +419,7 @@ export default function Role() {
                                     </Grid>
                                     <Grid item xs={9} md={9} marginLeft={2}>
                                         <TextField fullWidth id="outlined-search" required label="權重" type="number" value={dialogOption.data?.weight}
-                                            onChange={e => setdialogData("weight", Number(e.target.value))} />
+                                            onChange={e => setDialogData("weight", Number(e.target.value))} />
                                     </Grid>
                                 </Grid>
                                 <Grid container direction="row" justifyContent="flex-start" alignItems="center" marginBottom={2}>
@@ -408,7 +428,7 @@ export default function Role() {
                                     </Grid>
                                     <Grid item xs={9} md={9} marginLeft={2}>
                                         <TextField fullWidth id="outlined-multiline-static" label="備註" multiline rows={4} value={dialogOption.data?.remark}
-                                            onChange={e => setdialogData("remark", e.target.value)} />
+                                            onChange={e => setDialogData("remark", e.target.value)} />
                                     </Grid>
                                 </Grid>
 
@@ -418,7 +438,7 @@ export default function Role() {
                                     </Grid>
                                     <Grid item xs={9} md={9} marginLeft={2}>
                                         <FormControlLabel label="狀態" control={<Switch defaultChecked={dialogOption.data?.status}
-                                            onChange={(e, checked) => setdialogData("status", checked)} />} />
+                                            onChange={(e, checked) => setDialogData("status", checked)} />} />
                                     </Grid>
                                 </Grid>
                                 <Grid container direction="row" justifyContent="flex-start" alignItems="center" >
@@ -426,7 +446,8 @@ export default function Role() {
                                         <Typography align="right">權限圖：</Typography>
                                     </Grid>
                                     <Grid item xs={9} md={9} marginLeft={2}>
-                                        {RecursiveTreeView(role{}, selected, setSelect)}
+                                        {RecursiveTreeView({ id: 0, name: "all", child: menuAllList }, selected, setSelect)}
+
                                     </Grid>
                                 </Grid>
                             </Grid>
@@ -434,29 +455,28 @@ export default function Role() {
                         </DraggableDialog>
                     </Grid>
                     <Grid container item direction="row" xs={10} >
-                        <div style={{ width: '1600px' }}>
-                            <DataGrid
-                                autoHeight
-                                rows={roleList}
-                                columns={columns}
-                                checkboxSelection
-                                onSelectionModelChange={(selectionModel) => setCheckboxItem(selectionModel.join(','))}
-                                disableSelectionOnClick
-                                disableColumnMenu
-                                pageSize={pageMutlSearchData.pageLimit}
-                                // onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-                                // rowsPerPageOptions={process.env.PAGE_SIZE?.split(',') as unknown as number[]}
-                                // sortModel={sortModel}
-                                sortingMode="server"
-                                onSortModelChange={(model) => sendHandle(1, model)}
-                                components={{
-                                    Pagination: Pagination,
-                                }}
-                                componentsProps={{
-                                    pagination: { count: Math.ceil(pageMutlSearchData.count / pageMutlSearchData.pageLimit), page: pageMutlSearchData.page, onChange: pageHandle, showFirstButton: true, showLastButton: true },
-                                }}
-                            />
-                        </div>
+                        <DataGrid
+                            sx={{ width: '1800px', minHeight: '500px', textAlign: 'center' }}
+                            autoHeight
+                            rows={roleList}
+                            columns={columns}
+                            checkboxSelection
+                            onSelectionModelChange={(selectionModel) => setCheckboxItem(selectionModel.join(','))}
+                            disableSelectionOnClick
+                            disableColumnMenu
+                            pageSize={pageMutlSearchData.pageLimit}
+                            // onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+                            // rowsPerPageOptions={process.env.PAGE_SIZE?.split(',') as unknown as number[]}
+                            // sortModel={sortModel}
+                            sortingMode="server"
+                            onSortModelChange={(model) => sendHandle(1, model)}
+                            components={{
+                                Pagination: Pagination,
+                            }}
+                            componentsProps={{
+                                pagination: { count: Math.ceil(pageMutlSearchData.count / pageMutlSearchData.pageLimit), page: pageMutlSearchData.page, onChange: pageHandle, showFirstButton: true, showLastButton: true },
+                            }}
+                        />
                     </Grid>
                 </Grid>
             </Navigation >

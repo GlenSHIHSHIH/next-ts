@@ -5,13 +5,13 @@ import { Checkbox, FormControlLabel } from "@mui/material";
 import React from "react";
 
 export interface RenderTree {
-    id: string;
+    id: any;
     name: string;
     feature?: string;
     child?: RenderTree[];
 }
 
-export default function RecursiveTreeView(data: RenderTree,selected: string[],setSelected:(value:string[])=>void) {
+export default function RecursiveTreeView(data: RenderTree, selected: string[], setSelected: (value: string[]) => void) {
     // const [selected, setSelected] = React.useState<string[]>([]);
     // console.log(selected);
 
@@ -97,8 +97,7 @@ export default function RecursiveTreeView(data: RenderTree,selected: string[],se
                 .filter((value) => !childNodesToToggle.includes(value))
                 .filter((value) => !path.includes(value));
 
-        array = array.filter((v, i) => array.indexOf(v) === i);
-
+        array = array.filter((v, i) => array.indexOf(v) === i );
         setSelected(array);
     }
 
@@ -110,11 +109,11 @@ export default function RecursiveTreeView(data: RenderTree,selected: string[],se
             selectedSet.has(childNodeId)
         ) || false;
 
-        if (allSelectedChildren && !selectedSet.has(nodes.id)) {
-            console.log("if allSelectedChildren");
+        // if (allSelectedChildren && !selectedSet.has(nodes.id)) {
+        //     console.log("if allSelectedChildren");
 
-            setSelected([...selected, nodes.id]);
-        }
+        //     setSelected([...selected, nodes.id]);
+        // }
 
         return (
             <TreeItem
@@ -147,7 +146,7 @@ export default function RecursiveTreeView(data: RenderTree,selected: string[],se
     return (
         <TreeView
             defaultCollapseIcon={<ExpandMoreIcon />}
-            defaultExpanded={["0", "3", "4"]}
+            defaultExpanded={[]}
             defaultExpandIcon={<ChevronRightIcon />}
         >
             {renderTree(data)}
