@@ -3,64 +3,60 @@ import { Auth } from "@context/reducer";
 import { Add, Delete, Edit } from "@mui/icons-material";
 import Search from "@mui/icons-material/Search";
 import { Button, FormControlLabel, Grid, Pagination, Switch, TextField, Typography } from "@mui/material";
-import { DataGrid, GridColDef, GridSortModel, GridValueFormatterParams } from "@mui/x-data-grid";
-import { navigationAllApi, roleAddApi, roleApi, roleByIdApi, roleDeleteApi, roleEditByIdApi } from "@pages/api/backstage/role/roleApi";
+import { DataGrid, GridColDef, GridSortModel } from "@mui/x-data-grid";
+import { menuAddApi, menuApi, menuByIdApi, menuDeleteApi, menuEditByIdApi, menuParentListApi } from "@pages/api/backstage/menu/menuApi";
 import { PageMutlSearchData } from "@pages/api/backstage/utilApi";
-import BaseStyle from "@styles/page/backstage/base.module.css";
-import { setValueToInterfaceProperty } from "@utils/base_fucntion";
+import BaseStyle from "@styles/page/backstage/Base.module.css";
+import { objArrtoMap, setValueToInterfaceProperty } from "@utils/base_fucntion";
 import AlertFrame, { AlertMsg, setAlertAutoClose, setAlertData } from "component/backstage/AlertFrame";
 import AuthLayout from "component/backstage/AuthLayout";
 import DraggableDialog from "component/backstage/Dialogs";
 import Navigation from "component/backstage/Navigation";
-import RecursiveTreeView, { RenderTree } from "component/backstage/TreeFrame";
-import moment from "moment";
+import SelectBox from "component/SelectBox";
 import React, { ChangeEvent, useEffect, useState } from "react";
 
-interface RoleList {
+interface MenuViewList {
     id: number,
     name: string,
     key: string,
+    url: string,
+    feature: string,
+    parent: string,
     weight: number,
     status: boolean,
     remark: string,
-    createTime: Date,
-    updateTime: Date,
-    createUser: string,
-    updateUser: string,
 }
 
-interface RoleData {
+interface MenuParentList {
     id: number,
     name: string,
-    key: string,
-    weight: number,
-    status: boolean,
-    remark: string,
-    select: string[],
 }
 
-interface RoleSearch {
+interface MenuSearch {
     name?: string,
     key?: string,
+    url?: string,
+    feature?: string,
+    parent?: string,
 }
 
 interface DialogOption {
     title?: string,
     className?: string,
-    data?: RoleData,
+    data?: MenuViewList,
 }
 
-export default function Role() {
-    let title = "Role";
+export default function Menu() {
+    let title = "Menu";
 
     const { state, dispatch } = useAuthStateContext();
     const auth: Auth = state;
-    const [roleList, setRoleList] = useState<RoleList[]>([]);
-    const [menuAllList, setMenuAllList] = useState<RenderTree[]>([]);
+    const [menuViewList, setMenuViewList] = useState<MenuViewList[]>([]);
+    const [menuParentList, setMenuParentList] = useState<MenuParentList[]>([]);
     const [checkboxItem, setCheckboxItem] = useState<string>("");
     const [dialogOption, setDialogOption] = useState<DialogOption>({});
     const [sendCount, setSendCount] = useState<number>(0);
-    const [roleSearch, setRoleSearch] = useState<RoleSearch>();
+    const [menuSearch, setMenuSearch] = useState<MenuSearch>();
     const [alertMsg, setAlertMsg] = useState<AlertMsg>({ msg: "", show: false });
     const [pageMutlSearchData, setPageMutlSearchData] = useState<PageMutlSearchData>
         ({
@@ -79,14 +75,14 @@ export default function Role() {
 
     //取資料
     useEffect(() => {
-        getRoleList();
-        getNavigationAllList();
+        getMenuList();
+        getMenuParentList();
     }, [pageMutlSearchData.page, sendCount])
 
     //取表單資料 by 參數
-    const getRoleList = () => {
-        roleApi(pageMutlSearchData, auth)?.then((resp: any) => {
-            setRoleList(resp.data.roleList ?? []);
+    const getMenuList = () => {
+        menuApi(pageMutlSearchData, auth)?.then((resp: any) => {
+            setMenuViewList(resp.data.menuViewList ?? []);
             setPageMutlSearchData(resp.data.pageData);
         }).catch(error => {
             var alertData = setAlertData(alertMsg, error.response?.data?.msg ?? "資料讀取錯誤", true, "error");
@@ -94,45 +90,46 @@ export default function Role() {
         });
     }
 
-    //取菜單權限tree
-    const getNavigationAllList = () => {
-        navigationAllApi(auth)?.then((resp: any) => {
-            setMenuAllList(resp.data.menu ?? []);
+    //取表單父類別資料
+    const getMenuParentList = () => {
+        menuParentListApi(null, auth)?.then((resp: any) => {
+            setMenuParentList(resp.data.menuParentList);
         }).catch(error => {
-            var alertData = setAlertData(alertMsg, error.response?.data?.msg ?? "菜單權限讀取錯誤", true, "error");
+            var alertData = setAlertData(alertMsg, error.response?.data?.msg ?? "父類別選項資料錯誤", true, "error");
             setAlertMsg(alertData);
         });
     }
 
-
     //設定搜尋參數 to object
     const setSearchData = (searchName: any, value: string) => {
-        let search: RoleSearch;
-        if (roleSearch == undefined) {
+        let search: MenuSearch;
+        if (menuSearch == undefined) {
             search = {};
         } else {
-            search = { ...roleSearch };
+            search = { ...menuSearch };
         }
         // search[searchName]=value;
         search = setValueToInterfaceProperty(search, searchName, value);
-        setRoleSearch(search);
+        setMenuSearch(search);
     }
 
     //頁碼刷新
     const pageHandle = (event: ChangeEvent<unknown>, page: number) => {
+        console.log(page);
         let pageData = { ...pageMutlSearchData };
         pageData.page = page;
         setPageMutlSearchData(pageData);
     }
 
+
     //刪除功能
     const deleteItemHandle = () => {
-        roleDeleteApi(checkboxItem, auth)?.then((resp: any) => {
-            var alertData = setAlertData(alertMsg, checkboxItem + " 刪除成功", true, "success");
+        menuDeleteApi(checkboxItem, auth)?.then((resp: any) => {
+            var alertData = setAlertData(alertMsg, "id" + checkboxItem + " 刪除成功", true, "success");
             setAlertMsg(alertData);
             sendHandle();
         }).catch(error => {
-            var alertData = setAlertData(alertMsg, checkboxItem + error.response?.data?.msg ?? " 刪除失敗", true, "error");
+            var alertData = setAlertData(alertMsg, error.response?.data?.msg ?? "id:" + checkboxItem + " 刪除失敗", true, "error");
             setAlertMsg(alertData);
         });
 
@@ -147,14 +144,14 @@ export default function Role() {
     //送出搜尋資料參數
     function sendHandle(page?: number, sortModel?: GridSortModel) {
         let pageSearchData = { ...pageMutlSearchData };
-        let searchData = { ...roleSearch };
+        let menuSearchData = { ...menuSearch };
 
         if (sortModel != undefined) {
             pageSearchData.sortColumn = (sortModel[0]?.field) ?? ""
             pageSearchData.sort = (sortModel[0]?.sort) ?? ""
         }
 
-        pageSearchData.search = searchData;
+        pageSearchData.search = menuSearchData;
         if (page != undefined) {
             pageSearchData.page = page;
         }
@@ -162,6 +159,8 @@ export default function Role() {
         let count: number = sendCount;
         setSendCount(++count);
     }
+
+    const optionMapValue: Map<string, string> = new Map([["標題", "T"], ["頁面", "P"], ["按鍵功能", "F"]]);
 
     // 新增與修改彈跳視窗 dialog
     const [open, setOpen] = React.useState(false);
@@ -176,33 +175,31 @@ export default function Role() {
 
     const saveHandle = (e: any) => {
         e.preventDefault();
-        // role_menu tree 存入Dialog
-        setDialogTree();
-
         if (dialogOption?.title == "新增") {
-            roleAddApi(dialogOption.data, auth)?.then((resp: any) => {
+            menuAddApi(dialogOption.data, auth)?.then((resp: any) => {
                 var alertData = setAlertData(alertMsg, "新增成功", true, "success");
                 setAlertMsg(alertData);
                 sendHandle();
                 handleClose();
             }).catch(error => {
-                var alertData = setAlertData(alertMsg, "新增失敗", true, "error");
+                var alertData = setAlertData(alertMsg, error.response?.data?.msg ?? "新增失敗", true, "error");
                 setAlertMsg(alertData);
             });
 
         } else {
-            roleEditByIdApi(dialogOption.data, auth)?.then((resp: any) => {
-                var alertData = setAlertData(alertMsg, dialogOption.data?.id + " 修改成功", true, "success");
+            menuEditByIdApi(dialogOption.data, auth)?.then((resp: any) => {
+                var alertData = setAlertData(alertMsg, "id" + dialogOption.data?.id + " 修改成功", true, "success");
                 setAlertMsg(alertData);
                 sendHandle();
                 handleClose();
             }).catch(error => {
-                var alertData = setAlertData(alertMsg, dialogOption.data?.id + error.response?.data?.msg ?? " 修改失敗", true, "error");
+                var alertData = setAlertData(alertMsg, error.response?.data?.msg ?? "id" + dialogOption.data?.id + " 修改失敗", true, "error");
                 setAlertMsg(alertData);
             });
         }
 
     };
+
 
     //add
     const addHandle = () => {
@@ -211,51 +208,44 @@ export default function Role() {
         dialogOptionData.title = "新增";
         dialogOptionData.className = BaseStyle.dialogAddTitle;
         dialogOptionData.data = emptyInitial();
-        setSelected([]);
         setDialogOption(dialogOptionData)
     }
 
     const emptyInitial = () => {
-        var data: RoleData = {
+        var data: MenuViewList = {
             id: 0,
             name: "",
             key: "",
+            url: "",
+            feature: "",
+            parent: "",
             weight: 0,
             status: true,
             remark: "",
-            select: [],
         };
         return data;
     }
     //edit
     const editHandle = () => {
-        roleByIdApi(checkboxItem, auth)?.then((resp: any) => {
+        menuByIdApi(checkboxItem, auth)?.then((resp: any) => {
+            // console.log("resp");
+            // console.log(resp);
             var dialogOptionData: DialogOption = dialogOption;
             dialogOptionData.title = "修改";
             dialogOptionData.className = BaseStyle.dialogEditTitle;
-            dialogOptionData.data = resp.data.roleById;
+            dialogOptionData.data = resp.data.menuById;
             setDialogOption(dialogOptionData);
-            setSelected(resp.data.roleById.select ?? []);
             handleClickOpen();
         }).catch(error => {
-            var alertData = setAlertData(alertMsg, error.response?.data?.msg ?? "抓取資料錯誤", true, "error");
+            var alertData = setAlertData(alertMsg, error.response?.data?.msg ?? " 抓取資料錯誤", true, "error");
             setAlertMsg(alertData);
         });
     }
 
-    // 樹狀資料關聯
-    const [selected, setSelected] = React.useState<string[]>([]);
-    const setSelect = (vlaue: string[]) => {
-        setSelected(vlaue);
-        console.log(selected);
-        console.log("selected");
-        console.log(vlaue);
-    }
-
     //設定dialog 資料儲存
-    const setDialogData = (name: any, value: any) => {
+    const setdialogData = (name: any, value: any) => {
         let dialogOptionData: DialogOption;
-        let diaData: RoleData;
+        let diaData: MenuViewList;
         dialogOptionData = { ...dialogOption };
         if (dialogOptionData.data == undefined) {
             diaData = emptyInitial();
@@ -265,15 +255,7 @@ export default function Role() {
         diaData = setValueToInterfaceProperty(diaData, name, value);
         dialogOptionData.data = diaData;
         setDialogOption(dialogOptionData);
-    }
-
-    //設定tree 權限 資料儲存
-    const setDialogTree = () => {
-        let dialogOptionData = { ...dialogOption };
-        if (dialogOptionData.data != undefined) {
-            dialogOptionData.data.select = selected;
-        }
-        setDialogOption(dialogOptionData);
+        // console.log(dialogOptionData);
     }
 
     const columns: GridColDef[] = [
@@ -294,6 +276,23 @@ export default function Role() {
             minWidth: 150,
         },
         {
+            field: 'url',
+            headerName: '網址',
+            minWidth: 200,
+        },
+        {
+            field: 'parent',
+            headerName: '父類別',
+            sortable: false,
+            minWidth: 200,
+        },
+        {
+            field: 'feature',
+            headerName: '功能',
+            sortable: false,
+            minWidth: 160,
+        },
+        {
             field: 'weight',
             headerName: '排序權重',
             minWidth: 120,
@@ -307,38 +306,6 @@ export default function Role() {
         {
             field: 'remark',
             headerName: '備註',
-            sortable: false,
-            minWidth: 200,
-        },
-        {
-            field: 'createTime',
-            headerName: '新增時間',
-            type: 'dateTime',
-            sortable: false,
-            minWidth: 200,
-            valueFormatter: (params: GridValueFormatterParams) => {
-                return moment(params.value?.toString()).format("yyyy-MM-DD HH:mm:ss");
-            }
-        },
-        {
-            field: 'updateTime',
-            headerName: '更新時間',
-            type: 'dateTime',
-            sortable: false,
-            minWidth: 200,
-            valueFormatter: (params: GridValueFormatterParams) => {
-                return moment(params.value?.toString()).format("yyyy-MM-DD HH:mm:ss");
-            }
-        },
-        {
-            field: 'createUser',
-            headerName: '新增by',
-            sortable: false,
-            minWidth: 200,
-        },
-        {
-            field: 'updateUser',
-            headerName: '更新by',
             sortable: false,
             minWidth: 200,
         },
@@ -356,10 +323,33 @@ export default function Role() {
                 <Grid container direction="column" justifyContent="flex-start" alignItems="center">
                     <Grid container direction="row" spacing={2} marginBottom={2} justifyContent="flex-start" alignItems="center" >
                         <Grid item >
-                            <TextField id="outlined-search" label="名稱" type="search" value={roleSearch?.name} onChange={e => setSearchData("name", e.target.value)} />
+                            <TextField id="outlined-search" label="名稱" type="search" value={menuSearch?.name} onChange={e => setSearchData("name", e.target.value)} />
                         </Grid>
                         <Grid item >
-                            <TextField id="outlined-search" label="識別碼" type="search" value={roleSearch?.key} onChange={e => setSearchData("key", e.target.value)} />
+                            <TextField id="outlined-search" label="網址" type="search" value={menuSearch?.url} onChange={e => setSearchData("url", e.target.value)} />
+                        </Grid>
+                        <Grid item >
+                            <TextField id="outlined-search" label="識別碼" type="search" value={menuSearch?.key} onChange={e => setSearchData("key", e.target.value)} />
+                        </Grid>
+                        <Grid item >
+                            <SelectBox
+                                className={BaseStyle.dropDownList}
+                                selectName={'功能'}
+                                optionMapValue={optionMapValue}
+                                defaultValue={menuSearch?.feature}
+                                selectSet={(selectValue: string) => { setSearchData("feature", selectValue) }}
+                                optionAll={true}
+                            />
+                        </Grid>
+                        <Grid item >
+                            <SelectBox
+                                className={BaseStyle.dropDownList}
+                                selectName={'父類別'}
+                                optionMapValue={new Map([...(objArrtoMap(menuParentList))])}
+                                defaultValue={menuSearch?.parent}
+                                selectSet={(selectValue: string) => { setSearchData("parent", selectValue) }}
+                                optionAll={true}
+                            />
                         </Grid>
                         <Grid item >
                             <Button variant="contained" color="warning" size="large" style={{ height: '56px' }} endIcon={<Search />} onClick={send}>
@@ -401,7 +391,7 @@ export default function Role() {
                                     </Grid>
                                     <Grid item xs={9} md={9} marginLeft={2}>
                                         <TextField fullWidth id="outlined-search" required label="名稱" value={dialogOption.data?.name}
-                                            onChange={e => setDialogData("name", e.target.value)} />
+                                            onChange={e => setdialogData("name", e.target.value)} />
                                     </Grid>
                                 </Grid>
                                 <Grid container direction="row" justifyContent="flex-start" alignItems="center" marginBottom={2}>
@@ -410,7 +400,16 @@ export default function Role() {
                                     </Grid>
                                     <Grid item xs={9} md={9} marginLeft={2}>
                                         <TextField fullWidth id="outlined-search" required label="識別碼" value={dialogOption.data?.key}
-                                            onChange={e => setDialogData("key", e.target.value)} />
+                                            onChange={e => setdialogData("key", e.target.value)} />
+                                    </Grid>
+                                </Grid>
+                                <Grid container direction="row" justifyContent="flex-start" alignItems="center" marginBottom={2}>
+                                    <Grid item xs={2} md={2}>
+                                        <Typography align="right">網址：</Typography>
+                                    </Grid>
+                                    <Grid item xs={9} md={9} marginLeft={2}>
+                                        <TextField fullWidth id="outlined-search" required label="網址" value={dialogOption.data?.url}
+                                            onChange={e => setdialogData("url", e.target.value)} />
                                     </Grid>
                                 </Grid>
                                 <Grid container direction="row" justifyContent="flex-start" alignItems="center" marginBottom={2}>
@@ -419,7 +418,7 @@ export default function Role() {
                                     </Grid>
                                     <Grid item xs={9} md={9} marginLeft={2}>
                                         <TextField fullWidth id="outlined-search" required label="權重" type="number" value={dialogOption.data?.weight}
-                                            onChange={e => setDialogData("weight", Number(e.target.value))} />
+                                            onChange={e => setdialogData("weight", Number(e.target.value))} />
                                     </Grid>
                                 </Grid>
                                 <Grid container direction="row" justifyContent="flex-start" alignItems="center" marginBottom={2}>
@@ -428,26 +427,48 @@ export default function Role() {
                                     </Grid>
                                     <Grid item xs={9} md={9} marginLeft={2}>
                                         <TextField fullWidth id="outlined-multiline-static" label="備註" multiline rows={4} value={dialogOption.data?.remark}
-                                            onChange={e => setDialogData("remark", e.target.value)} />
+                                            onChange={e => setdialogData("remark", e.target.value)} />
                                     </Grid>
                                 </Grid>
 
+                                <Grid container direction="row" justifyContent="flex-start" alignItems="center" marginBottom={2}>
+                                    <Grid item xs={2} md={2}>
+                                        <Typography align="right">父類別：</Typography>
+                                    </Grid>
+                                    <Grid item xs={9} md={9} marginLeft={2}>
+                                        <SelectBox
+                                            className={BaseStyle.dropDownList}
+                                            selectName={'父類別'}
+                                            optionMapValue={new Map([...(objArrtoMap(menuParentList))])}
+                                            defaultValue={dialogOption.data?.parent}
+                                            selectSet={(selectValue: string) => { setdialogData("parent", selectValue) }}
+                                            optionAll={true}
+                                        />
+                                    </Grid>
+                                </Grid>
+                                <Grid container direction="row" justifyContent="flex-start" alignItems="center" marginBottom={2}>
+                                    <Grid item xs={2} md={2}>
+                                        <Typography align="right">功能：</Typography>
+                                    </Grid>
+                                    <Grid item xs={9} md={9} marginLeft={2}>
+                                        <SelectBox
+                                            className={BaseStyle.dropDownList}
+                                            selectName={'功能'}
+                                            optionMapValue={optionMapValue}
+                                            defaultValue={dialogOption.data?.feature}
+                                            selectSet={(selectValue: string) => { setdialogData("feature", selectValue) }}
+                                            optionAll={true}
+                                            required={true}
+                                        />
+                                    </Grid>
+                                </Grid>
                                 <Grid container direction="row" justifyContent="flex-start" alignItems="center" >
                                     <Grid item xs={2} md={2}>
                                         <Typography align="right">狀態：</Typography>
                                     </Grid>
                                     <Grid item xs={9} md={9} marginLeft={2}>
                                         <FormControlLabel label="狀態" control={<Switch defaultChecked={dialogOption.data?.status}
-                                            onChange={(e, checked) => setDialogData("status", checked)} />} />
-                                    </Grid>
-                                </Grid>
-                                <Grid container direction="row" justifyContent="flex-start" alignItems="center" >
-                                    <Grid item xs={2} md={2}>
-                                        <Typography align="right">權限圖：</Typography>
-                                    </Grid>
-                                    <Grid item xs={9} md={9} marginLeft={2}>
-                                        {RecursiveTreeView({ id: 0, name: "all", child: menuAllList }, selected, setSelect)}
-
+                                            onChange={(e, checked) => setdialogData("status", checked)} />} />
                                     </Grid>
                                 </Grid>
                             </Grid>
@@ -455,10 +476,11 @@ export default function Role() {
                         </DraggableDialog>
                     </Grid>
                     <Grid container item direction="row" xs={10} >
+
                         <DataGrid
-                            sx={{ width: '1800px', minHeight: '500px', textAlign: 'center' }}
+                            sx={{ width: '1600px', minHeight: '500px', textAlign: 'center' }}
                             autoHeight
-                            rows={roleList}
+                            rows={menuViewList}
                             columns={columns}
                             checkboxSelection
                             onSelectionModelChange={(selectionModel) => setCheckboxItem(selectionModel.join(','))}
@@ -477,6 +499,7 @@ export default function Role() {
                                 pagination: { count: Math.ceil(pageMutlSearchData.count / pageMutlSearchData.pageLimit), page: pageMutlSearchData.page, onChange: pageHandle, showFirstButton: true, showLastButton: true },
                             }}
                         />
+
                     </Grid>
                 </Grid>
             </Navigation >
