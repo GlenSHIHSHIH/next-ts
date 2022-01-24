@@ -2,10 +2,8 @@ import { Grid, Typography } from "@mui/material";
 import RecursiveTreeView, { RenderTree } from "component/backstage/TreeFrame";
 import { useState } from "react";
 
-export const data: RenderTree = {
-    "id": 0,
-    "name": "teeets",
-    "child": [
+export const data: RenderTree[] =
+    [
         {
             "id": 1,
             "name": "系統管理",
@@ -169,7 +167,7 @@ export const data: RenderTree = {
             ]
         }
     ]
-}
+
 
 
 export default function Test() {
@@ -190,7 +188,7 @@ export default function Test() {
                     <Typography align="right">權限圖：</Typography>
                 </Grid >
                 <Grid item xs={9} md={9} marginLeft={2}>
-                    {RecursiveTreeView(data, selected, setSelect)}
+                    {RecursiveTreeView({ id: 0, name: "全選", child: data }, selected, setSelect)}
 
                 </Grid>
             </Grid >
