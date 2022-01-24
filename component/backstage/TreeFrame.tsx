@@ -7,7 +7,7 @@ import React from "react";
 export interface RenderTree {
     id: any;
     name: string;
-    child?: RenderTree[];
+    child?: RenderTree[] | null;
 }
 
 export default function RecursiveTreeView(data: RenderTree, selected: string[], setSelected: (value: string[]) => void) {
