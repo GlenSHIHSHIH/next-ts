@@ -98,6 +98,7 @@ export default function Role() {
     const getNavigationAllList = () => {
         navigationAllApi(auth)?.then((resp: any) => {
             setMenuAllList({ id: 0, name: "全選", child: resp.data.menu });
+            // console.log(menuAllList);
         }).catch(error => {
             var alertData = setAlertData(alertMsg, error.response?.data?.msg ?? "菜單權限讀取錯誤", true, "error");
             setAlertMsg(alertData);
@@ -247,9 +248,9 @@ export default function Role() {
     const [selected, setSelected] = React.useState<string[]>([]);
     const setSelect = (value: string[]) => {
         setSelected(value);
-        console.log(selected);
-        console.log("selected");
-        console.log(value);
+        // console.log(selected);
+        // console.log("selected");
+        // console.log(value);
     }
 
     //設定dialog 資料儲存
