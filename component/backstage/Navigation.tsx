@@ -25,7 +25,7 @@ interface NavigationProp {
     title?: string
     children?: any
 }
-interface MenuNestData {
+export interface MenuNestData {
     id: number,
     name: string,
     key: string,
@@ -215,7 +215,7 @@ const Navigation: React.FC<NavigationProp> = (props: any) => {
     const container = window !== undefined ? () => window().document.body : undefined;
     return (
         <Box sx={{ display: 'flex' }}>
-             {alertMsg.show && <AlertFrame
+            {alertMsg.show && <AlertFrame
                 strongContent={alertMsg.msg}
                 alertType="error"
                 isOpen={alertMsg.show}

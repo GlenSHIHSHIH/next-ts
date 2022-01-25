@@ -7,7 +7,7 @@ import { DataGrid, GridColDef, GridSortModel, GridValueFormatterParams } from "@
 import { navigationAllApi, roleAddApi, roleApi, roleByIdApi, roleDeleteApi, roleEditByIdApi } from "@pages/api/backstage/role/roleApi";
 import { PageMutlSearchData } from "@pages/api/backstage/utilApi";
 import BaseStyle from "@styles/page/backstage/base.module.css";
-import { setValueToInterfaceProperty } from "@utils/base_fucntion";
+import { featureRole, setValueToInterfaceProperty } from "@utils/base_fucntion";
 import AlertFrame, { AlertMsg, setAlertAutoClose, setAlertData } from "component/backstage/AlertFrame";
 import AuthLayout from "component/backstage/AuthLayout";
 import DraggableDialog from "component/backstage/Dialogs";
@@ -51,12 +51,15 @@ interface DialogOption {
 }
 
 export default function Role() {
-    let title = "Role";
+    let title = "角色介面";
 
     const { state, dispatch } = useAuthStateContext();
     const auth: Auth = state;
+    const [pAdd, setPAdd] = useState<boolean>(false);
+    const [pEdit, setPEdit] = useState<boolean>(false);
+    const [pDelete, setPDelete] = useState<boolean>(false);
     const [roleList, setRoleList] = useState<RoleList[]>([]);
-    const [menuAllList, setMenuAllList] = useState<RenderTree>({ id: 0, name: "全選"});
+    const [menuAllList, setMenuAllList] = useState<RenderTree>({ id: 0, name: "全選" });
     const [checkboxItem, setCheckboxItem] = useState<string>("");
     const [dialogOption, setDialogOption] = useState<DialogOption>({});
     const [sendCount, setSendCount] = useState<number>(0);
@@ -81,6 +84,12 @@ export default function Role() {
     useEffect(() => {
         getRoleList();
         getNavigationAllList();
+        let fetchData = async () => {
+            setPAdd(await featureRole(auth, "/backstage/role/create"));
+            setPEdit(await featureRole(auth, "/backstage/role/edit"));
+            setPDelete(await featureRole(auth, "/backstage/role/delete"));
+        };
+        fetchData();
     }, [pageMutlSearchData.page, sendCount])
 
     //取表單資料 by 參數
@@ -369,23 +378,26 @@ export default function Role() {
                         </Grid>
                     </Grid>
                     <Grid container direction="row" spacing={1} marginBottom={2} justifyContent="flex-start" alignItems="center" >
-                        <Grid item >
-                            <Button variant="contained" color="primary" size="medium" style={{ height: '56px' }} endIcon={<Add />} onClick={addHandle}>
-                                Add
-                            </Button>
-                        </Grid>
-                        <Grid item >
-                            <Button variant="contained" color="success" size="medium" style={{ height: '56px' }} endIcon={<Edit />} onClick={editHandle}
-                                disabled={(checkboxItem.split(",").length != 1 || checkboxItem == "")}>
-                                Edit
-                            </Button>
-                        </Grid>
-                        <Grid item >
-                            <Button variant="contained" color="error" size="medium" style={{ height: '56px' }} endIcon={<Delete />} onClick={deleteItemHandle}
-                                disabled={(checkboxItem.split(",").length < 1 || checkboxItem == "")}>
-                                Delete
-                            </Button>
-                        </Grid>
+                        {pAdd &&
+                            <Grid item >
+                                <Button variant="contained" color="primary" size="medium" style={{ height: '56px' }} endIcon={<Add />} onClick={addHandle}>
+                                    Add
+                                </Button>
+                            </Grid>}
+                        {pEdit &&
+                            <Grid item >
+                                <Button variant="contained" color="success" size="medium" style={{ height: '56px' }} endIcon={<Edit />} onClick={editHandle}
+                                    disabled={(checkboxItem.split(",").length != 1 || checkboxItem == "")}>
+                                    Edit
+                                </Button>
+                            </Grid>}
+                        {pDelete &&
+                            <Grid item >
+                                <Button variant="contained" color="error" size="medium" style={{ height: '56px' }} endIcon={<Delete />} onClick={deleteItemHandle}
+                                    disabled={(checkboxItem.split(",").length < 1 || checkboxItem == "")}>
+                                    Delete
+                                </Button>
+                            </Grid>}
                     </Grid>
                     <Grid container item direction="row" xs={10} >
                         <DraggableDialog

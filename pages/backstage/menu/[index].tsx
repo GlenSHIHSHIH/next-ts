@@ -7,7 +7,7 @@ import { DataGrid, GridColDef, GridSortModel } from "@mui/x-data-grid";
 import { menuAddApi, menuApi, menuByIdApi, menuDeleteApi, menuEditByIdApi, menuParentListApi } from "@pages/api/backstage/menu/menuApi";
 import { PageMutlSearchData } from "@pages/api/backstage/utilApi";
 import BaseStyle from "@styles/page/backstage/Base.module.css";
-import { objArrtoMap, setValueToInterfaceProperty } from "@utils/base_fucntion";
+import { featureRole, objArrtoMap, setValueToInterfaceProperty } from "@utils/base_fucntion";
 import AlertFrame, { AlertMsg, setAlertAutoClose, setAlertData } from "component/backstage/AlertFrame";
 import AuthLayout from "component/backstage/AuthLayout";
 import DraggableDialog from "component/backstage/Dialogs";
@@ -47,10 +47,13 @@ interface DialogOption {
 }
 
 export default function Menu() {
-    let title = "Menu";
+    let title = "菜單介面";
 
     const { state, dispatch } = useAuthStateContext();
     const auth: Auth = state;
+    const [pAdd, setPAdd] = useState<boolean>(false);
+    const [pEdit, setPEdit] = useState<boolean>(false);
+    const [pDelete, setPDelete] = useState<boolean>(false);
     const [menuViewList, setMenuViewList] = useState<MenuViewList[]>([]);
     const [menuParentList, setMenuParentList] = useState<MenuParentList[]>([]);
     const [checkboxItem, setCheckboxItem] = useState<string>("");
@@ -77,6 +80,12 @@ export default function Menu() {
     useEffect(() => {
         getMenuList();
         getMenuParentList();
+        let fetchData = async () => {
+            setPAdd(await featureRole(auth, "/backstage/menu/create"));
+            setPEdit(await featureRole(auth, "/backstage/menu/edit"));
+            setPDelete(await featureRole(auth, "/backstage/menu/delete"));
+        };
+        fetchData();
     }, [pageMutlSearchData.page, sendCount])
 
     //取表單資料 by 參數
@@ -358,23 +367,26 @@ export default function Menu() {
                         </Grid>
                     </Grid>
                     <Grid container direction="row" spacing={1} marginBottom={2} justifyContent="flex-start" alignItems="center" >
-                        <Grid item >
-                            <Button variant="contained" color="primary" size="medium" style={{ height: '56px' }} endIcon={<Add />} onClick={addHandle}>
-                                Add
-                            </Button>
-                        </Grid>
-                        <Grid item >
-                            <Button variant="contained" color="success" size="medium" style={{ height: '56px' }} endIcon={<Edit />} onClick={editHandle}
-                                disabled={(checkboxItem.split(",").length != 1 || checkboxItem == "")}>
-                                Edit
-                            </Button>
-                        </Grid>
-                        <Grid item >
-                            <Button variant="contained" color="error" size="medium" style={{ height: '56px' }} endIcon={<Delete />} onClick={deleteItemHandle}
-                                disabled={(checkboxItem.split(",").length < 1 || checkboxItem == "")}>
-                                Delete
-                            </Button>
-                        </Grid>
+                        {pAdd
+                            && <Grid item >
+                                <Button variant="contained" color="primary" size="medium" style={{ height: '56px' }} endIcon={<Add />} onClick={addHandle}>
+                                    Add
+                                </Button>
+                            </Grid>}
+                        {pEdit
+                            && <Grid item >
+                                <Button variant="contained" color="success" size="medium" style={{ height: '56px' }} endIcon={<Edit />} onClick={editHandle}
+                                    disabled={(checkboxItem.split(",").length != 1 || checkboxItem == "")}>
+                                    Edit
+                                </Button>
+                            </Grid>}
+                        {pDelete
+                            && <Grid item >
+                                <Button variant="contained" color="error" size="medium" style={{ height: '56px' }} endIcon={<Delete />} onClick={deleteItemHandle}
+                                    disabled={(checkboxItem.split(",").length < 1 || checkboxItem == "")}>
+                                    Delete
+                                </Button>
+                            </Grid>}
                     </Grid>
                     <Grid container item direction="row" xs={10} >
                         <DraggableDialog
