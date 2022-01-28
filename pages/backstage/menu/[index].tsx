@@ -134,11 +134,11 @@ export default function Menu() {
     //刪除功能
     const deleteItemHandle = () => {
         menuDeleteApi(checkboxItem, auth)?.then((resp: any) => {
-            var alertData = setAlertData(alertMsg, "id" + checkboxItem + " 刪除成功", true, "success");
+            var alertData = setAlertData(alertMsg, "id:" + checkboxItem + " ,刪除成功", true, "success");
             setAlertMsg(alertData);
             sendHandle();
         }).catch(error => {
-            var alertData = setAlertData(alertMsg, error.response?.data?.msg ?? "id:" + checkboxItem + " 刪除失敗", true, "error");
+            var alertData = setAlertData(alertMsg, "id:" + checkboxItem +","+ error.response?.data?.msg ?? " 刪除失敗", true, "error");
             setAlertMsg(alertData);
         });
 
@@ -202,7 +202,7 @@ export default function Menu() {
                 sendHandle();
                 handleClose();
             }).catch(error => {
-                var alertData = setAlertData(alertMsg, error.response?.data?.msg ?? "id" + dialogOption.data?.id + " 修改失敗", true, "error");
+                var alertData = setAlertData(alertMsg, "id" + dialogOption.data?.id + "," + error.response?.data?.msg ?? "修改失敗", true, "error");
                 setAlertMsg(alertData);
             });
         }

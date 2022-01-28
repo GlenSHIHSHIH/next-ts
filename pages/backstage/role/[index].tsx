@@ -138,11 +138,11 @@ export default function Role() {
     //刪除功能
     const deleteItemHandle = () => {
         roleDeleteApi(checkboxItem, auth)?.then((resp: any) => {
-            var alertData = setAlertData(alertMsg, checkboxItem + " 刪除成功", true, "success");
+            var alertData = setAlertData(alertMsg, "id:"+checkboxItem + " 刪除成功", true, "success");
             setAlertMsg(alertData);
             sendHandle();
         }).catch(error => {
-            var alertData = setAlertData(alertMsg, checkboxItem + error.response?.data?.msg ?? " 刪除失敗", true, "error");
+            var alertData = setAlertData(alertMsg, "id:"+checkboxItem + error.response?.data?.msg ?? "刪除失敗", true, "error");
             setAlertMsg(alertData);
         });
 
@@ -196,18 +196,18 @@ export default function Role() {
                 sendHandle();
                 handleClose();
             }).catch(error => {
-                var alertData = setAlertData(alertMsg, "新增失敗", true, "error");
+                var alertData = setAlertData(alertMsg, error.response?.data?.msg ??"新增失敗", true, "error");
                 setAlertMsg(alertData);
             });
 
         } else {
             roleEditByIdApi(dialogOption.data, auth)?.then((resp: any) => {
-                var alertData = setAlertData(alertMsg, dialogOption.data?.id + " 修改成功", true, "success");
+                var alertData = setAlertData(alertMsg, "id:"+dialogOption.data?.id + ", 修改成功", true, "success");
                 setAlertMsg(alertData);
                 sendHandle();
                 handleClose();
             }).catch(error => {
-                var alertData = setAlertData(alertMsg, dialogOption.data?.id + error.response?.data?.msg ?? " 修改失敗", true, "error");
+                var alertData = setAlertData(alertMsg, "id:"+dialogOption.data?.id +","+ error.response?.data?.msg ?? " 修改失敗", true, "error");
                 setAlertMsg(alertData);
             });
         }

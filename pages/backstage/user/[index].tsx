@@ -151,7 +151,7 @@ export default function User() {
             setAlertMsg(alertData);
             sendHandle();
         }).catch(error => {
-            var alertData = setAlertData(alertMsg, error.response?.data?.msg ?? "id:" + checkboxItem + " 刪除失敗", true, "error");
+            var alertData = setAlertData(alertMsg, "id:" + checkboxItem + "," + error.response?.data?.msg ?? "刪除失敗", true, "error");
             setAlertMsg(alertData);
         });
 
@@ -216,7 +216,7 @@ export default function User() {
                 sendHandle();
                 handleClose();
             }).catch(error => {
-                var alertData = setAlertData(alertMsg, error.response?.data?.msg ?? "id" + dialogOption.data?.id + " 修改失敗", true, "error");
+                var alertData = setAlertData(alertMsg, "id" + dialogOption.data?.id + "," + error.response?.data?.msg ?? " 修改失敗", true, "error");
                 setAlertMsg(alertData);
             });
         }
