@@ -14,6 +14,11 @@ export const userByIdApi = (data: any, auth: Auth) => {
     return api("get", "/backstage/user/" + data, null, { ...setAuthHeader(auth) })
 }
 
+export const userEditPwdByIdApi = (data: any, auth: Auth) => {
+    // console.log("values");
+    // console.log({ ...setAuthHeader(auth), params: data });
+    return api("put", "/backstage/user/edit/" + data.id, data, { ...setAuthHeader(auth) })
+}
 export const userEditByIdApi = (data: any, auth: Auth) => {
     // console.log("values");
     // console.log({ ...setAuthHeader(auth), params: data });
