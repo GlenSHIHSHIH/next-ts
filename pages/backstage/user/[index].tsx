@@ -4,7 +4,7 @@ import { Add, Delete, Edit } from "@mui/icons-material";
 import Search from "@mui/icons-material/Search";
 import { Button, Checkbox, FormControlLabel, Grid, Pagination, Switch, TextField, Typography } from "@mui/material";
 import { DataGrid, GridColDef, GridSortModel, GridValueFormatterParams } from "@mui/x-data-grid";
-import { roleAllListApi, userAddApi, userApi, userByIdApi, userDeleteApi, userEditByIdApi, userEditPwdByIdApi } from "@pages/api/backstage/user/userApi";
+import { roleAllListApi, userAddApi, userApi, userByIdApi, userDeleteApi, userEditByIdApi, userEditPwdByIdApi, userResetPwdByIdApi } from "@pages/api/backstage/user/userApi";
 import { PageMutlSearchData } from "@pages/api/backstage/utilApi";
 import BaseStyle from "@styles/page/backstage/Base.module.css";
 import { featureRole, setValueToInterfaceProperty } from "@utils/base_fucntion";
@@ -62,7 +62,7 @@ interface RoleData {
 
 interface PasswordChange {
     id?: number,
-    isOpen: boolean,
+    type?: number,
     orgPassword?: string,
     newPassword?: string,
     checkPassword?: string,
@@ -78,7 +78,6 @@ export default function User() {
     const [pDelete, setPDelete] = useState<boolean>(false);
     const [userList, setUserList] = useState<UserList[]>([]);
     const [checkboxItem, setCheckboxItem] = useState<string>("");
-    const [password, setPassword] = useState<PasswordChange>({isOpen:false});
     const [roleData, setRoleData] = useState<RoleData[]>([]);
     const [dialogOption, setDialogOption] = useState<DialogOption>({});
     const [sendCount, setSendCount] = useState<number>(0);
@@ -310,37 +309,73 @@ export default function User() {
     }
 
     //密碼更新 password
+    const [passwordDialog, setPasswordDialog] = React.useState(false);
+    const [changePassword, setChangePassword] = useState<PasswordChange>({});
+
     //彈跳視窗
-    const passwordIsOpen = (b: boolean) => {
-        let setPwd = { ...password };
-        setPwd.isOpen = b;
-        setPassword(setPwd);
+    const passwordIsOpen = (b: boolean, setType: number) => {
+        setPasswordDialog(b);
+        let setPwd: PasswordChange = changePassword ?? {};
+        setPwd = setValueToInterfaceProperty(setPwd, "type", setType);
+        setChangePassword(setPwd);
     }
 
     //關閉視窗
     const passwordClose = () => {
-        passwordIsOpen(false);
+        setPasswordDialog(false);
+        setChangePassword({});
+
+    }
+
+    //新密碼 確認
+    const passwordCheck = () => {
+
+        if ((changePassword?.newPassword?.length ?? 0) < 6) {
+            return "密碼長度不得小於6";
+        }
+
+        if (changePassword?.orgPassword == changePassword?.newPassword) {
+            return "新舊密碼不得相同";
+        }
+
+        return "";
     }
 
     //設定值
     const setPasswordData = (name: any, value: any) => {
-        let setPwd = { ...password };
+        let setPwd: PasswordChange = { ...changePassword } ?? {};
         setPwd = setValueToInterfaceProperty(setPwd, name, value);
-        setPassword(setPwd);
+        setChangePassword(setPwd);
     }
 
     //送出
     const passwordHandle = (e: any) => {
         e.preventDefault();
+        // console.log("changePassword");
+        // console.log(changePassword);
+        // return;
         //api 寫入
-        userEditPwdByIdApi(password, auth)?.then((resp: any) => {
-            var alertData = setAlertData(alertMsg, "密碼修改成功", true, "success");
-            setAlertMsg(alertData);
-            passwordIsOpen(false);
-        }).catch(error => {
-            var alertData = setAlertData(alertMsg, "id" + password.id + "," + error.response?.data?.msg ?? "密碼修改失敗", true, "error");
-            setAlertMsg(alertData);
-        });
+        if (changePassword.type == 2) {
+            userEditPwdByIdApi(changePassword, auth)?.then((resp: any) => {
+                var alertData = setAlertData(alertMsg, "密碼修改成功", true, "success");
+                setAlertMsg(alertData);
+                passwordClose();
+            }).catch(error => {
+                var alertData = setAlertData(alertMsg, "id:" + changePassword?.id + "," + error.response?.data?.msg ?? "密碼修改失敗", true, "error");
+                setAlertMsg(alertData);
+                console.log("userEditPwdByIdApi");
+            });
+        } else if (changePassword.type == 1) {
+            userResetPwdByIdApi(changePassword, auth)?.then((resp: any) => {
+                var alertData = setAlertData(alertMsg, "密碼重置成功", true, "success");
+                setAlertMsg(alertData);
+                passwordClose();
+            }).catch(error => {
+                var alertData = setAlertData(alertMsg, "id:" + changePassword?.id + "," + error.response?.data?.msg ?? "密碼修改失敗", true, "error");
+                setAlertMsg(alertData);
+                console.log("userResetPwdByIdApi");
+            });
+        }
     }
 
     const columns: GridColDef[] = [
@@ -364,19 +399,31 @@ export default function User() {
             field: 'password',
             headerName: '功能',
             sortable: false,
-            minWidth: 150,
+            minWidth: 200,
             renderCell: (cellValues) => {
                 return (
-                    <Button
-                        variant="contained"
-                        color="error"
-                        onClick={(event) => {
-                            passwordIsOpen(true);
-                            setPasswordData("id", cellValues.id);
-                        }}
-                    >
-                        密碼變更
-                    </Button>
+                    <div>
+                        <Button
+                            variant="contained"
+                            color="error"
+                            onClick={(event) => {
+                                passwordIsOpen(true, 2);
+                                setPasswordData("id", cellValues.id);
+                            }}
+                        >
+                            密碼變更
+                        </Button>
+                        <Button
+                            variant="contained"
+                            color="info"
+                            onClick={(event) => {
+                                passwordIsOpen(true, 1);
+                                setPasswordData("id", cellValues.id);
+                            }}
+                        >
+                            密碼重置
+                        </Button>
+                    </div>
                 );
             }
         },
@@ -493,40 +540,45 @@ export default function User() {
                     </Grid>
                     <Grid container item direction="row" xs={10} >
                         <DraggableDialog
-                            title={"變更密碼"}
-                            open={password.isOpen}
+                            title={changePassword?.type == 2 ? "密碼變更" : "密碼重置"}
+                            open={passwordDialog}
                             closeHandle={passwordClose}
                             saveHandle={passwordHandle}
-                            className={BaseStyle.dialogErrorTitle ?? ""}
+                            className={changePassword?.type == 2 ? BaseStyle.dialogErrorTitle : BaseStyle.dialogInfoTitle}
                         >
                             <Grid container direction="column" justifyContent="center" alignItems="flex-start">
-                                <Grid container direction="row" justifyContent="flex-start" alignItems="center" marginBottom={2}>
-                                    <Grid item xs={2} md={2}>
-                                        <Typography align="right">原始密碼：</Typography>
+                                {changePassword?.type == 2 &&
+                                    <Grid container direction="row" justifyContent="flex-start" alignItems="center" marginBottom={2}>
+                                        <Grid item xs={2} md={2}>
+                                            <Typography align="right">原始密碼：</Typography>
+                                        </Grid>
+                                        <Grid item xs={9} md={9} marginLeft={2}>
+                                            <TextField fullWidth id="outlined-search" label="原始密碼" type={"password"}
+                                                required error={(changePassword?.orgPassword?.length ?? 0) < 6}
+                                                helperText={(changePassword?.orgPassword?.length ?? 0) < 6 ? "密碼長度不得小於6" : ""}
+                                                onChange={e => setPasswordData("orgPassword", e.target.value)} />
+                                        </Grid>
                                     </Grid>
-                                    <Grid item xs={9} md={9} marginLeft={2}>
-                                        <TextField fullWidth id="outlined-search" label="原始密碼" type={"password"}
-                                            required error={(password.orgPassword?.length ?? 0) < 6} helperText="密碼長度不得小於6"
-                                            onChange={e => setPasswordData("orgPassword", e.target.value)} />
-                                    </Grid>
-                                </Grid>
+                                }
                                 <Grid container direction="row" justifyContent="flex-start" alignItems="center" marginBottom={2}>
                                     <Grid item xs={2} md={2}>
                                         <Typography align="right">新密碼：</Typography>
                                     </Grid>
                                     <Grid item xs={9} md={9} marginLeft={2}>
                                         <TextField fullWidth id="outlined-search" label="新密碼" type={"password"}
-                                            required error={(password.newPassword?.length ?? 0) < 6} helperText="密碼長度不得小於6"
+                                            required error={(changePassword?.newPassword?.length ?? 0) < 6 || changePassword?.orgPassword == changePassword?.newPassword}
+                                            helperText={passwordCheck()}
                                             onChange={e => setPasswordData("newPassword", e.target.value)} />
                                     </Grid>
                                 </Grid>
+
                                 <Grid container direction="row" justifyContent="flex-start" alignItems="center" marginBottom={2}>
                                     <Grid item xs={2} md={2}>
                                         <Typography align="right">密碼確認：</Typography>
                                     </Grid>
                                     <Grid item xs={9} md={9} marginLeft={2}>
                                         <TextField fullWidth id="outlined-search" label="新密碼確認" type={"password"}
-                                            required error={password.checkPassword != password.newPassword} helperText="密碼不相符"
+                                            required error={changePassword?.checkPassword != changePassword?.newPassword} helperText={changePassword?.checkPassword != changePassword?.newPassword ? "密碼不相符" : ""}
                                             onChange={e => setPasswordData("checkPassword", e.target.value)} />
                                     </Grid>
                                 </Grid>
@@ -615,7 +667,7 @@ export default function User() {
                                         {roleData.map((r: RoleData) => {
                                             return (
                                                 < FormControlLabel label={r.name}
-                                                    control={<Checkbox disabled={!r.status} defaultChecked={dialogOption.data?.select.includes(r.id.toString())}
+                                                    control={<Checkbox disabled={!r.status} defaultChecked={dialogOption.data?.select?.includes(r.id.toString()) ?? false}
                                                         onChange={(e, checked) => setSelect(r.id.toString(), checked)} />} />
                                             )
                                         })

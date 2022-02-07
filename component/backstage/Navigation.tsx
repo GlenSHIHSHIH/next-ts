@@ -177,7 +177,7 @@ const Navigation: React.FC<NavigationProp> = (props: any) => {
                                     </ListItemButton>
                                     <Collapse in={open} component="div" timeout="auto" unmountOnExit>
                                         <List disablePadding > {/*disablePadding */}
-                                            {child.map((c: MenuNestData) => {
+                                            {child?.map((c: MenuNestData) => {
                                                 if (c.feature == "P") {
                                                     return (
                                                         <Link href={c.url} passHref>

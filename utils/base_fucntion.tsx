@@ -73,7 +73,7 @@ export async function featureRole(auth: Auth, url: string): Promise<boolean> {
 }
 
 function findLoopBy(url: string, data: MenuNestData[]): boolean {
-    for (let index = 0; index < data.length; index++) {
+    for (let index = 0; index < data?.length; index++) {
         if (url == data[index].url) {
             return true;
         }
