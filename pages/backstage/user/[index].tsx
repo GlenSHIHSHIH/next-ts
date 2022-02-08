@@ -76,6 +76,8 @@ export default function User() {
     const [pAdd, setPAdd] = useState<boolean>(false);
     const [pEdit, setPEdit] = useState<boolean>(false);
     const [pDelete, setPDelete] = useState<boolean>(false);
+    const [pwdEdit, setPwdEdit] = useState<boolean>(false);
+    const [pwdReset, setPwdReset] = useState<boolean>(false);
     const [userList, setUserList] = useState<UserList[]>([]);
     const [checkboxItem, setCheckboxItem] = useState<string>("");
     const [roleData, setRoleData] = useState<RoleData[]>([]);
@@ -106,6 +108,8 @@ export default function User() {
             setPAdd(await featureRole(auth, "/backstage/user/create"));
             setPEdit(await featureRole(auth, "/backstage/user/edit"));
             setPDelete(await featureRole(auth, "/backstage/user/delete"));
+            setPwdEdit(await featureRole(auth, "/backstage/user/password/edit"));
+            setPwdReset(await featureRole(auth, "/backstage/user/password/reset"));
         };
         fetchData();
     }, [pageMutlSearchData.page, sendCount])
@@ -403,27 +407,31 @@ export default function User() {
             renderCell: (cellValues) => {
                 return (
                     <div>
-                        <Button
-                            variant="contained"
-                            color="error"
-                            onClick={(event) => {
-                                passwordIsOpen(true, 2);
-                                setPasswordData("id", cellValues.id);
-                            }}
-                        >
-                            密碼變更
-                        </Button>
-                        <Button
-                            variant="contained"
-                            color="info"
-                            onClick={(event) => {
-                                passwordIsOpen(true, 1);
-                                setPasswordData("id", cellValues.id);
-                            }}
-                        >
-                            密碼重置
-                        </Button>
-                    </div>
+                        {pwdEdit &&
+                            <Button
+                                variant="contained"
+                                color="error"
+                                onClick={(event) => {
+                                    passwordIsOpen(true, 2);
+                                    setPasswordData("id", cellValues.id);
+                                }}
+                            >
+                                密碼變更
+                            </Button>
+                        }
+                        {pwdReset &&
+                            < Button
+                                variant="contained"
+                                color="info"
+                                onClick={(event) => {
+                                    passwordIsOpen(true, 1);
+                                    setPasswordData("id", cellValues.id);
+                                }}
+                            >
+                                密碼重置
+                            </Button>
+                        }
+                    </div >
                 );
             }
         },
