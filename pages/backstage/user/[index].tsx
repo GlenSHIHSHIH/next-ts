@@ -157,8 +157,12 @@ export default function User() {
 
 
     //刪除功能
-    const deleteItemHandle = () => {
-        userDeleteApi(checkboxItem, auth)?.then((resp: any) => {
+    const deleteItemHandle = (id: string) => {
+        let ids = checkboxItem;
+        if (id != "") {
+            ids = id;
+        }
+        userDeleteApi(ids, auth)?.then((resp: any) => {
             var alertData = setAlertData(alertMsg, "id" + checkboxItem + " 刪除成功", true, "success");
             setAlertMsg(alertData);
             sendHandle();
@@ -274,8 +278,12 @@ export default function User() {
         return data;
     }
     //edit
-    const editHandle = () => {
-        userByIdApi(checkboxItem, auth)?.then((resp: any) => {
+    const editHandle = (id: string) => {
+        let ids = checkboxItem;
+        if (id != "") {
+            ids = id;
+        }
+        userByIdApi(ids, auth)?.then((resp: any) => {
             var dialogOptionData: DialogOption = dialogOption;
             dialogOptionData.title = "修改";
             dialogOptionData.className = BaseStyle.dialogEditTitle;
@@ -403,14 +411,14 @@ export default function User() {
             field: 'password',
             headerName: '功能',
             sortable: false,
-            minWidth: 200,
+            minWidth: 400,
             renderCell: (cellValues) => {
                 return (
                     <div>
                         {pwdEdit &&
                             <Button
                                 variant="contained"
-                                color="error"
+                                color="warning"
                                 onClick={(event) => {
                                     passwordIsOpen(true, 2);
                                     setPasswordData("id", cellValues.id);
@@ -429,6 +437,20 @@ export default function User() {
                                 }}
                             >
                                 密碼重置
+                            </Button>
+                        }
+                        {pEdit &&
+                            <Button variant="contained" color="success"
+                                onClick={(event) => { editHandle(cellValues.id.toString()) }}
+                            >
+                                Edit
+                            </Button>
+                        }
+                        {pDelete &&
+                            <Button variant="contained" color="error"
+                                onClick={(event) => { deleteItemHandle(cellValues.id.toString()) }}
+                            >
+                                Delete
                             </Button>
                         }
                     </div >
@@ -533,14 +555,14 @@ export default function User() {
                             </Grid>}
                         {pEdit
                             && <Grid item >
-                                <Button variant="contained" color="success" size="medium" style={{ height: '56px' }} endIcon={<Edit />} onClick={editHandle}
+                                <Button variant="contained" color="success" size="medium" style={{ height: '56px' }} endIcon={<Edit />} onClick={(event) => { editHandle("") }}
                                     disabled={(checkboxItem.split(",").length != 1 || checkboxItem == "")}>
                                     Edit
                                 </Button>
                             </Grid>}
                         {pDelete
                             && <Grid item >
-                                <Button variant="contained" color="error" size="medium" style={{ height: '56px' }} endIcon={<Delete />} onClick={deleteItemHandle}
+                                <Button variant="contained" color="error" size="medium" style={{ height: '56px' }} endIcon={<Delete />} onClick={(event) => { deleteItemHandle("") }}
                                     disabled={(checkboxItem.split(",").length < 1 || checkboxItem == "")}>
                                     Delete
                                 </Button>

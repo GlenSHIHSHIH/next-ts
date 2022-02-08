@@ -132,13 +132,17 @@ export default function Menu() {
 
 
     //刪除功能
-    const deleteItemHandle = () => {
-        menuDeleteApi(checkboxItem, auth)?.then((resp: any) => {
+    const deleteItemHandle = (id: string) => {
+        let ids = checkboxItem;
+        if (id != "") {
+            ids = id;
+        }
+        menuDeleteApi(ids, auth)?.then((resp: any) => {
             var alertData = setAlertData(alertMsg, "id:" + checkboxItem + " ,刪除成功", true, "success");
             setAlertMsg(alertData);
             sendHandle();
         }).catch(error => {
-            var alertData = setAlertData(alertMsg, "id:" + checkboxItem +","+ error.response?.data?.msg ?? " 刪除失敗", true, "error");
+            var alertData = setAlertData(alertMsg, "id:" + checkboxItem + "," + error.response?.data?.msg ?? " 刪除失敗", true, "error");
             setAlertMsg(alertData);
         });
 
@@ -235,8 +239,12 @@ export default function Menu() {
         return data;
     }
     //edit
-    const editHandle = () => {
-        menuByIdApi(checkboxItem, auth)?.then((resp: any) => {
+    const editHandle = (id: string) => {
+        let ids = checkboxItem;
+        if (id != "") {
+            ids = id;
+        }
+        menuByIdApi(ids, auth)?.then((resp: any) => {
             // console.log("resp");
             // console.log(resp);
             var dialogOptionData: DialogOption = dialogOption;
@@ -307,6 +315,32 @@ export default function Menu() {
             minWidth: 120,
         },
         {
+            field: '',
+            headerName: '功能',
+            sortable: false,
+            minWidth: 200,
+            renderCell: (cellValues) => {
+                return (
+                    <div>
+                        {pEdit &&
+                            <Button variant="contained" color="success"
+                                onClick={(event) => { editHandle(cellValues.id.toString()) }}
+                            >
+                                Edit
+                            </Button>
+                        }
+                        {pDelete &&
+                            <Button variant="contained" color="error"
+                                onClick={(event) => { deleteItemHandle(cellValues.id.toString()) }}
+                            >
+                                Delete
+                            </Button>
+                        }
+                    </div >
+                );
+            }
+        },
+        {
             field: 'status',
             headerName: '狀態',
             minWidth: 120,
@@ -375,14 +409,16 @@ export default function Menu() {
                             </Grid>}
                         {pEdit
                             && <Grid item >
-                                <Button variant="contained" color="success" size="medium" style={{ height: '56px' }} endIcon={<Edit />} onClick={editHandle}
+                                <Button variant="contained" color="success" size="medium" style={{ height: '56px' }} endIcon={<Edit />}
+                                    onClick={(event) => { editHandle("") }}
                                     disabled={(checkboxItem.split(",").length != 1 || checkboxItem == "")}>
                                     Edit
                                 </Button>
                             </Grid>}
                         {pDelete
                             && <Grid item >
-                                <Button variant="contained" color="error" size="medium" style={{ height: '56px' }} endIcon={<Delete />} onClick={deleteItemHandle}
+                                <Button variant="contained" color="error" size="medium" style={{ height: '56px' }} endIcon={<Delete />}
+                                    onClick={(event) => { deleteItemHandle("") }}
                                     disabled={(checkboxItem.split(",").length < 1 || checkboxItem == "")}>
                                     Delete
                                 </Button>
@@ -420,7 +456,7 @@ export default function Menu() {
                                         <Typography align="right">網址：</Typography>
                                     </Grid>
                                     <Grid item xs={9} md={9} marginLeft={2}>
-                                        <TextField fullWidth id="outlined-search" required label="網址" value={dialogOption.data?.url}
+                                        <TextField fullWidth id="outlined-search" label="網址" value={dialogOption.data?.url}
                                             onChange={e => setdialogData("url", e.target.value)} />
                                     </Grid>
                                 </Grid>

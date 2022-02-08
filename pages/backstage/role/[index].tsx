@@ -136,8 +136,13 @@ export default function Role() {
     }
 
     //刪除功能
-    const deleteItemHandle = () => {
-        roleDeleteApi(checkboxItem, auth)?.then((resp: any) => {
+    const deleteItemHandle = (id: string) => {
+        let ids = checkboxItem;
+        if (id != "") {
+            ids = id;
+        }
+
+        roleDeleteApi(ids, auth)?.then((resp: any) => {
             var alertData = setAlertData(alertMsg, "id:"+checkboxItem + " 刪除成功", true, "success");
             setAlertMsg(alertData);
             sendHandle();
@@ -238,8 +243,12 @@ export default function Role() {
         return data;
     }
     //edit
-    const editHandle = () => {
-        roleByIdApi(checkboxItem, auth)?.then((resp: any) => {
+    const editHandle = (id: string) => {
+        let ids = checkboxItem;
+        if (id != "") {
+            ids = id;
+        }
+        roleByIdApi(ids, auth)?.then((resp: any) => {
             var dialogOptionData: DialogOption = dialogOption;
             dialogOptionData.title = "修改";
             dialogOptionData.className = BaseStyle.dialogEditTitle;
@@ -304,6 +313,32 @@ export default function Role() {
             field: 'weight',
             headerName: '排序權重',
             minWidth: 120,
+        },
+        {
+            field: '',
+            headerName: '功能',
+            sortable: false,
+            minWidth: 200,
+            renderCell: (cellValues) => {
+                return (
+                    <div>
+                        {pEdit &&
+                            <Button variant="contained" color="success"
+                                onClick={(event) => { editHandle(cellValues.id.toString()) }}
+                            >
+                                Edit
+                            </Button>
+                        }
+                        {pDelete &&
+                            <Button variant="contained" color="error"
+                                onClick={(event) => { deleteItemHandle(cellValues.id.toString()) }}
+                            >
+                                Delete
+                            </Button>
+                        }
+                    </div >
+                );
+            }
         },
         {
             field: 'status',
@@ -383,14 +418,16 @@ export default function Role() {
                             </Grid>}
                         {pEdit &&
                             <Grid item >
-                                <Button variant="contained" color="success" size="medium" style={{ height: '56px' }} endIcon={<Edit />} onClick={editHandle}
+                                <Button variant="contained" color="success" size="medium" style={{ height: '56px' }} endIcon={<Edit />}
+                                    onClick={(event) => {editHandle("")}}
                                     disabled={(checkboxItem.split(",").length != 1 || checkboxItem == "")}>
                                     Edit
                                 </Button>
                             </Grid>}
                         {pDelete &&
                             <Grid item >
-                                <Button variant="contained" color="error" size="medium" style={{ height: '56px' }} endIcon={<Delete />} onClick={deleteItemHandle}
+                                <Button variant="contained" color="error" size="medium" style={{ height: '56px' }} endIcon={<Delete />}
+                                    onClick={(event) => {deleteItemHandle("")}}
                                     disabled={(checkboxItem.split(",").length < 1 || checkboxItem == "")}>
                                     Delete
                                 </Button>
