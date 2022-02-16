@@ -6,7 +6,7 @@ import { Button, FormControlLabel, Grid, Pagination, Switch, TextField, Typograp
 import { DataGrid, GridColDef, GridSortModel, GridValueFormatterParams } from "@mui/x-data-grid";
 import { navigationAllApi, roleAddApi, roleApi, roleByIdApi, roleDeleteApi, roleEditByIdApi } from "@pages/api/backstage/role/roleApi";
 import { PageMutlSearchData } from "@pages/api/backstage/utilApi";
-import BaseStyle from "@styles/page/backstage/base.module.css";
+import BaseStyle from "@styles/page/backstage/Base.module.css";
 import { featureRole, setValueToInterfaceProperty } from "@utils/base_fucntion";
 import AlertFrame, { AlertMsg, setAlertAutoClose, setAlertData } from "component/backstage/AlertFrame";
 import AuthLayout from "component/backstage/AuthLayout";
