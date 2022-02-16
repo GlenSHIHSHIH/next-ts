@@ -1,7 +1,7 @@
 import { useAuthStateContext } from "@context/context";
 import { Auth } from "@context/reducer";
 import { Delete, Refresh } from "@mui/icons-material";
-import { Button, Grid, TextField } from "@mui/material";
+import { Button, FormControl, Grid, InputLabel, Select, TextField } from "@mui/material";
 import { cacheAnyDeleteApi, cacheDeleteApi, cacheKeyListApi } from "@pages/api/backstage/cache/cacheApi";
 import { featureRole } from "@utils/base_fucntion";
 import AlertFrame, { AlertMsg, setAlertAutoClose, setAlertData } from "component/backstage/AlertFrame";
@@ -48,6 +48,7 @@ export default function Menu() {
     const [pDelete, setPDelete] = useState<boolean>(false);
     const [pAnyDelete, setPAnyDelete] = useState<boolean>(false);
     const [deleteKey, setDeleteKey] = useState<string>("");
+    const [deleteKeyArr, setDeleteKeyArr] = useState<string[]>([]);
     const [cacheKeyList, setCacheKeyList] = useState<string[]>();
     const [sendCount, setSendCount] = useState<number>(0);
     const [alertMsg, setAlertMsg] = useState<AlertMsg>({ msg: "", show: false });
@@ -91,8 +92,7 @@ export default function Menu() {
         });
     };
 
-    const deleteAnyHandle = () => {
-        let key = deleteKey;
+    const deleteAnyHandleStr = (key: string) => {
         cacheAnyDeleteApi(key, auth)?.then((resp: any) => {
             var alertData = setAlertData(alertMsg, "cache key:" + key + "刪除成功", true, "success");
             setAlertMsg(alertData);
@@ -101,8 +101,30 @@ export default function Menu() {
             var alertData = setAlertData(alertMsg, "cache key:" + key + "刪除失敗", true, "error");
             setAlertMsg(alertData);
         });
+    }
+
+    const deleteAnyHandle = () => {
+        let key = deleteKey;
+        deleteAnyHandleStr(key);
     };
 
+    const deleteMultipleHandle = () => {
+        deleteKeyArr.map((key:string)=>{
+            deleteAnyHandleStr(key);
+        });
+
+    };
+
+    const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        const { options } = event.target;
+        const value: string[] = [];
+        for (let i = 0, l = options.length; i < l; i += 1) {
+            if (options[i].selected) {
+                value.push(options[i].value);
+            }
+        }
+        setDeleteKeyArr(value);
+    };
 
     return (
         <AuthLayout>
@@ -142,24 +164,46 @@ export default function Menu() {
                         }
                     </Grid>
 
-                    <Grid container item direction="row" xs={10} >
+                    <Grid container item direction="row" justifyContent="center" alignItems="flex-start" marginTop={2} xs={10} >
                         < Grid item >
-                            <TextField
-                                id="filled-multiline-static"
-                                label="CacheKey"
-                                multiline
-                                disabled
-                                value={cacheKeyList?.join("\n")}
-                                rows={20}
-                                defaultValue="Default Value"
-                                variant="filled"
-                            />
+                            <FormControl sx={{ m: 1, minWidth: 120, maxWidth: 300, minHeight: 300, maxHeight: 500 }}>
+                                <InputLabel shrink htmlFor="select-multiple-native">
+                                    CacheKey
+                                </InputLabel>
+                                <Select
+                                    sx={{ height: '100%' }}
+                                    native
+                                    multiple
+                                    // @ts-ignore Typings are not considering `native`
+                                    onChange={handleChange}
+                                    label="CacheKey"
+                                    inputProps={{
+                                        id: 'select-multiple-native',
+                                    }}
+                                >
+                                    {cacheKeyList?.map((ck) => (
+                                        <option key={ck} value={ck}>
+                                            {ck}
+                                        </option>
+                                    ))}
+                                </Select>
+                            </FormControl>
                         </Grid>
                         < Grid item >
-                            <Button variant="contained" color="info" size="medium" style={{ height: '56px' }} endIcon={<Refresh />}
-                                onClick={(event) => { setSendCount(sendCount + 1) }}>
-                                {"重新整理"}
-                            </Button>
+                            <Grid container item direction="column" justifyContent="center" alignItems="flex-start" marginTop={2} xs={10} >
+                                < Grid item >
+                                    <Button variant="contained" color="info" size="medium" style={{ height: '60px',minWidth:'120px' }} endIcon={<Refresh />}
+                                        onClick={(event) => { setSendCount(sendCount + 1) }}>
+                                        {"重新整理"}
+                                    </Button>
+                                </Grid>
+                                < Grid item >
+                                    <Button variant="contained" color="error" size="medium" style={{ height: '60px',minWidth:'120px' }} endIcon={<Delete />}
+                                        onClick={(event) => { deleteMultipleHandle() }}>
+                                        {"刪除選取"}
+                                    </Button>
+                                </Grid>
+                            </Grid>
                         </Grid>
                     </Grid>
 
