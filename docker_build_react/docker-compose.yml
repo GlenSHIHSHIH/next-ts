@@ -18,6 +18,9 @@ services:
       - "--certificatesresolvers.myresolver.acme.keyType=RSA4096"
       - "--certificatesresolvers.myresolver.acme.email=a0935745150@gmail.com"
       - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+      - "--log.filePath=/path/to/traefik.log"
+      - "--log.format=json"
+      - "--log.level=DEBUG"
     ports:
       - 80:80
       - 443:443
@@ -25,6 +28,7 @@ services:
       - shopee-network
     volumes:
       - "./letsencrypt:/letsencrypt"
+      - "./log:/path/to/traefik.log"
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
 
   react_build:
