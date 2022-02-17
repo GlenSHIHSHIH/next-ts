@@ -2,6 +2,12 @@
   height: 170px;
 }
 
+.cardHeader {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  height: 120px;
+}
+
 .cardContentDescript {
   text-overflow: ellipsis;
   overflow: hidden;

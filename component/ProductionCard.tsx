@@ -44,7 +44,7 @@ const ProductionCard: React.FC<CardProps> = (props) => {
     return (
         <Card sx={{ maxWidth: cardWidth }}>
             <ThemeProvider theme={theme}>
-                <CardHeader
+                <CardHeader className={cardStyle.cardHeader}
                     component={"a"}
                     href={url ?? ""}
                     title={productionName}          //"商品名稱"
