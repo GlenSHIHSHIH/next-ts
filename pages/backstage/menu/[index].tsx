@@ -81,9 +81,9 @@ export default function Menu() {
         getMenuList();
         getMenuParentList();
         let fetchData = async () => {
-            setPAdd(await featureRole(auth, "/backstage/menu/create"));
-            setPEdit(await featureRole(auth, "/backstage/menu/edit"));
-            setPDelete(await featureRole(auth, "/backstage/menu/delete"));
+            setPAdd(await featureRole(auth, "menu:create"));
+            setPEdit(await featureRole(auth, "menu:edit"));
+            setPDelete(await featureRole(auth, "menu:delete"));
         };
         fetchData();
     }, [pageMutlSearchData.page, sendCount])

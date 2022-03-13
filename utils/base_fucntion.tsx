@@ -59,7 +59,7 @@ export function objArrtoMap(objData: any) {
 }
 
 //判斷功能有無權限
-export async function featureRole(auth: Auth, url: string): Promise<boolean> {
+export async function featureRole(auth: Auth, key: string): Promise<boolean> {
 
     let menuList: MenuNestData[];
 
@@ -69,16 +69,16 @@ export async function featureRole(auth: Auth, url: string): Promise<boolean> {
         return false;
     });
 
-    return findLoopBy(url, menuList);
+    return findLoopBy(key, menuList);
 }
 
-function findLoopBy(url: string, data: MenuNestData[]): boolean {
+function findLoopBy(key: string, data: MenuNestData[]): boolean {
     for (let index = 0; index < data?.length; index++) {
-        if (url == data[index].url) {
+        if (key == data[index].key) {
             return true;
         }
         if (data[index].child != null) {
-            let check = findLoopBy(url, data[index].child);
+            let check = findLoopBy(key, data[index].child);
             if (check) {
                 return true;
             }

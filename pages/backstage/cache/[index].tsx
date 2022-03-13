@@ -64,8 +64,8 @@ export default function Menu() {
     useEffect(() => {
         getCacheKeyList();
         let fetchData = async () => {
-            setPDelete(await featureRole(auth, "/backstage/cache/delete"));
-            setPAnyDelete(await featureRole(auth, "/backstage/cache/any/delete"));
+            setPDelete(await featureRole(auth, "cache:delete"));
+            setPAnyDelete(await featureRole(auth, "cache:delete:any"));
         };
         fetchData();
     }, [sendCount])
@@ -109,7 +109,7 @@ export default function Menu() {
     };
 
     const deleteMultipleHandle = () => {
-        deleteKeyArr.map((key:string)=>{
+        deleteKeyArr.map((key: string) => {
             deleteAnyHandleStr(key);
         });
 
@@ -192,13 +192,13 @@ export default function Menu() {
                         < Grid item >
                             <Grid container item direction="column" justifyContent="center" alignItems="flex-start" marginTop={2} xs={10} >
                                 < Grid item >
-                                    <Button variant="contained" color="info" size="medium" style={{ height: '60px',minWidth:'120px' }} endIcon={<Refresh />}
+                                    <Button variant="contained" color="info" size="medium" style={{ height: '60px', minWidth: '120px' }} endIcon={<Refresh />}
                                         onClick={(event) => { setSendCount(sendCount + 1) }}>
                                         {"重新整理"}
                                     </Button>
                                 </Grid>
                                 < Grid item >
-                                    <Button variant="contained" color="error" size="medium" style={{ height: '60px',minWidth:'120px' }} endIcon={<Delete />}
+                                    <Button variant="contained" color="error" size="medium" style={{ height: '60px', minWidth: '120px' }} endIcon={<Delete />}
                                         onClick={(event) => { deleteMultipleHandle() }}>
                                         {"刪除選取"}
                                     </Button>

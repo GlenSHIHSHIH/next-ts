@@ -85,9 +85,9 @@ export default function Role() {
         getRoleList();
         getNavigationAllList();
         let fetchData = async () => {
-            setPAdd(await featureRole(auth, "/backstage/role/create"));
-            setPEdit(await featureRole(auth, "/backstage/role/edit"));
-            setPDelete(await featureRole(auth, "/backstage/role/delete"));
+            setPAdd(await featureRole(auth, "role:create"));
+            setPEdit(await featureRole(auth, "role:edit"));
+            setPDelete(await featureRole(auth, "role:delete"));
         };
         fetchData();
     }, [pageMutlSearchData.page, sendCount])
@@ -143,11 +143,11 @@ export default function Role() {
         }
 
         roleDeleteApi(ids, auth)?.then((resp: any) => {
-            var alertData = setAlertData(alertMsg, "id:"+checkboxItem + " 刪除成功", true, "success");
+            var alertData = setAlertData(alertMsg, "id:" + checkboxItem + " 刪除成功", true, "success");
             setAlertMsg(alertData);
             sendHandle();
         }).catch(error => {
-            var alertData = setAlertData(alertMsg, "id:"+checkboxItem + error.response?.data?.msg ?? "刪除失敗", true, "error");
+            var alertData = setAlertData(alertMsg, "id:" + checkboxItem + error.response?.data?.msg ?? "刪除失敗", true, "error");
             setAlertMsg(alertData);
         });
 
@@ -201,18 +201,18 @@ export default function Role() {
                 sendHandle();
                 handleClose();
             }).catch(error => {
-                var alertData = setAlertData(alertMsg, error.response?.data?.msg ??"新增失敗", true, "error");
+                var alertData = setAlertData(alertMsg, error.response?.data?.msg ?? "新增失敗", true, "error");
                 setAlertMsg(alertData);
             });
 
         } else {
             roleEditByIdApi(dialogOption.data, auth)?.then((resp: any) => {
-                var alertData = setAlertData(alertMsg, "id:"+dialogOption.data?.id + ", 修改成功", true, "success");
+                var alertData = setAlertData(alertMsg, "id:" + dialogOption.data?.id + ", 修改成功", true, "success");
                 setAlertMsg(alertData);
                 sendHandle();
                 handleClose();
             }).catch(error => {
-                var alertData = setAlertData(alertMsg, "id:"+dialogOption.data?.id +","+ error.response?.data?.msg ?? " 修改失敗", true, "error");
+                var alertData = setAlertData(alertMsg, "id:" + dialogOption.data?.id + "," + error.response?.data?.msg ?? " 修改失敗", true, "error");
                 setAlertMsg(alertData);
             });
         }
@@ -419,7 +419,7 @@ export default function Role() {
                         {pEdit &&
                             <Grid item >
                                 <Button variant="contained" color="success" size="medium" style={{ height: '56px' }} endIcon={<Edit />}
-                                    onClick={(event) => {editHandle("")}}
+                                    onClick={(event) => { editHandle("") }}
                                     disabled={(checkboxItem.split(",").length != 1 || checkboxItem == "")}>
                                     Edit
                                 </Button>
@@ -427,7 +427,7 @@ export default function Role() {
                         {pDelete &&
                             <Grid item >
                                 <Button variant="contained" color="error" size="medium" style={{ height: '56px' }} endIcon={<Delete />}
-                                    onClick={(event) => {deleteItemHandle("")}}
+                                    onClick={(event) => { deleteItemHandle("") }}
                                     disabled={(checkboxItem.split(",").length < 1 || checkboxItem == "")}>
                                     Delete
                                 </Button>

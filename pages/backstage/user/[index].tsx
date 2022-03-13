@@ -105,11 +105,11 @@ export default function User() {
         getUserList();
         getRoleAllList();
         let fetchData = async () => {
-            setPAdd(await featureRole(auth, "/backstage/user/create"));
-            setPEdit(await featureRole(auth, "/backstage/user/edit"));
-            setPDelete(await featureRole(auth, "/backstage/user/delete"));
-            setPwdEdit(await featureRole(auth, "/backstage/user/password/edit"));
-            setPwdReset(await featureRole(auth, "/backstage/user/password/reset"));
+            setPAdd(await featureRole(auth, "user:create"));
+            setPEdit(await featureRole(auth, "user:edit"));
+            setPDelete(await featureRole(auth, "user:delete"));
+            setPwdEdit(await featureRole(auth, "user:password:edit"));
+            setPwdReset(await featureRole(auth, "user:password:reset"));
         };
         fetchData();
     }, [pageMutlSearchData.page, sendCount])
