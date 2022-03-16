@@ -12,11 +12,17 @@ import { getCarouselListApi, getCategoryListApi, getProductionListApi } from "pa
 import React, { useEffect, useRef, useState } from "react";
 import { Carousel } from 'react-responsive-carousel';
 import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
+import { fileURL } from "pages/api/baseApi";
 
 interface CarouselData {
-    id: number,
-    name: string,
-    image: string,
+    id?: number,
+    name?: string,
+    picture?: Picture[],
+}
+
+interface Picture {
+    pictureName: string,
+    alt: string,
     url: string,
     weight: number,
 }
@@ -50,7 +56,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
     var category: string[] = [];
     var pList: ProductionCardData[] = [];
-    var carousel: CarouselData[] = [];
+    var carousel: CarouselData = {};
     var pageData: PageData = {
         count: 0,
         page: 1,
@@ -74,7 +80,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     await getCarouselListApi(null)?.then(res => {
         // console.log("get carousel list");
         // console.log(res);
-        carousel = res.data.carousels;
+        carousel = res.data.carousel;
+        carousel.picture = res.data.picture
     }).catch(error => {
         console.log("getCarouselList 錯誤");
     })
@@ -193,11 +200,11 @@ export default function ProductionPage({ baseConfig, carousel, category, pList, 
                     <Grid item justifyContent="center">
                         <Carousel showThumbs={false} infiniteLoop={true} showStatus={false} autoPlay={true} interval={4000}>
                             {
-                                carousel?.map((c: CarouselData) => {
+                                carousel?.picture.map((p: Picture) => {
                                     return (
-                                        <a href={c.url} target="_blank" key={"Carousel" + c.id.toString()}>
+                                        <a href={p.url} target="_blank" key={"Carousel" + p.pictureName}>
                                             <div >
-                                                <img src={c.image} alt={c.name} />
+                                                <img src={fileURL + p.pictureName} alt={p.alt} />
                                                 {/* <p className="legend">Legend 1</p> */}
                                             </div>
                                         </a>

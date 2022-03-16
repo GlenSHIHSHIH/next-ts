@@ -5,6 +5,7 @@ const devBaseURL = process.env.DEVELOP_BASEURL;
 const proBaseURL = process.env.PRODUCTION_BASE_URL;
 console.log("env: " + process.env.NODE_ENV);
 const baseURL = process.env.NODE_ENV === 'development' ? devBaseURL : proBaseURL;
+export const fileURL = baseURL + "/file/"
 // console.log(baseURL);
 
 const instance = axios.create({
