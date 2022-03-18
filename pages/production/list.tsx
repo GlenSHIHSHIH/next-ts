@@ -8,11 +8,11 @@ import SearchBar from "component/SearchBar";
 import SelectBox from "component/SelectBox";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { useRouter } from 'next/router';
+import { fileURL } from "pages/api/baseApi";
 import { getCarouselListApi, getCategoryListApi, getProductionListApi } from "pages/api/productionApi";
 import React, { useEffect, useRef, useState } from "react";
 import { Carousel } from 'react-responsive-carousel';
 import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
-import { fileURL } from "pages/api/baseApi";
 
 interface CarouselData {
     id?: number,
@@ -21,7 +21,7 @@ interface CarouselData {
 }
 
 interface Picture {
-    pictureName: string,
+    name: string,
     alt: string,
     url: string,
     weight: number,
@@ -200,11 +200,11 @@ export default function ProductionPage({ baseConfig, carousel, category, pList, 
                     <Grid item justifyContent="center">
                         <Carousel showThumbs={false} infiniteLoop={true} showStatus={false} autoPlay={true} interval={4000}>
                             {
-                                carousel?.picture.map((p: Picture) => {
+                                carousel?.picture?.map((p: Picture) => {
                                     return (
-                                        <a href={p.url} target="_blank" key={"Carousel" + p.pictureName}>
+                                        <a href={p.url} target="_blank" key={"Carousel" + p.name}>
                                             <div >
-                                                <img src={fileURL + p.pictureName} alt={p.alt} />
+                                                <img src={fileURL + p.name} alt={p.alt} />
                                                 {/* <p className="legend">Legend 1</p> */}
                                             </div>
                                         </a>
