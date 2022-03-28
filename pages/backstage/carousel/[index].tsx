@@ -2,6 +2,7 @@ import { useAuthStateContext } from "@context/context";
 import { Auth } from "@context/reducer";
 import { Add, Delete, Edit } from "@mui/icons-material";
 import Search from "@mui/icons-material/Search";
+import DateTimePicker from "@mui/lab/DateTimePicker";
 import { Button, FormControlLabel, Grid, Pagination, Switch, TextField, Typography } from "@mui/material";
 import { DataGrid, GridColDef, GridSortModel, GridValueFormatterParams } from "@mui/x-data-grid";
 import { carouselAddApi, carouselApi, carouselByIdApi, carouselDeleteApi, carouselEditByIdApi } from "@pages/api/backstage/carousel/carouselApi";
@@ -28,14 +29,23 @@ interface CarouselList {
     updateUser: string,
 }
 
-interface RoleData {
+interface CarouselData {
     id: number,
     name: string,
-    key: string,
     weight: number,
     status: boolean,
-    remark: string,
-    select: string[],
+    startTime: Date,
+    endTime: Date,
+    picture?: Picture[],
+}
+
+interface Picture {
+    id: number,
+    name: string,
+    alt: string,
+    url: string,
+    status: boolean,
+    weight: number,
 }
 
 interface PageSearch {
@@ -46,7 +56,7 @@ interface PageSearch {
 interface DialogOption {
     title?: string,
     className?: string,
-    data?: RoleData,
+    data?: CarouselData,
 }
 
 export default function Role() {
@@ -214,14 +224,14 @@ export default function Role() {
     }
 
     const emptyInitial = () => {
-        var data: RoleData = {
+        var data: CarouselData = {
             id: 0,
             name: "",
-            key: "",
             weight: 0,
             status: true,
-            remark: "",
-            select: [],
+            startTime: new Date(),
+            endTime: new Date(),
+            picture: [],
         };
         return data;
     }
@@ -235,7 +245,10 @@ export default function Role() {
             var dialogOptionData: DialogOption = dialogOption;
             dialogOptionData.title = "修改";
             dialogOptionData.className = BaseStyle.dialogEditTitle;
-            dialogOptionData.data = resp.data.roleById;
+            var carousel :CarouselData =resp.data.carousel;
+            var pictureData : Picture[] =resp.data.picture;
+            carousel.picture=pictureData;
+            dialogOptionData.data = carousel;
             setDialogOption(dialogOptionData);
             handleClickOpen();
         }).catch(error => {
@@ -247,7 +260,7 @@ export default function Role() {
     //設定dialog 資料儲存
     const setDialogData = (name: any, value: any) => {
         let dialogOptionData: DialogOption;
-        let diaData: RoleData;
+        let diaData: CarouselData;
         dialogOptionData = { ...dialogOption };
         if (dialogOptionData.data == undefined) {
             diaData = emptyInitial();
@@ -430,6 +443,32 @@ export default function Role() {
                                     <Grid item xs={9} md={9} marginLeft={2}>
                                         <TextField fullWidth id="outlined-search" required label="權重" type="number" value={dialogOption.data?.weight}
                                             onChange={e => setDialogData("weight", Number(e.target.value))} />
+                                    </Grid>
+                                </Grid>
+                                <Grid container direction="row" justifyContent="flex-start" alignItems="center" marginBottom={2}>
+                                    <Grid item xs={2} md={2}>
+                                        <Typography align="right">開始時間：</Typography>
+                                    </Grid>
+                                    <Grid item xs={9} md={9} marginLeft={2}>
+                                        <DateTimePicker
+                                            label="開始時間："
+                                            value={dialogOption.data?.startTime}
+                                            onChange={date => setDialogData("startTime", date)}
+                                            renderInput={(params) => <TextField {...params} />}
+                                        />
+                                    </Grid>
+                                </Grid>
+                                <Grid container direction="row" justifyContent="flex-start" alignItems="center" marginBottom={2}>
+                                    <Grid item xs={2} md={2}>
+                                        <Typography align="right">結束時間：</Typography>
+                                    </Grid>
+                                    <Grid item xs={9} md={9} marginLeft={2}>
+                                        <DateTimePicker
+                                            label="結束時間"
+                                            value={dialogOption.data?.endTime}
+                                            onChange={date => setDialogData("endTime", date)}
+                                            renderInput={(params) => <TextField {...params} />}
+                                        />
                                     </Grid>
                                 </Grid>
                                 <Grid container direction="row" justifyContent="flex-start" alignItems="center" >

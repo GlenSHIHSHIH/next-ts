@@ -1,7 +1,9 @@
-import UseAuthState from 'context/context'
-import type { AppProps } from 'next/app'
-import React, { StrictMode } from 'react'
-import '../styles/globals.css'
+import AdapterDateFns from '@mui/lab/AdapterDateFns';
+import LocalizationProvider from '@mui/lab/LocalizationProvider';
+import UseAuthState from 'context/context';
+import type { AppProps } from 'next/app';
+import React, { StrictMode } from 'react';
+import '../styles/globals.css';
 
 function MyApp({ Component, pageProps }: AppProps) {
 
@@ -10,7 +12,10 @@ function MyApp({ Component, pageProps }: AppProps) {
             <UseAuthState>
                 <StrictMode>
                     {/* <Layout> */}
-                    <Component {...pageProps} />
+                    <LocalizationProvider dateAdapter={AdapterDateFns}>
+                        <Component {...pageProps} />
+                    </LocalizationProvider>
+                    {/* <Component {...pageProps} /> */}
                     {/* </Layout> */}
                 </StrictMode>
             </UseAuthState>
