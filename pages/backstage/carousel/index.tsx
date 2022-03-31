@@ -2,20 +2,17 @@ import { useAuthStateContext } from "@context/context";
 import { Auth } from "@context/reducer";
 import { Add, Delete, Edit } from "@mui/icons-material";
 import Search from "@mui/icons-material/Search";
-import DateTimePicker from "@mui/lab/DateTimePicker";
-import { Button, FormControlLabel, Grid, Pagination, Switch, TextField, Typography } from "@mui/material";
+import { Button, Grid, Pagination, TextField } from "@mui/material";
 import { DataGrid, GridColDef, GridSortModel, GridValueFormatterParams } from "@mui/x-data-grid";
-import { carouselAddApi, carouselApi, carouselByIdApi, carouselDeleteApi, carouselEditByIdApi } from "@pages/api/backstage/carousel/carouselApi";
+import { carouselApi, carouselDeleteApi } from "@pages/api/backstage/carousel/carouselApi";
 import { PageMutlSearchData } from "@pages/api/backstage/utilApi";
-import BaseStyle from "@styles/page/backstage/Base.module.css";
 import { featureRole, setValueToInterfaceProperty } from "@utils/base_fucntion";
 import AlertFrame, { AlertMsg, setAlertAutoClose, setAlertData } from "component/backstage/AlertFrame";
 import AuthLayout from "component/backstage/AuthLayout";
-import DraggableDialog from "component/backstage/Dialogs";
 import Navigation from "component/backstage/Navigation";
 import moment from "moment";
+import { useRouter } from "next/router";
 import React, { ChangeEvent, useEffect, useState } from "react";
-
 interface CarouselList {
     id: number,
     name: string,
@@ -53,23 +50,18 @@ interface PageSearch {
     key?: string,
 }
 
-interface DialogOption {
-    title?: string,
-    className?: string,
-    data?: CarouselData,
-}
 
-export default function Role() {
+export default function Carousel() {
     let title = "輪詢圖介面";
 
     const { state, dispatch } = useAuthStateContext();
     const auth: Auth = state;
+    const router = useRouter();
     const [pAdd, setPAdd] = useState<boolean>(false);
     const [pEdit, setPEdit] = useState<boolean>(false);
     const [pDelete, setPDelete] = useState<boolean>(false);
     const [CarouselList, setCarouselList] = useState<CarouselList[]>([]);
     const [checkboxItem, setCheckboxItem] = useState<string>("");
-    const [dialogOption, setDialogOption] = useState<DialogOption>({});
     const [sendCount, setSendCount] = useState<number>(0);
     const [pageSearch, setPageSearch] = useState<PageSearch>();
     const [alertMsg, setAlertMsg] = useState<AlertMsg>({ msg: "", show: false });
@@ -174,103 +166,26 @@ export default function Role() {
         setSendCount(++count);
     }
 
-    // 新增與修改彈跳視窗 dialog
-    const [open, setOpen] = React.useState(false);
-
-    const handleClickOpen = () => {
-        setOpen(true);
-    };
-
-    const handleClose = () => {
-        setOpen(false);
-    };
-
-    const saveHandle = (e: any) => {
-        e.preventDefault();
-
-        if (dialogOption?.title == "新增") {
-            carouselAddApi(dialogOption.data, auth)?.then((resp: any) => {
-                var alertData = setAlertData(alertMsg, "新增成功", true, "success");
-                setAlertMsg(alertData);
-                sendHandle();
-                handleClose();
-            }).catch(error => {
-                var alertData = setAlertData(alertMsg, error.response?.data?.msg ?? "新增失敗", true, "error");
-                setAlertMsg(alertData);
-            });
-
-        } else {
-            carouselEditByIdApi(dialogOption.data, auth)?.then((resp: any) => {
-                var alertData = setAlertData(alertMsg, "id:" + dialogOption.data?.id + ", 修改成功", true, "success");
-                setAlertMsg(alertData);
-                sendHandle();
-                handleClose();
-            }).catch(error => {
-                var alertData = setAlertData(alertMsg, "id:" + dialogOption.data?.id + "," + error.response?.data?.msg ?? " 修改失敗", true, "error");
-                setAlertMsg(alertData);
-            });
-        }
-
-    };
-
     //add
     const addHandle = () => {
-        handleClickOpen();
-        var dialogOptionData: DialogOption = dialogOption;
-        dialogOptionData.title = "新增";
-        dialogOptionData.className = BaseStyle.dialogAddTitle;
-        dialogOptionData.data = emptyInitial();
-        setDialogOption(dialogOptionData)
+        router.push({
+            pathname: '/backstage/carousel/[id]',
+            query: { id: "create" },
+          });
     }
 
-    const emptyInitial = () => {
-        var data: CarouselData = {
-            id: 0,
-            name: "",
-            weight: 0,
-            status: true,
-            startTime: new Date(),
-            endTime: new Date(),
-            picture: [],
-        };
-        return data;
-    }
     //edit
     const editHandle = (id: string) => {
         let ids = checkboxItem;
         if (id != "") {
             ids = id;
         }
-        carouselByIdApi(ids, auth)?.then((resp: any) => {
-            var dialogOptionData: DialogOption = dialogOption;
-            dialogOptionData.title = "修改";
-            dialogOptionData.className = BaseStyle.dialogEditTitle;
-            var carousel :CarouselData =resp.data.carousel;
-            var pictureData : Picture[] =resp.data.picture;
-            carousel.picture=pictureData;
-            dialogOptionData.data = carousel;
-            setDialogOption(dialogOptionData);
-            handleClickOpen();
-        }).catch(error => {
-            var alertData = setAlertData(alertMsg, error.response?.data?.msg ?? "抓取資料錯誤", true, "error");
-            setAlertMsg(alertData);
-        });
+        router.push({
+            pathname: '/backstage/carousel/[id]',
+            query: { id: ids },
+          });
     }
 
-    //設定dialog 資料儲存
-    const setDialogData = (name: any, value: any) => {
-        let dialogOptionData: DialogOption;
-        let diaData: CarouselData;
-        dialogOptionData = { ...dialogOption };
-        if (dialogOptionData.data == undefined) {
-            diaData = emptyInitial();
-        } else {
-            diaData = { ...dialogOptionData.data };
-        }
-        diaData = setValueToInterfaceProperty(diaData, name, value);
-        dialogOptionData.data = diaData;
-        setDialogOption(dialogOptionData);
-    }
 
     const columns: GridColDef[] = [
         {
@@ -400,7 +315,8 @@ export default function Role() {
                                 <Button variant="contained" color="primary" size="medium" style={{ height: '56px' }} endIcon={<Add />} onClick={addHandle}>
                                     Add
                                 </Button>
-                            </Grid>}
+                            </Grid>
+                        }
                         {pEdit &&
                             <Grid item >
                                 <Button variant="contained" color="success" size="medium" style={{ height: '56px' }} endIcon={<Edit />}
@@ -408,7 +324,8 @@ export default function Role() {
                                     disabled={(checkboxItem.split(",").length != 1 || checkboxItem == "")}>
                                     Edit
                                 </Button>
-                            </Grid>}
+                            </Grid>
+                        }
                         {pDelete &&
                             <Grid item >
                                 <Button variant="contained" color="error" size="medium" style={{ height: '56px' }} endIcon={<Delete />}
@@ -416,72 +333,8 @@ export default function Role() {
                                     disabled={(checkboxItem.split(",").length < 1 || checkboxItem == "")}>
                                     Delete
                                 </Button>
-                            </Grid>}
-                    </Grid>
-                    <Grid container item direction="row" xs={10} >
-                        <DraggableDialog
-                            title={dialogOption.title ?? ""}
-                            open={open}
-                            closeHandle={handleClose}
-                            saveHandle={saveHandle}
-                            className={dialogOption.className ?? ""}
-                        >
-                            <Grid container direction="column" justifyContent="center" alignItems="flex-start">
-                                <Grid container direction="row" justifyContent="flex-start" alignItems="center" marginBottom={2}>
-                                    <Grid item xs={2} md={2}>
-                                        <Typography align="right">名稱：</Typography>
-                                    </Grid>
-                                    <Grid item xs={9} md={9} marginLeft={2}>
-                                        <TextField fullWidth id="outlined-search" required label="名稱" value={dialogOption.data?.name}
-                                            onChange={e => setDialogData("name", e.target.value)} />
-                                    </Grid>
-                                </Grid>
-                                <Grid container direction="row" justifyContent="flex-start" alignItems="center" marginBottom={2}>
-                                    <Grid item xs={2} md={2}>
-                                        <Typography align="right">權重：</Typography>
-                                    </Grid>
-                                    <Grid item xs={9} md={9} marginLeft={2}>
-                                        <TextField fullWidth id="outlined-search" required label="權重" type="number" value={dialogOption.data?.weight}
-                                            onChange={e => setDialogData("weight", Number(e.target.value))} />
-                                    </Grid>
-                                </Grid>
-                                <Grid container direction="row" justifyContent="flex-start" alignItems="center" marginBottom={2}>
-                                    <Grid item xs={2} md={2}>
-                                        <Typography align="right">開始時間：</Typography>
-                                    </Grid>
-                                    <Grid item xs={9} md={9} marginLeft={2}>
-                                        <DateTimePicker
-                                            label="開始時間："
-                                            value={dialogOption.data?.startTime}
-                                            onChange={date => setDialogData("startTime", date)}
-                                            renderInput={(params) => <TextField {...params} />}
-                                        />
-                                    </Grid>
-                                </Grid>
-                                <Grid container direction="row" justifyContent="flex-start" alignItems="center" marginBottom={2}>
-                                    <Grid item xs={2} md={2}>
-                                        <Typography align="right">結束時間：</Typography>
-                                    </Grid>
-                                    <Grid item xs={9} md={9} marginLeft={2}>
-                                        <DateTimePicker
-                                            label="結束時間"
-                                            value={dialogOption.data?.endTime}
-                                            onChange={date => setDialogData("endTime", date)}
-                                            renderInput={(params) => <TextField {...params} />}
-                                        />
-                                    </Grid>
-                                </Grid>
-                                <Grid container direction="row" justifyContent="flex-start" alignItems="center" >
-                                    <Grid item xs={2} md={2}>
-                                        <Typography align="right">狀態：</Typography>
-                                    </Grid>
-                                    <Grid item xs={9} md={9} marginLeft={2}>
-                                        <FormControlLabel label="狀態" control={<Switch defaultChecked={dialogOption.data?.status}
-                                            onChange={(e, checked) => setDialogData("status", checked)} />} />
-                                    </Grid>
-                                </Grid>
                             </Grid>
-                        </DraggableDialog>
+                        }
                     </Grid>
                     <Grid container item direction="row" xs={10} >
                         <DataGrid
