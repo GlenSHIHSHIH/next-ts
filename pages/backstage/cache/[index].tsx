@@ -9,38 +9,7 @@ import AuthLayout from "component/backstage/AuthLayout";
 import Navigation from "component/backstage/Navigation";
 import React, { useEffect, useState } from "react";
 
-interface MenuViewList {
-    id: number,
-    name: string,
-    key: string,
-    url: string,
-    feature: string,
-    parent: string,
-    weight: number,
-    status: boolean,
-    remark: string,
-}
-
-interface MenuParentList {
-    id: number,
-    name: string,
-}
-
-interface MenuSearch {
-    name?: string,
-    key?: string,
-    url?: string,
-    feature?: string,
-    parent?: string,
-}
-
-interface DialogOption {
-    title?: string,
-    className?: string,
-    data?: MenuViewList,
-}
-
-export default function Menu() {
+export default function Cache() {
     let title = "cache介面";
 
     const { state, dispatch } = useAuthStateContext();
