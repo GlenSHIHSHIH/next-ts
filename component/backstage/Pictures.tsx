@@ -58,7 +58,7 @@ const Pictures: React.FC<PicturesProp> = (props: any) => {
                     <TextField fullWidth id="outlined-search" required label="id" value={id} disabled />
                 </Grid>
             </Grid>
-            <Grid container direction="row" justifyContent="flex-start" alignItems="center" >
+            <Grid container direction="row" justifyContent="flex-start" alignItems="center" marginBottom={2}>
                 <Grid item xs={2} md={2}>
                     <Typography align="right">圖片：</Typography>
                 </Grid>
@@ -66,13 +66,13 @@ const Pictures: React.FC<PicturesProp> = (props: any) => {
                     <img src={pictureUrl} height={pictureUrl ? height : 0} width={pictureUrl ? width : 0} />
                     <label >
                         <Input type="file" id="contained-button-file" onChange={addImg} sx={{ display: 'none' }} />
-                        <Button variant="contained" component="div">
+                        <Button variant="contained" component="div" size="medium">
                             Upload
                         </Button>
                     </label>
                 </Grid>
             </Grid>
-            <Grid container direction="row" justifyContent="flex-start" alignItems="center" >
+            {/* <Grid container direction="row" justifyContent="flex-start" alignItems="center" >
                 <Grid item xs={2} md={2}>
                     <Typography align="right">狀態：</Typography>
                 </Grid>
@@ -80,7 +80,7 @@ const Pictures: React.FC<PicturesProp> = (props: any) => {
                     <FormControlLabel label="狀態" control={<Switch defaultChecked={status}
                         onChange={(e, checked) => setPictureData(index, "status", checked)} />} />
                 </Grid>
-            </Grid>
+            </Grid> */}
             {/* <Grid container direction="row" justifyContent="flex-start" alignItems="center" marginBottom={2}>
                 <Grid item xs={2} md={2}>
                     <Typography align="right">名稱：</Typography>
@@ -115,6 +115,15 @@ const Pictures: React.FC<PicturesProp> = (props: any) => {
                 <Grid item xs={6} md={6} marginLeft={2}>
                     <TextField fullWidth id="outlined-search" required label="權重" type="number" value={weight}
                         onChange={e => setPictureData(index, "weight", e.target.value)} />
+                </Grid>
+            </Grid>
+            <Grid container direction="row" justifyContent="flex-start" alignItems="center" >
+                <Grid item xs={2} md={2}>
+                    <Typography align="right">狀態：</Typography>
+                </Grid>
+                <Grid item xs={6} md={6} marginLeft={2}>
+                    <FormControlLabel label="狀態" control={<Switch defaultChecked={status}
+                        onChange={(e, checked) => setPictureData(index, "status", checked)} />} />
                 </Grid>
             </Grid>
             <Grid container direction="row" justifyContent="center" alignItems="center" marginBottom={2} marginTop={2}>
