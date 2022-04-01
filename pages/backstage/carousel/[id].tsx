@@ -3,7 +3,7 @@ import { Auth } from '@context/reducer';
 import Addicon from '@mui/icons-material/Add';
 import { DateTimePicker } from '@mui/lab';
 import { Button, FormControlLabel, Grid, IconButton, Switch, TextField, Typography } from "@mui/material";
-import { carouselByIdApi } from '@pages/api/backstage/carousel/carouselApi';
+import { carouselByIdApi, carouselEditByIdApi } from '@pages/api/backstage/carousel/carouselApi';
 import { setValueToInterfaceProperty } from '@utils/base_fucntion';
 import AlertFrame, { AlertMsg, setAlertAutoClose, setAlertData } from "component/backstage/AlertFrame";
 import AuthLayout from 'component/backstage/AuthLayout';
@@ -51,25 +51,23 @@ export default function CarouselFeature() {
 
     const { state, dispatch } = useAuthStateContext();
     const auth: Auth = state;
-    const router = useRouter();
-    const { id } = router.query;
     const [alertMsg, setAlertMsg] = useState<AlertMsg>({ msg: "", show: false });
     const [picture, setPicture] = useState<Picture[]>([]);
     const [carousel, setCarousel] = useState<CarouselData>(StructInitial());
     const [title, setTitle] = useState<string>("");
+    const [pId, setPId] = useState<string | string[] | undefined>(useRouter().query['id']);
 
     useEffect(() => {
-        var sId: string = id?.toString() ?? "";
-        if (isNaN(Number(id))) {
-            setTitle("輪詢圖新增任務");
+        var sId: string = pId?.toString() ?? "";
+        if (isNaN(Number(sId))) {
+            setTitle("新增");
         } else if (sId.length > 0) {
-            setTitle("輪詢圖修改任務");
+            setTitle("修改");
             getDataListForEdit(sId);
         }
-    }, [title]);
+    }, []);
 
     useEffect(() => {
-
     }, [carousel, picture]);
 
     //切換成 edit
@@ -108,7 +106,6 @@ export default function CarouselFeature() {
     }
 
     const deletePicture = (pIndex: number) => {
-        console.log("deletePicture");
         var pData: Picture[] = [...picture];
         // delete pData[pIndex];
         pData = pData.filter((value: Picture, index: number) => { return index != pIndex });
@@ -122,7 +119,16 @@ export default function CarouselFeature() {
     }
 
     const sned = () => {
-        console.log(picture);
+        var cData: CarouselData = { ...carousel };
+        var pData: Picture[] = [...picture];
+        cData.picture = pData;
+        carouselEditByIdApi(cData, auth)?.then((resp: any) => {
+            console.log(resp);
+        }).catch(error => {
+            var alertData = setAlertData(alertMsg, error.response?.data?.msg ?? "抓取資料錯誤", true, "error");
+            setAlertMsg(alertData);
+        });
+        console.log(cData);
     }
 
     //資料儲存
@@ -135,7 +141,7 @@ export default function CarouselFeature() {
 
     return (
         <AuthLayout>
-            <Navigation title={title}>
+            <Navigation title={"輪詢圖" + title + "任務"}>
                 {alertMsg.show && <AlertFrame
                     strongContent={alertMsg.msg}
                     alertType={alertMsg.type ?? "error"}
@@ -144,8 +150,10 @@ export default function CarouselFeature() {
                     autoHide={4000} />}
                 <Grid container direction="column" justifyContent="center" alignItems="flex-start">
                     <Grid container direction="row" justifyContent="flex-start" alignItems="center" marginBottom={2}>
+                        <Grid item xs={1} md={1}>
+                        </Grid>
                         <Grid item xs={3} md={3}>
-                            <Typography variant="h5" align="right">新增任務</Typography>
+                            <Typography variant="h5">{title}輪詢圖任務</Typography>
                         </Grid>
                     </Grid>
                     <Grid container direction="row" justifyContent="flex-start" alignItems="center" marginBottom={2}>
@@ -191,11 +199,6 @@ export default function CarouselFeature() {
                                 renderInput={(params) => <TextField {...params} />}
                             />
                         </Grid>
-                        <Grid container direction="row" justifyContent="flex-start" alignItems="center" marginBottom={2} marginTop={3}>
-                            <Grid item xs={3} md={3}>
-                                <Typography variant="h5" align="right">新增任務圖片</Typography>
-                            </Grid>
-                        </Grid>
                     </Grid>
                     <Grid container direction="row" justifyContent="flex-start" alignItems="center" >
                         <Grid item xs={2} md={2}>
@@ -206,10 +209,16 @@ export default function CarouselFeature() {
                                 onChange={(e, checked) => setStructData("status", checked)} />} />
                         </Grid>
                     </Grid>
+                    <Grid container direction="row" justifyContent="flex-start" alignItems="center" marginBottom={2} marginTop={3}>
+                        <Grid item xs={1} md={1}>
+                        </Grid>
+                        <Grid item xs={3} md={3}>
+                            <Typography variant="h5">任務圖片</Typography>
+                        </Grid>
+                    </Grid>
                 </Grid>
 
                 {picture.map((p: Picture, index: number) => {
-                    console.log(index);
                     return (
                         <div key={index}>
                             <Pictures id={p.id} index={index} name={p.name} pictureUrl={p.pictureUrl}
@@ -225,12 +234,12 @@ export default function CarouselFeature() {
                 }
                 <Grid container direction="row" justifyContent="flex-start" alignItems="center" marginBottom={2}>
                     <Grid item xs={2} md={2}>
-                        <IconButton aria-label="delete" size="large" onClick={addPictureStruct}>
+                        <IconButton aria-label="delete" size="large" style={{ float: "right" }} onClick={addPictureStruct}>
                             <Addicon fontSize="inherit" />
                         </IconButton>
                     </Grid>
                     <Grid item xs={6} md={6} marginLeft={2}>
-                        <Button style={{ float: "right" }} onClick={sned}>send</Button>
+                        <Button style={{ float: "right" }} variant="contained" onClick={sned}>Save</Button>
                     </Grid>
                 </Grid>
 

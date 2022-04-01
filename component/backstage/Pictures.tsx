@@ -66,8 +66,8 @@ const Pictures: React.FC<PicturesProp> = (props: any) => {
                     <img src={pictureUrl} height={pictureUrl ? height : 0} width={pictureUrl ? width : 0} />
                     <label >
                         <Input type="file" id="contained-button-file" onChange={addImg} sx={{ display: 'none' }} />
-                        <Button variant="contained" component="div" size="medium">
-                            Upload
+                        <Button variant="contained" component="div" size="medium" color={(pictureUrl == "") ? "primary" :"error"}>
+                            {(pictureUrl == "") ? "Upload" : "Change"}
                         </Button>
                     </label>
                 </Grid>
@@ -127,7 +127,7 @@ const Pictures: React.FC<PicturesProp> = (props: any) => {
                 </Grid>
             </Grid>
             <Grid container direction="row" justifyContent="center" alignItems="center" marginBottom={2} marginTop={2}>
-                <Grid  item xs={10} md={10} >
+                <Grid item xs={10} md={10} >
                     <Divider ></Divider>
                 </Grid>
             </Grid>
