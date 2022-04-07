@@ -16,13 +16,15 @@ interface PicturesProp {
     weight: number,
     height: number,
     width: number,
+    size: number,//mb
     setAlertMsgData: (text: string) => void,
     delPicture: (pIndex: number) => void,
     setPictureData: (pIndex: number, name: any, data: any) => void,
 }
 
 const Pictures: React.FC<PicturesProp> = (props: any) => {
-    const { id, index, name, pictureUrl, alt, url, status, weight, height, width, setAlertMsgData, delPicture, setPictureData } = props;
+    const { id, index, name, pictureUrl, alt, url, status, weight, height, width, size, setAlertMsgData, delPicture, setPictureData } = props;
+    const mb = 1024 * 1024;
     const addImg = (event: React.ChangeEvent<HTMLInputElement>) => {
         var filter = /^(?:image\/bmp|image\/cis\-cod|image\/gif|image\/ief|image\/jpeg|image\/jpeg|image\/jpeg|image\/pipeg|image\/png|image\/svg\+xml|image\/tiff|image\/x\-cmu\-raster|image\/x\-cmx|image\/x\-icon|image\/x\-portable\-anymap|image\/x\-portable\-bitmap|image\/x\-portable\-graymap|image\/x\-portable\-pixmap|image\/x\-rgb|image\/x\-xbitmap|image\/x\-xpixmap|image\/x\-xwindowdump)$/i;
         var reader = new FileReader();
@@ -35,6 +37,12 @@ const Pictures: React.FC<PicturesProp> = (props: any) => {
             setAlertMsgData("文件必須為圖片!");
             return;
         }
+
+        if (file.size > mb * size) {
+            setAlertMsgData("圖片需小於" + size + "MB!");
+            return;
+        }
+
         reader.readAsDataURL(file);
         reader.onloadend = function (e) {
             setPictureData(index, "pictureUrl", reader.result);
@@ -66,7 +74,7 @@ const Pictures: React.FC<PicturesProp> = (props: any) => {
                     <img src={pictureUrl} height={pictureUrl ? height : 0} width={pictureUrl ? width : 0} />
                     <label >
                         <Input type="file" id="contained-button-file" onChange={addImg} sx={{ display: 'none' }} />
-                        <Button variant="contained" component="div" size="medium" color={(pictureUrl == "") ? "primary" :"error"}>
+                        <Button variant="contained" component="div" size="medium" color={(pictureUrl == "") ? "primary" : "error"}>
                             {(pictureUrl == "") ? "Upload" : "Change"}
                         </Button>
                     </label>
@@ -114,7 +122,7 @@ const Pictures: React.FC<PicturesProp> = (props: any) => {
                 </Grid>
                 <Grid item xs={6} md={6} marginLeft={2}>
                     <TextField fullWidth id="outlined-search" required label="權重" type="number" value={weight}
-                        onChange={e => setPictureData(index, "weight", e.target.value)} />
+                        onChange={e => setPictureData(index, "weight", Number(e.target.value))} />
                 </Grid>
             </Grid>
             <Grid container direction="row" justifyContent="flex-start" alignItems="center" >
@@ -122,7 +130,7 @@ const Pictures: React.FC<PicturesProp> = (props: any) => {
                     <Typography align="right">狀態：</Typography>
                 </Grid>
                 <Grid item xs={6} md={6} marginLeft={2}>
-                    <FormControlLabel label="狀態" control={<Switch defaultChecked={status}
+                    <FormControlLabel label="狀態" control={<Switch  checked={status}
                         onChange={(e, checked) => setPictureData(index, "status", checked)} />} />
                 </Grid>
             </Grid>

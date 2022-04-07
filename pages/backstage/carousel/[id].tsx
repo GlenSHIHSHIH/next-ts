@@ -3,7 +3,7 @@ import { Auth } from '@context/reducer';
 import Addicon from '@mui/icons-material/Add';
 import { DateTimePicker } from '@mui/lab';
 import { Button, FormControlLabel, Grid, IconButton, Switch, TextField, Typography } from "@mui/material";
-import { carouselByIdApi, carouselEditByIdApi } from '@pages/api/backstage/carousel/carouselApi';
+import { carouselAddApi, carouselByIdApi, carouselEditByIdApi } from '@pages/api/backstage/carousel/carouselApi';
 import { setValueToInterfaceProperty } from '@utils/base_fucntion';
 import AlertFrame, { AlertMsg, setAlertAutoClose, setAlertData } from "component/backstage/AlertFrame";
 import AuthLayout from 'component/backstage/AuthLayout';
@@ -48,24 +48,27 @@ export default function CarouselFeature() {
         };
         return data;
     }
-
+    const router = useRouter();
     const { state, dispatch } = useAuthStateContext();
     const auth: Auth = state;
     const [alertMsg, setAlertMsg] = useState<AlertMsg>({ msg: "", show: false });
     const [picture, setPicture] = useState<Picture[]>([]);
     const [carousel, setCarousel] = useState<CarouselData>(StructInitial());
     const [title, setTitle] = useState<string>("");
-    const [pId, setPId] = useState<string | string[] | undefined>(useRouter().query['id']);
+    const [pId, setPId] = useState<string | string[] | undefined>(router.query['id']);
+    const [style, setStyle] = useState<string>("");
 
     useEffect(() => {
         var sId: string = pId?.toString() ?? "";
         if (isNaN(Number(sId))) {
             setTitle("新增");
+            setStyle("新增");
         } else if (sId.length > 0) {
             setTitle("修改");
             getDataListForEdit(sId);
+            setStyle("修改");
         }
-    }, []);
+    }, [style]);
 
     useEffect(() => {
     }, [carousel, picture]);
@@ -122,13 +125,23 @@ export default function CarouselFeature() {
         var cData: CarouselData = { ...carousel };
         var pData: Picture[] = [...picture];
         cData.picture = pData;
-        carouselEditByIdApi(cData, auth)?.then((resp: any) => {
-            console.log(resp);
-        }).catch(error => {
-            var alertData = setAlertData(alertMsg, error.response?.data?.msg ?? "抓取資料錯誤", true, "error");
-            setAlertMsg(alertData);
-        });
         console.log(cData);
+        if (style == "新增") {
+            carouselAddApi(cData, auth)?.then((resp: any) => {
+                console.log(resp);
+            }).catch(error => {
+                var alertData = setAlertData(alertMsg, error.response?.data?.msg ?? "資料新增錯誤", true, "error");
+                setAlertMsg(alertData);
+            });
+        } else {
+            carouselEditByIdApi(cData, auth)?.then((resp: any) => {
+                console.log(resp);
+                router.push("/backstage/carousel");
+            }).catch(error => {
+                var alertData = setAlertData(alertMsg, error.response?.data?.msg ?? "資料修改錯誤", true, "error");
+                setAlertMsg(alertData);
+            });
+        }
     }
 
     //資料儲存
@@ -205,8 +218,8 @@ export default function CarouselFeature() {
                             <Typography align="right">狀態：</Typography>
                         </Grid>
                         <Grid item xs={9} md={9} marginLeft={2}>
-                            <FormControlLabel label="狀態" control={<Switch defaultChecked={carousel.status}
-                                onChange={(e, checked) => setStructData("status", checked)} />} />
+                            <FormControlLabel label="狀態" control={<Switch checked={carousel.status}
+                             onChange={(e, checked) => setStructData("status", checked)} />} />
                         </Grid>
                     </Grid>
                     <Grid container direction="row" justifyContent="flex-start" alignItems="center" marginBottom={2} marginTop={3}>
@@ -224,8 +237,7 @@ export default function CarouselFeature() {
                             <Pictures id={p.id} index={index} name={p.name} pictureUrl={p.pictureUrl}
                                 alt={p.alt} url={p.url} status={p.status} weight={p.weight}
                                 height={175} width={300} setAlertMsgData={setAlertMsgData}
-                                delPicture={deletePicture}
-                                setPictureData={setPictureData}
+                                size={5} delPicture={deletePicture} setPictureData={setPictureData}
                             >
                             </Pictures>
                         </div>
