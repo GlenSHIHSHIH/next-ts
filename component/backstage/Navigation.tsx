@@ -82,6 +82,9 @@ const Navigation: React.FC<NavigationProp> = (props: any) => {
         };
         fetchData();
     }, []);
+    useEffect(() => {
+
+    }, [openValue]);
 
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
@@ -100,7 +103,7 @@ const Navigation: React.FC<NavigationProp> = (props: any) => {
             }
         }
 
-        return null;
+        return undefined;
     }
 
     const setOpenBoolean = (id: number) => {
@@ -165,7 +168,7 @@ const Navigation: React.FC<NavigationProp> = (props: any) => {
                     <Divider />
                     <List >
                         {menusData.map(({ id, name, child }: MenuNestData) => {
-                            const open = isOpenBoolean(id) || false;
+                            const open = isOpenBoolean(id);
                             return (
                                 <div >
                                     <ListItemButton key={id} onClick={handleClick(id)}>
