@@ -59,11 +59,11 @@ export async function jwtValidate(auth: Auth): Promise<boolean> {
     var apiData = api("get", "/backstage/jwt/check", null, { headers: { Authorization: "Bearer " + auth.authorityJwt?.token } });
     var returnBool = await apiData?.then(res => {
         if (res.data.id > 0) {
-            console.log("驗證 jwt成功");
+            // console.log("驗證 jwt成功");
             return true;
         }
     }).catch(error => {
-        console.log("驗證 jwt失敗");
+        // console.log("驗證 jwt失敗");
         console.log(error);
         return false;
     });
