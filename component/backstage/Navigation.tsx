@@ -77,14 +77,70 @@ const Navigation: React.FC<NavigationProp> = (props: any) => {
             var data = await getNaviApi(state);
             if (data.length > 0) {
                 setMenuList(JSON.parse(data));
+                var menuNestData = newMenuNestDataRoot();
+                menuNestData.child = JSON.parse(data)
+                setNodeParentsIdToOpenValue(menuNestData, router.asPath);
             }
 
         };
         fetchData();
     }, []);
+
     useEffect(() => {
 
     }, [openValue]);
+
+    const newMenuNestDataRoot = () => {
+        var menuNestData: MenuNestData = {
+            id: 0,
+            name: "",
+            key: "",
+            url: "",
+            feature: "",
+            parent: 0,
+            child: [],
+        }
+        return menuNestData;
+    }
+
+    const setNodeParentsIdToOpenValue = (nodes: MenuNestData, url: string) => {
+        let path: number[] = [];
+        function getNodeById(node: MenuNestData, url: string, parentsPath: number[]): MenuNestData | null {
+            let result = null;
+            if (node.url === url) {
+                return node;
+            } else if (Array.isArray(node.child)) {
+                for (let childNode of node.child) {
+                    result = getNodeById(childNode, url, parentsPath);
+                    if (!!result) {
+                        parentsPath.push(node.id);
+                        return result;
+                    }
+                }
+                return result;
+            }
+            return result;
+        }
+
+        var nodeToToggle = getNodeById(nodes, url, path);
+        if (!!nodeToToggle) {
+            path.push(nodeToToggle.id);
+            var openValue: OpenValue[] = [];
+            for (var nodeId of path) {
+                // setOpenBoolean(nodeId);
+                let open: OpenValue = {
+                    id: nodeId,
+                    isopen: true
+                }
+                openValue.push(open);
+            }
+            setOpenValue(openValue);
+
+        } else {
+            console.log("fales:nodeToToggle");
+            console.log(nodeToToggle);
+        }
+    };
 
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
