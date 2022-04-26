@@ -4,7 +4,7 @@ import { Add, Delete, Edit } from "@mui/icons-material";
 import Search from "@mui/icons-material/Search";
 import { Button, FormControlLabel, Grid, Pagination, Switch, TextField, Typography } from "@mui/material";
 import { DataGrid, GridColDef, GridSortModel, GridValueFormatterParams } from "@mui/x-data-grid";
-import { navigationAllApi, roleAddApi, roleApi, roleByIdApi, roleDeleteApi, roleEditByIdApi } from "@pages/api/backstage/role/roleApi";
+import { getMenuAllApi, getProjectMenuAllApi, roleAddApi, roleApi, roleByIdApi, roleDeleteApi, roleEditByIdApi } from "@pages/api/backstage/role/roleApi";
 import { PageMutlSearchData } from "@pages/api/backstage/utilApi";
 import BaseStyle from "@styles/page/backstage/Base.module.css";
 import { featureRole, setValueToInterfaceProperty } from "@utils/base_fucntion";
@@ -37,6 +37,7 @@ interface RoleData {
     status: boolean,
     remark: string,
     select: string[],
+    projectSelect: string[],
 }
 
 interface RoleSearch {
@@ -60,11 +61,23 @@ export default function Role() {
     const [pDelete, setPDelete] = useState<boolean>(false);
     const [roleList, setRoleList] = useState<RoleList[]>([]);
     const [menuAllList, setMenuAllList] = useState<RenderTree>({ id: 0, name: "全選" });
+    const [projMenuAllList, setProjMenuAllList] = useState<RenderTree>({ id: "0,0,0", name: "全選" });
     const [checkboxItem, setCheckboxItem] = useState<string>("");
     const [dialogOption, setDialogOption] = useState<DialogOption>({});
     const [sendCount, setSendCount] = useState<number>(0);
     const [roleSearch, setRoleSearch] = useState<RoleSearch>();
     const [alertMsg, setAlertMsg] = useState<AlertMsg>({ msg: "", show: false });
+    // 樹狀菜單關聯
+    const [selected, setSelected] = React.useState<string[]>([]);
+    const setSelect = (value: string[]) => {
+        setSelected(value);
+    }
+     // 樹狀專案菜單關聯
+    const [projectSelected, setProjectSelected] = React.useState<string[]>([]);
+    const setProjectSelect = (value: string[]) => {
+        setProjectSelected(value);
+    }
+
     const [pageMutlSearchData, setPageMutlSearchData] = useState<PageMutlSearchData>
         ({
             count: 0,
@@ -83,7 +96,8 @@ export default function Role() {
     //取資料
     useEffect(() => {
         getRoleList();
-        getNavigationAllList();
+        getMenuAllList();
+        getProjectMenuAllList();
         let fetchData = async () => {
             setPAdd(await featureRole(auth, "role:create"));
             setPEdit(await featureRole(auth, "role:edit"));
@@ -104,12 +118,23 @@ export default function Role() {
     }
 
     //取菜單權限tree
-    const getNavigationAllList = () => {
-        navigationAllApi(auth)?.then((resp: any) => {
+    const getMenuAllList = () => {
+        getMenuAllApi(auth)?.then((resp: any) => {
             setMenuAllList({ id: 0, name: "全選", child: resp.data.menu });
             // console.log(menuAllList);
         }).catch(error => {
             var alertData = setAlertData(alertMsg, error.response?.data?.msg ?? "菜單權限讀取錯誤", true, "error");
+            setAlertMsg(alertData);
+        });
+    }
+
+    //取專案菜單權限tree
+    const getProjectMenuAllList = () => {
+        getProjectMenuAllApi(auth)?.then((resp: any) => {
+            setProjMenuAllList({ id: "0,0,0", name: "全選", child: resp.data.projectMenu });
+            // console.log(menuAllList);
+        }).catch(error => {
+            var alertData = setAlertData(alertMsg, error.response?.data?.msg ?? "專案菜單權限讀取錯誤", true, "error");
             setAlertMsg(alertData);
         });
     }
@@ -239,6 +264,7 @@ export default function Role() {
             status: true,
             remark: "",
             select: [],
+            projectSelect: [],
         };
         return data;
     }
@@ -262,12 +288,6 @@ export default function Role() {
         });
     }
 
-    // 樹狀資料關聯
-    const [selected, setSelected] = React.useState<string[]>([]);
-    const setSelect = (value: string[]) => {
-        setSelected(value);
-    }
-
     //設定dialog 資料儲存
     const setDialogData = (name: any, value: any) => {
         let dialogOptionData: DialogOption;
@@ -288,6 +308,7 @@ export default function Role() {
         let dialogOptionData = { ...dialogOption };
         if (dialogOptionData.data != undefined) {
             dialogOptionData.data.select = selected;
+            dialogOptionData.data.projectSelect = projectSelected;
         }
         setDialogOption(dialogOptionData);
     }
@@ -494,6 +515,15 @@ export default function Role() {
                                     </Grid>
                                     <Grid item xs={9} md={9} marginLeft={2}>
                                         {RecursiveTreeView(menuAllList, selected, setSelect)}
+
+                                    </Grid>
+                                </Grid>
+                                <Grid container direction="row" justifyContent="flex-start" alignItems="center" >
+                                    <Grid item xs={2} md={2}>
+                                        <Typography align="right">專案權限圖：</Typography>
+                                    </Grid>
+                                    <Grid item xs={9} md={9} marginLeft={2}>
+                                        {RecursiveTreeView(projMenuAllList, projectSelected, setProjectSelect)}
 
                                     </Grid>
                                 </Grid>
